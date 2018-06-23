@@ -1,0 +1,321 @@
+<template>
+  <div class="lineRanking">
+    <div class="flex-between">
+      <div class="header flex-start">
+        <div class="header1"></div>
+        <div class="header2"></div>
+        <htitle data='里程分布'></htitle>
+      </div>
+      <div>
+        <run-real-title width='150px' title="最高里程车辆" padding='0 8px 0 15px'></run-real-title>
+      </div>
+    </div>
+
+    <div class="left">
+      <div class="flex-between">
+        <div class="lc flex-center" :class="{'selected':level1==='里程统计'}" @click='selectLevel1("里程统计")'>里程统计</div>
+        <div class="lc flex-center" :class="{'selected':level1==='里程变化趋势'}" @click='selectLevel1("里程变化趋势")'>里程变化</div>
+        <div class="lc flex-center" :class="{'selected':level1==='里程分布比例'}" @click='selectLevel1("里程分布比例")'>里程分布</div>
+      </div>
+
+      <div class="change flex-between">
+        <div class="flex-center">统计周期</div>
+        <key-value-select width='190px' :data='yearOption' @select='selectYear'></key-value-select>
+        <key-value-select width='130px' :data='monthOption' @select='selectMonth'></key-value-select>
+      </div>
+      <div class="mileageDistributionEchart" v-if="level1==='里程统计'&&mileageStatistics">
+        <loading :data='mileageStatistics'>
+          <bar-more chartTheme="dark" :data="mileageStatistics" :color="[
+                        '#05d0eb',
+                        '#81d9e5',
+                        '#f6ffcb',
+                        '#e75029',
+                        '#038bfc',
+                        '#006a55',
+                      ]" :dataZoom=true yaxisNameL="里程(公里)">
+          </bar-more>
+        </loading>
+      </div>
+      <div class="mileageDistributionEchart" v-if="level1==='里程变化趋势'&&mileageTrend">
+        <loading :data='mileageTrend'>
+          <lineDoubleAxis chartTheme="dark" :data="mileageTrend" :color="[
+                        '#05d0eb',
+                        '#81d9e5',
+                        '#f6ffcb',
+                        '#e75029',
+                        '#038bfc',
+                        '#006a55',
+                      ]" dataZoom=false :property='property' yaxisNameL="费用(万元)" yaxisNameR="数量(次)"></lineDoubleAxis>
+        </loading>
+      </div>
+      <div class="mileageDistributionEchart" v-if="level1==='里程分布比例'&&mileageRatio">
+        <loading :data='mileageRatio'>
+          <pie-rose chartTheme="dark" :data='mileageRatio'></pie-rose>
+        </loading>
+      </div>
+    </div>
+    <!-- <div class="right">
+      <div class="lcTitle">最高里程车辆TOP10</div>
+      <div class="listTitle">
+        <div v-for='(item,index) in listTitle' :key='index'>{{item}}</div>
+      </div>
+      <ul>
+        <li v-for="(item,index) in topMileage" :key='index'>
+          <div :title="item.ranking">{{item.ranking}}</div>
+          <div :title="item.cljcxx&&item.cljcxx.plate_number">{{item.cljcxx&&item.cljcxx.plate_number}}</div>
+          <div :title="item.total_km">{{item.total_km}}</div>
+        </li>
+      </ul>
+    </div> -->
+  </div>
+</template>
+
+<script>
+import { mapState, mapActions } from 'vuex'
+import KeyValueSelect from '../../../components/KeyValueSelect'
+import Dictionary from '../../../util/dictionary'
+import lineDoubleAxis from '../../../components/charts/mileageLineDoubleAxis'
+import pieRose from '../../../components/charts/pieRose'
+import barMore from '../../../components/charts/barMore'
+import htitle from '../../../components/companysecure/title'
+import RunRealTitle from '../../../components/companymanage/RunRealTitle'
+
+const { date } = Dictionary
+export default {
+  components: {
+    KeyValueSelect,
+    lineDoubleAxis,
+    htitle,
+    pieRose,
+    RunRealTitle,
+    barMore,
+  },
+  computed: {
+    ...mapState('maintitlemsg', ['selectedEntity']),
+    ...mapState('manageMileageDistribution', [
+      'mileageStatistics',
+      'mileageTrend',
+      'mileageRatio',
+      'topMileage',
+    ]),
+    property() {
+      const p = [
+        {
+          name: '平均里程',
+          type: 'line',
+          axis: 1,
+        },
+        {
+          name: '总里程',
+          type: 'line',
+          axis: 0,
+        },
+      ]
+      return p
+    },
+  },
+  methods: {
+    ...mapActions('manageMileageDistribution', [
+      'getMileageStatistics',
+      'getMileageTrend',
+      'getMileageRatio',
+    ]),
+
+    fetchData() {
+      const action = {
+        里程统计: () => {
+          this.getMileageStatistics({
+            // entity_id: this.selectedEntity.entity_id,
+            entity_id: '1310000010010000',
+            year: this.year,
+            month: this.month,
+          })
+        },
+        里程变化趋势: () => {
+          this.getMileageTrend({
+            // entity_id: this.selectedEntity.entity_id,
+            entity_id: '1310000010010000',
+            year: this.year,
+            month: this.month,
+          })
+        },
+        里程分布比例: () => {
+          this.getMileageRatio({
+            // entity_id: this.selectedEntity.entity_id,
+            entity_id: '1310000010010000',
+            year: this.year,
+            month: this.month,
+          })
+        },
+      }
+      action[this.level1]()
+    },
+    selectLevel1(item) {
+      this.level1 = item
+      this.fetchData()
+    },
+    selectYear(item) {
+      this.year = item.value
+      this.fetchData()
+    },
+    selectMonth(item) {
+      this.month = item.value
+      this.fetchData()
+    },
+  },
+
+  data: () => ({
+    // listTitle: ['排名', '车牌号', '车队', '里程数'],
+    listTitle: ['排名', '车牌号', '里程数'],
+    yearOption: [{ label: '全部', value: null }, ...date.year],
+    monthOption: [{ label: '全部', value: null }, ...date.month],
+    level1: '里程分布比例',
+    year: 2017,
+    month: 11,
+  }),
+}
+</script>
+
+<style lang="scss" scoped>
+.lineRanking {
+  width: 100%;
+  height: 100%;
+  .lcTitle {
+    height: 30px;
+    margin-bottom: 10px;
+    line-height: 25px;
+    background: rgba(129, 217, 229, 0.3);
+    text-indent: 20px;
+    font-size: 16px;
+    color: #89dddf;
+  }
+
+  .lcTitle {
+    width: 131px;
+  }
+  .left {
+    margin: 10px auto;
+    height: 220px;
+    .lc {
+      width: 33.3%;
+      height: 25px;
+      box-sizing: border-box;
+      color: #b5b5b5;
+      font-size: 14px;
+      border: 1px solid rgba(0, 191, 229, 1);
+      background: rgba(0, 191, 229, 0.2);
+      cursor: pointer;
+      &.selected {
+        background: rgba(0, 191, 229, 0.5);
+        color: #ffffff;
+      }
+    }
+   
+    // .lc:hover {
+    //   background: rgba(0, 191, 229, 0.5);
+    //   color: #ffffff;
+    // }
+    .change {
+      height: 25px;
+      margin: 5px auto;
+      div {
+        height: 25px;
+        color: #b5b5b5;
+      }
+    }
+    .mileageDistributionEchart {
+      clear: both;
+      height: 160px;
+      // background: lightblue;
+    }
+  }
+  .right {
+    float: left;
+    width: 279px;
+    height: 220px;
+    .listTitle {
+      clear: both;
+      height: 25px;
+      margin-bottom: 10px;
+      div {
+        float: left;
+        height: 25px;
+        margin-left: 10px;
+        box-sizing: border-box;
+        text-align: center;
+        line-height: 22px;
+        border: 1px solid #81d9e5;
+        color: #b5b5b5;
+        font-size: 16px;
+        width: 90px;
+      }
+      div:nth-child(1) {
+        margin-left: 0px;
+        width: 60px;
+      }
+      div:nth-child(4) {
+        width: 100px;
+      }
+    }
+    ul::-webkit-scrollbar {
+      background: rgba(0, 191, 229, 0.5);
+      width: 6px;
+    }
+    ul::-webkit-scrollbar-thumb {
+      background: rgba(0, 191, 229, 1);
+    }
+    ul {
+      list-style: none;
+      height: 145px;
+      overflow-y: scroll;
+      color: #b5b5b5;
+      li {
+        margin-bottom: 5px;
+        height: 25px;
+        cursor: pointer;
+        div {
+          float: left;
+          height: 25px;
+          box-sizing: border-box;
+          line-height: 23px;
+          text-align: center;
+          border: 1px solid rgba(0, 191, 229, 1);
+          background: rgba(0, 191, 229, 0.2);
+          width: 90px;
+          margin-left: 10px;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+        div:nth-child(1) {
+          width: 60px;
+          margin-left: 0;
+        }
+        div:last-child {
+          width: 84px;
+        }
+      }
+      li:hover div {
+        background: rgba(0, 191, 229, 0.5);
+        color: #ffffff;
+      }
+    }
+  }
+  .header {
+    width: 245px;
+    height: 30px;
+    background: rgba(3, 139, 252, 0.3);
+  }
+  .header1 {
+    width: 4px;
+    height: 100%;
+    background: #81d9e5;
+  }
+  .header2 {
+    width: 10px;
+    height: 100%;
+    background: #81d9e5;
+    margin-left: 10px;
+  }
+}
+</style>

@@ -1,0 +1,879 @@
+<template>
+  <div class="tyreConfiguration">
+    <div class="tyreConfiguration-line"></div>
+    <div class="tyreConfiguration-title">
+      轮胎配置信息
+    </div>
+    <loading :data="ltsyxxData">
+      <div class="tyreConfiguration-content clearfix">
+        <!-- 搜索信息 -->
+        <div class="tyreConfiguration_content_search">
+          <drop-down-box :items="tirePosiData"
+                         @selected='getItem'></drop-down-box>
+          <!-- v-if="qcar===vehicleType" -->
+          <!-- <drop-down-box :items="tirePosiData"
+                         v-if="hcar===vehicleType"
+                         @selected='getItem'></drop-down-box>
+          <drop-down-box :items="tirePosiData"
+                         v-if="bcar===vehicleType"
+                         @selected='getItem'></drop-down-box> -->
+        </div>
+        <!-- 配置信息 -->
+        <div class="configurationInfo">
+          <div class="items"
+               v-if="detailesBoxShow===1">
+            <div class="brandTitle">轮胎编号
+              <i></i>
+            </div>
+            <div class="drivingMileageTitle">行驶里程
+              <i></i>
+            </div>
+            <div class="brandName"
+                 v-if="selectedTireInfo">
+              <div class="rotateBox"></div>
+              {{selectedTireInfo.brandData}}
+            </div>
+            <div class="drivingMileage"
+                 v-if="selectedTireInfo">
+              <div class="rotateBox"></div>{{selectedTireInfo.totalDrivedKmData}}公里</div>
+            <div class="repaireCountTitle">维修次数
+              <i></i>
+            </div>
+            <div class="changeAlarmTitle">更换报警
+              <i></i>
+            </div>
+            <div class="changeAlarm"
+                 v-if="selectedTireInfo">
+              <div class="rotateBox"></div>
+              {{selectedTireInfo.repaireCountData}}
+            </div>
+            <div class="repaireCount">
+              <div class="rotateBox"></div>
+              <div class="before"
+                   v-if="alarmChange">
+                <div class="alarmRation"
+                     :class="{alarmColor:alarmColor}"
+                     v-for="item in alarmChange.ratio"
+                     :key="item.id">
+                </div>
+              </div>
+              <div class="after">
+                <div class="alarmRationBgc"
+                     v-for="item in 20"
+                     :key="item.id">
+                </div>
+              </div>
+              <!-- 显示里程信息 -->
+              <div class="showDrivingMileageInfo">
+                <div class="ratedKmWrap">
+                  <p class="title">轮胎额定行驶里程</p>
+                  <p class="MileageInfo"
+                     v-if="selectedTireInfo">{{selectedTireInfo.RatedKMData||''}}公里</p>
+                </div>
+                <div class="middleBoder">
+                  <div></div>
+                  <div></div>
+                </div>
+                <div class="totalDrivedKmWrap"
+                     v-if="alarmChange">
+                  <p class="title">轮胎累计行驶里程</p>
+                  <p class="MileageInfo">{{selectedTireInfo.totalDrivedKmData}}公里</p>
+                </div>
+              </div>
+            </div>
+            <div class="tireDetailsButton"
+                 @click="ConfigDetailsBtn"
+                 :class="{btnHightLight:configDetailsShow}">轮胎配置详细信息</div>
+          </div>
+          <div class="items"
+               v-if="detailesBoxShow===2">
+            <div class="brandTitle">轮胎胎压
+              <i></i>
+            </div>
+            <!-- 注意单位和图标 -->
+            <div class="brandName"
+                 v-if="selectedTireInfo">
+              <div class="rotateBox"></div>
+              {{selectedTireInfo.tyrePressureData}}
+            </div>
+          </div>
+          <!-- <div class="tyreImg"></div> -->
+          <div class="prev"
+               @click="scrollContent(-1)">
+            <i></i>
+          </div>
+          <div class="next"
+               @click="scrollContent(1)">
+            <i></i>
+          </div>
+        </div>
+      </div>
+    </loading>
+    <slot></slot>
+    <div v-show="false">{{tirePosiData}}</div>
+    <div v-show="false">{{selectedTireInfo}}</div>
+    <div v-show="false">{{alarmChange}}</div>
+  </div>
+</template>
+
+<script>
+/*eslint-disable */
+import { mapState } from "vuex";
+import PopUpFrame from "@/components/PopUpFrame";
+import DropDownBox from "../car/DropDownBox";
+import PopUpWidget from "../car/PopUpWidget";
+
+export default {
+  props: ["ltsyxxData", "ltghxxData"],
+  name: "tyre-configuration",
+  components: {
+    DropDownBox,
+    PopUpFrame,
+    PopUpWidget
+  },
+  data() {
+    return {
+      hcar: "货车",
+      qcar: "牵引车",
+      bcar: "半挂车",
+      tireSelected: "",
+      alarmColor: false,
+      configDetailsShow: false,
+      turnsDetailsShow: false,
+      repaireDetailsShow: false,
+      vehicleType: null,
+      detailesBoxShow: 1
+    };
+  },
+  computed: {
+    ...mapState("carModelsSearchContainer", ["cljcxxData"]),
+    tirePosiData() {
+      if (
+        this.ltsyxxData &&
+        this.ltsyxxData !== undefined &&
+        this.ltsyxxData !== null
+      ) {
+        const tirePositions =
+          this.ltsyxxData &&
+          this.ltsyxxData.ltwz_relate_info &&
+          this.ltsyxxData.ltwz_relate_info
+            .map(item => item.tire_position)
+            .filter(t => t !== undefined && t !== null);
+        this.tireSelected = tirePositions[0];
+        return tirePositions;
+      }
+      return "";
+    },
+    selectedTireInfo() {
+      if (
+        this.ltsyxxData &&
+        this.ltsyxxData !== undefined &&
+        this.ltsyxxData !== null
+      ) {
+        // 轮胎编号
+        const brand =
+          this.ltsyxxData &&
+          this.ltsyxxData.ltwz_relate_info &&
+          this.ltsyxxData.ltwz_relate_info.filter(
+            lt =>
+              lt && lt.tire_position && lt.tire_position === this.tireSelected
+          );
+        const brandData = brand && brand[0] && brand[0].tyre_id;
+        //  维修次数
+        const repaireCount =
+          this.ltsyxxData &&
+          this.ltsyxxData.ltwz_relate_info &&
+          this.ltsyxxData.ltwz_relate_info.filter(
+            lt =>
+              lt && lt.tire_position && lt.tire_position === this.tireSelected
+          );
+        const repaireCountData =
+          repaireCount && repaireCount[0] && repaireCount[0].repair_times;
+        // console.log("repaireCountData", repaireCountData);
+        //  轮胎额定行驶里程
+        const RatedKM =
+          this.ltsyxxData &&
+          this.ltsyxxData.ltwz_relate_info &&
+          this.ltsyxxData.ltwz_relate_info.filter(
+            lt =>
+              lt && lt.tire_position && lt.tire_position === this.tireSelected
+          );
+        const RatedKMInfo = RatedKM && RatedKM[0] && RatedKM[0].rated_km;
+        const RatedKMData = RatedKMInfo && parseInt(RatedKMInfo, 10);
+        // console.log('RatedKMData', RatedKMData)
+
+        // 轮胎累计行驶里程
+        const totalDrivedKm =
+          this.ltsyxxData &&
+          this.ltsyxxData.ltwz_relate_info &&
+          this.ltsyxxData.ltwz_relate_info.filter(
+            lt =>
+              lt && lt.tire_position && lt.tire_position === this.tireSelected
+          );
+        const totalDrivedKmData =
+          totalDrivedKm && totalDrivedKm[0] && totalDrivedKm[0].total_drived_km;
+        // console.log('totalDrivedKmData', totalDrivedKmData)
+        //胎压
+        const tyrePressure =
+          this.ltsyxxData &&
+          this.ltsyxxData.ltwz_relate_info &&
+          this.ltsyxxData.ltwz_relate_info.filter(
+            lt =>
+              lt && lt.tire_position && lt.tire_position === this.tireSelected
+          );
+        const tyrePressureData =
+          tyrePressure && tyrePressure[0] && tyrePressure[0].tyre_pressure;
+        // console.log("tyrePressureData", tyrePressureData);
+        // 总信息
+        const data = {
+          brandData,
+          repaireCountData,
+          RatedKMData,
+          totalDrivedKmData,
+          tyrePressureData
+        };
+        // console.log('data', data)
+        return data;
+      }
+      return "";
+    },
+    // 更换报警
+    alarmChange() {
+      if (this.selectedTireInfo) {
+        // console.log('this.selectedTireInfo', this.tirePoselectedTireInfosiData)
+        // const ratedKmShow = this.selectedTireInfo.RatedKMData
+
+        const ratedKm = parseFloat(this.selectedTireInfo.RatedKMData); // 额定行驶里程
+        const totalDrivedKm = parseFloat(
+          this.selectedTireInfo.totalDrivedKmData
+        ); // 轮胎累计行驶里程
+        // 额定行驶里程   >=   轮胎累计行驶里程
+        if (ratedKm >= totalDrivedKm) {
+          const ratio = (ratedKm - totalDrivedKm) / ratedKm;
+          if (ratio < 0.2) {
+            this.alarmColor = true;
+          }
+          return {
+            ratedKm,
+            totalDrivedKm,
+            ratio: Math.floor(ratio * 20)
+          };
+          /* eslint-disable */
+          // console.log(ratedKm,totalDrivedKm,ratio)
+        }
+        return {
+          ratedKm,
+          totalDrivedKm,
+          ratio: 1
+        };
+        //  console.log(ratedKm,totalDrivedKm,ratio)
+      }
+      return null;
+    }
+  },
+  methods: {
+    getItem(data) {
+      this.tireSelected = data;
+    },
+    ConfigDetailsBtn() {
+      this.configDetailsShow = !this.configDetailsShow;
+      const tireSelected = this.tireSelected;
+      this.$emit("configDetailsBtn", tireSelected);
+    },
+    closeConfigDetails() {
+      this.configDetailsShow = false;
+      this.turnsDetailsShow = false;
+      this.repaireDetailsShow = false;
+    },
+    turnsDetailsBtn() {
+      this.repaireDetailsShow = false;
+      this.turnsDetailsShow = !this.turnsDetailsShow;
+    },
+    closeTurnsDetails() {
+      this.turnsDetailsShow = false;
+    },
+    repaireDetailsBtn() {
+      this.turnsDetailsShow = false;
+      this.repaireDetailsShow = !this.repaireDetailsShow;
+    },
+    closeRepaireDetails() {
+      this.repaireDetailsShow = false;
+    },
+    scrollContent(i) {
+      this.detailesBoxShow += 1 * i;
+      if (this.detailesBoxShow > 2) {
+        this.detailesBoxShow = 2;
+      }
+      if (this.detailesBoxShow < 1) {
+        this.detailesBoxShow = 1;
+      }
+    }
+  }
+};
+</script>
+
+<style lang="scss" scope>
+.clearfix {
+  &:before,
+  &:after {
+    content: "";
+    display: table;
+  }
+  &:after {
+    clear: both;
+    overflow: hidden;
+  }
+}
+@mixin size($width, $height) {
+  width: $width;
+  height: $height;
+}
+.tyreConfiguration {
+  @include size(100%, 100%);
+  .tyreConfiguration-title {
+    @include size(100%, 30px);
+    position: relative;
+    color: #89dddf;
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 30px;
+    padding-left: 50px;
+    box-sizing: border-box;
+    background: url(~assets/car/left_header_strip_2.png) no-repeat;
+  }
+  .tyreConfiguration-line {
+    width: 349px;
+    height: 2px;
+    margin-left: 19px;
+    margin-bottom: 8px;
+    background: #478294;
+  }
+  .tyreConfiguration-content {
+    @include size(368px, 215px);
+    // margin-left: 30px;
+    padding-top: 10px;
+    box-sizing: border-box;
+    .tyreConfiguration_content_search {
+      @include size(340px, 30px);
+      margin-left: 30px;
+      position: relative;
+      line-height: 30px;
+      padding: 5px;
+      vertical-align: middle;
+      box-sizing: border-box;
+      background: rgba(3, 139, 252, 0.2);
+      position: relative;
+    }
+    .configurationInfo {
+      @include size(340px, 160px);
+      margin-top: 10px;
+      margin-left: 30px;
+      .items {
+        @include size(280px, 100%);
+        margin-left: 28px;
+        float: left;
+        .brandTitle {
+          @include size(130px, 24px);
+          line-height: 24px;
+          font-size: 16px;
+          color: #89dddf;
+          text-align: center;
+          box-sizing: border-box;
+          margin-right: 14px;
+          float: left;
+          position: relative;
+          padding-left: 13px;
+          i {
+            @include size(40px, 24px);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: url(../../assets/car/css_sprite_car-01.png) no-repeat -40px -40px;
+          }
+        }
+        .drivingMileageTitle {
+          @extend .brandTitle;
+          margin-right: 0px;
+          i {
+            background: url(../../assets/car/css_sprite_car-01.png) no-repeat -100px -40px;
+          }
+        }
+        .brandName {
+          @extend .brandTitle;
+          @include size(130px, 30px);
+          line-height: 30px;
+          font-size: 14px;
+          color: #fff;
+          font-weight: bold;
+          border: 1px solid #81d9e5;
+          text-align: left;
+          padding-left: 28px;
+          margin-top: 5px;
+          box-sizing: border-box;
+          position: relative;
+          background: none;
+          .rotateBox {
+            @include size(7px, 7px);
+            position: absolute;
+            top: 11px;
+            left: 9px;
+            transform: rotate(45deg);
+            background: #05d0eb;
+          }
+        }
+        .drivingMileage {
+          @extend .brandName;
+          margin-right: 0px;
+        }
+        .repaireCountTitle {
+          @extend .brandTitle;
+          margin-top: 10px;
+          i {
+            background: url(../../assets/car/css_sprite_car-01.png) no-repeat -160px -40px;
+          }
+        }
+        .changeAlarmTitle {
+          @extend .brandTitle;
+          margin-right: 0px;
+          margin-top: 10px;
+          position: relative;
+          i {
+            background: url(../../assets/car/css_sprite_car-01.png) no-repeat -220px -40px;
+          }
+        }
+        .changeAlarm {
+          @extend .brandName;
+        }
+        .repaireCount {
+          @extend .brandName;
+          margin-right: 0;
+          position: relative;
+          .before {
+            @include size(160px, 10px);
+            position: absolute;
+            top: 0px;
+            left: 22px;
+            z-index: 2;
+            .alarmRation {
+              @include size(4px, 10px);
+              float: left;
+              margin-left: 1px;
+              margin-top: 10px;
+              background: #0c9605;
+              div:first-child {
+                margin-left: 20px;
+              }
+            }
+            .alarmColor {
+              background: #e75029;
+            }
+          }
+          .after {
+            @include size(160px, 10px);
+            position: absolute;
+            top: 0px;
+            left: 22px;
+            z-index: 1;
+            .alarmRationBgc {
+              @include size(4px, 10px);
+              float: left;
+              margin-left: 1px;
+              margin-top: 10px;
+              background: rgba(3, 139, 252, 0.2);
+              div:first-child {
+                margin-left: 20px;
+              }
+            }
+          }
+          .showDrivingMileageInfo {
+            width: 300px;
+            background: rgba(9, 10, 11, 0.9);
+            border: 2px solid rgba(5, 208, 235, 0.8);
+            padding: 10px;
+            box-sizing: border-box;
+            position: relative;
+            top: 32px;
+            left: 10px;
+            z-index: 2;
+            display: none;
+            .ratedKmWrap {
+              height: 30px;
+              overflow: hidden;
+              .title {
+                float: left;
+                font-size: 16px;
+                color: #fff;
+              }
+              .MileageInfo {
+                float: right;
+                font-size: 16px;
+                color: #fff;
+              }
+            }
+            .middleBoder {
+              @include size(100%, 2px);
+              position: relative;
+              top: 10px;
+              left: 0;
+              background: rgba(129, 217, 229, 0.5);
+              div:first-child {
+                @include size(20px, 2px);
+                background: #81d9e5;
+                position: absolute;
+                top: 0px;
+                left: 0;
+              }
+              div:last-child {
+                @include size(20px, 2px);
+                background: #81d9e5;
+                position: absolute;
+                top: 0px;
+                right: 0;
+              }
+            }
+            .totalDrivedKmWrap {
+              @extend .ratedKmWrap;
+              height: 30px;
+              margin-top: 22px;
+            }
+          }
+        }
+        .repaireCount:hover .showDrivingMileageInfo {
+          display: block;
+        }
+
+        .tireDetailsButton {
+          @include size(100%, 25px);
+          line-height: 25px;
+          margin-top: 5px;
+          color: #b5b5b5;
+          font-size: 14px;
+          text-align: center;
+          background: rgba(0, 91, 127, 0.5);
+          float: left;
+          cursor: pointer;
+          position: relative;
+        }
+        .tireDetailsButton:hover {
+          color: #fff;
+        }
+        .btnHightLight {
+          background: rgba(0, 91, 127, 1);
+          color: #fff;
+        }
+        // 轮胎配置详细信息弹出框
+        .tireDetailsWrap {
+          width: 750px;
+          position: absolute;
+          bottom: 28px;
+          left: 585px;
+          z-index: 31;
+          .detailsContent {
+            width: 100%;
+            overflow: hidden;
+            .items {
+              width: 100%;
+              overflow: hidden;
+              .itemWrap {
+                @include size(350px, 30px);
+                line-height: 30px;
+                margin-bottom: 10px;
+                margin-right: 10px;
+                float: left;
+                .subTitle {
+                  @include size(110px, 30px);
+                  line-height: 30px;
+                  text-align: left;
+                  color: #89dddf;
+                  font-size: 14px;
+                  float: left;
+                }
+                .content {
+                  @include size(240px, 30px);
+                  line-height: 30px;
+                  padding-left: 30px;
+                  color: #fff;
+                  font-size: 14px;
+                  font-weight: bold;
+                  border: 1px solid #89dddf;
+                  float: left;
+                  position: relative;
+                  box-sizing: border-box;
+                  .rotateBox {
+                    @include size(7px, 7px);
+                    position: absolute;
+                    top: 11px;
+                    left: 10px;
+                    transform: rotate(45deg);
+                    background: #05d0eb;
+                  }
+                }
+              }
+              .clearMarginRight {
+                margin-right: 0;
+              }
+            }
+            .bottomBtnWrap {
+              width: 100%;
+              overflow: hidden;
+              margin-top: 10px;
+              float: left;
+              .takeTurns {
+                @include size(200px, 30px);
+                line-height: 30px;
+                float: right;
+                margin-left: 10px;
+                color: #b5b5b5;
+                text-align: center;
+                font-size: 16px;
+                background: rgba(0, 91, 127, 0.5);
+              }
+              .repaire {
+                @extend .takeTurns;
+                background: rgba(0, 91, 127, 0.5);
+              }
+              .takeTurns:hover,
+              .repaire:hover {
+                color: #fff;
+                cursor: pointer;
+              }
+            }
+          }
+        }
+        // 详情信息: 弹出框1：轮胎轮换记录
+        .tireTakeTurnsRecordWrap {
+          width: 750px;
+          position: absolute;
+          bottom: -340px;
+          left: 584px;
+          z-index: 32;
+          .detailsContent {
+            width: 100%;
+            height: 265px;
+            overflow: hidden;
+            border: 1px solid #81d9e5;
+            box-sizing: border-box;
+            .titleWrap {
+              @include size(100%, 25px);
+              margin-top: 10px;
+              margin-bottom: 5px;
+              background: rgba(5, 208, 235, 0.2);
+              .title {
+                @include size(115.52px, 25px);
+                line-height: 25px;
+                text-align: center;
+                color: #89dddf;
+                font-size: 14px;
+                float: left;
+              }
+            }
+            .detailListWrap {
+              width: 100%;
+              ul {
+                width: 703px;
+                height: 220px;
+                list-style: none;
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+                overflow-y: scroll;
+                li {
+                  width: 99.3%;
+                  height: 20px;
+                  overflow: hidden;
+                  list-style: none;
+                  margin: 0;
+                  padding: 0;
+                  margin-bottom: 5px;
+                  background: rgba(129, 217, 229, 0.1);
+                  ul {
+                    width: 100%;
+                    height: 20px;
+                    overflow: hidden;
+                    list-style: none;
+                    margin: 0;
+                    padding: 0;
+                    li {
+                      width: (100%/6);
+                      height: 20px;
+                      line-height: 20px;
+                      text-align: center;
+                      color: #b5b5b5;
+                      font-size: 14px;
+                      float: left;
+                      list-style: none;
+                      margin: 0;
+                      padding: 0;
+                    }
+                  }
+                  ul:hover {
+                    background: rgba(129, 217, 229, 0.5);
+                  }
+                  ul:hover {
+                    li {
+                      color: #fff;
+                    }
+                  }
+                }
+              }
+              ul::-webkit-scrollbar {
+                @include size(5px, 220px);
+                background: url(~assets/car/scroll.png) no-repeat center center;
+                position: relative;
+                right: 10px;
+                top: 5px;
+                background-size: 5px 220px;
+              }
+              ul::-webkit-scrollbar-thumb {
+                background: rgba(5, 208, 235, 1);
+              }
+            }
+          }
+        }
+        // 详情信息: 弹出框2：轮胎维修记录
+        .tireRepaireRecordWrap {
+          width: 750px;
+          position: absolute;
+          bottom: -340px;
+          left: 584px;
+          z-index: 32;
+          .detailsContent {
+            width: 100%;
+            height: 265px;
+            overflow: hidden;
+            border: 1px solid #81d9e5;
+            box-sizing: border-box;
+            .titleWrap {
+              @include size(100%, 25px);
+              margin-top: 10px;
+              margin-bottom: 5px;
+              background: rgba(5, 208, 235, 0.2);
+              .title {
+                @include size(99px, 25px);
+                line-height: 25px;
+                text-align: center;
+                color: #89dddf;
+                font-size: 14px;
+                float: left;
+              }
+            }
+            .detailListWrap {
+              width: 100%;
+              ul {
+                width: 703px;
+                height: 220px;
+                list-style: none;
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+                overflow-y: scroll;
+                li {
+                  width: 99.3%;
+                  height: 20px;
+                  overflow: hidden;
+                  list-style: none;
+                  margin: 0;
+                  padding: 0;
+                  margin-bottom: 5px;
+                  background: rgba(129, 217, 229, 0.1);
+                  ul {
+                    width: 100%;
+                    height: 20px;
+                    overflow: hidden;
+                    list-style: none;
+                    margin: 0;
+                    padding: 0;
+                    li {
+                      width: (100%/7);
+                      height: 20px;
+                      line-height: 20px;
+                      text-align: center;
+                      color: #b5b5b5;
+                      font-size: 14px;
+                      float: left;
+                      list-style: none;
+                      margin: 0;
+                      padding: 0;
+                    }
+                  }
+                  ul:hover {
+                    background: rgba(129, 217, 229, 0.5);
+                  }
+                  ul:hover {
+                    li {
+                      color: #fff;
+                    }
+                  }
+                }
+              }
+              ul::-webkit-scrollbar {
+                @include size(5px, 220px);
+                background: url(~assets/car/scroll.png) no-repeat center center;
+                position: relative;
+                right: 10px;
+                top: 5px;
+                background-size: 5px 220px;
+              }
+              ul::-webkit-scrollbar-thumb {
+                background: rgba(5, 208, 235, 1);
+              }
+            }
+          }
+        }
+      }
+      .prev {
+        @include size(25px, 130px);
+        line-height: 130px;
+        text-align: left;
+        position: absolute;
+        top: 42px;
+        left: 25px;
+        color: #81d9e5;
+        font-size: 24px;
+        font-weight: bold;
+        cursor: pointer;
+        i {
+          @include size(15px, 24px);
+          position: absolute;
+          top: 50%;
+          left: 5px;
+          background: url(../../assets/car/css_sprite_car-01.png) no-repeat -280px -40px;
+        }
+      }
+      .prev:hover i {
+        background: url(../../assets/car/css_sprite_car-01.png) no-repeat -340px -40px;
+      }
+      .next {
+        @include size(25px, 130px);
+        line-height: 130px;
+        text-align: right;
+        position: absolute;
+        top: 42px;
+        right: 15px;
+        color: #81d9e5;
+        font-size: 30px;
+        font-weight: bold;
+        cursor: pointer;
+        i {
+          @include size(15px, 24px);
+          position: absolute;
+          top: 50%;
+          right: -5px;
+          background: url(../../assets/car/css_sprite_car-01.png) no-repeat -280px -40px;
+          transform: rotate(180deg);
+        }
+      }
+      .next:hover i {
+        background: url(../../assets/car/css_sprite_car-01.png) no-repeat -340px -40px;
+
+        transform: rotate(180deg);
+      }
+      // .tyreImg {
+      //   @include size(189px,100%);
+      //   float: left;
+      //   background: url(../../assets/car/css_sprite_car-01.png) no-repeat -15px -192px;
+      // }
+    }
+  }
+}
+</style>

@@ -1,0 +1,814 @@
+<template>
+  <div class="carAlertInfoPopUp"
+       v-if="carAlertPopUpShow">
+    <div class="close"
+         @click="close"></div>
+    <div class="content clearfix">
+      <div class="contentTit clearfix">预警提醒</div>
+      <div class="tabToggle clearfix">
+        <div class="tab1 "
+             @click="toggleTab(1)"
+             :class="{activeTab:nowIndex===1}">证件</div>
+        <div class="tab2"
+             @click="toggleTab(2)"
+             :class="{activeTab:nowIndex===2}">辅件</div>
+        <!-- <div class="tab3"
+             @click="toggleTab(3)"
+             :class="{activeTab:nowIndex===3}">车辆</div> -->
+      </div>
+      <div class="contentSmallTit  clearfix">
+        <div class="contentSmallTitLeft ">证书名称</div>
+        <div class="contentSmallTitRight">
+          <select name=""
+                  id=""
+                  v-model="title"
+                  @click='type'>
+            <option v-for='(item,index) in select'
+                    :value="item"
+                    :key='index'>{{item}}</option>
+          </select>
+          <div>剩余时间</div>
+        </div>
+      </div>
+      <ul v-if="nowIndex===1 &&alertList1">
+        <li v-for="(item,index) in  alertList1"
+            :key="index"
+            class="  clearfix">
+          <div class="liLift">{{item.name}}</div>
+          <div class="liRight "
+               :style="{background:item.color}">{{item.value}}</div>
+        </li>
+      </ul>
+      <ul v-if="nowIndex===2 &&alertList2">
+        <li v-for="(item,index) in  alertList2"
+            :key="index"
+            class="  clearfix">
+          <div class="liLift">{{item.name}}</div>
+          <div class="liRight "
+               :style="{background:item.color}">{{item.value}}</div>
+        </li>
+      </ul>
+      <!-- <ul v-if="nowIndex===3 &&alertList3">
+        <li v-for="(item,index) in  alertList3"
+            :key="index"
+            class="  clearfix">
+          <div class="liLift">{{item.name}}</div>
+          <div class="liRight "
+               :style="{background:item.color}">{{item.value}}</div>
+        </li>
+      </ul> -->
+    </div>
+    <div v-show="false">{{getAlertList}}</div>
+  </div>
+
+</template>
+
+<script>
+/* eslint-disable */
+import { mapMutations, mapState } from "vuex";
+
+export default {
+  name: "car-alert-info",
+  // props: ["carAlertLists"],
+  data() {
+    return {
+      title: "全部",
+      select: ["全部", "10天", "30天", "90天"],
+      nowIndex: 1,
+      move: false,
+      alertList1: null,
+      alertList2: null,
+      alertList3: null
+      // carAlertInftData: {
+      //   certificate: {
+      //     all: [
+      //       {
+      //         vehicle_certificate_type_code: "2101",
+      //         certificate_type: "行驶证",
+      //         expire_date: "2018-07-11"
+      //       },
+      //       {
+      //         vehicle_certificate_type_code: "2102",
+      //         certificate_type: "道路运输证",
+      //         expire_date: "2018-07-01"
+      //       },
+      //       {
+      //         vehicle_certificate_type_code: "2103",
+      //         certificate_type: "气源地准入证",
+      //         expire_date: "2018-08-15"
+      //       },
+      //       {
+      //         vehicle_certificate_type_code: "2104",
+      //         certificate_type: "交强险",
+      //         expire_date: "2018-09-11"
+      //       },
+      //       {
+      //         vehicle_certificate_type_code: "2105",
+      //         certificate_type: "商业险",
+      //         expire_date: "2018-07-22"
+      //       },
+      //       {
+      //         vehicle_certificate_type_code: "2106",
+      //         certificate_type: "车船使用税",
+      //         expire_date: "2018-08-26"
+      //       },
+      //       {
+      //         vehicle_certificate_type_code: "2107",
+      //         certificate_type: "二级维护证明",
+      //         expire_date: "2018-09-20"
+      //       }
+      //     ],
+      //     lessTen: [
+      //       {
+      //         vehicle_certificate_type_code: "",
+      //         certificate_type: "",
+      //         expire_date: ""
+      //       }
+      //     ],
+      //     ten_to_thirty: [
+      //       {
+      //         vehicle_certificate_type_code: "",
+      //         certificate_type: "",
+      //         expire_date: ""
+      //       }
+      //     ],
+      //     thirty_to_ninety: [
+      //       {
+      //         vehicle_certificate_type_code: "",
+      //         certificate_type: "",
+      //         expire_date: ""
+      //       }
+      //     ],
+      //     greaterNinety: [
+      //       {
+      //         vehicle_certificate_type_code: "2101",
+      //         certificate_type: "行驶证",
+      //         expire_date: "2020-01-11"
+      //       },
+      //       {
+      //         vehicle_certificate_type_code: "2102",
+      //         certificate_type: "道路运输证",
+      //         expire_date: "2019-02-11"
+      //       },
+      //       {
+      //         vehicle_certificate_type_code: "2103",
+      //         certificate_type: "气源地准入证",
+      //         expire_date: "2019-04-11"
+      //       },
+      //       {
+      //         vehicle_certificate_type_code: "2104",
+      //         certificate_type: "交强险",
+      //         expire_date: "2021-01-11"
+      //       },
+      //       {
+      //         vehicle_certificate_type_code: "2105",
+      //         certificate_type: "商业险",
+      //         expire_date: "2020-02-11"
+      //       },
+      //       {
+      //         vehicle_certificate_type_code: "2106",
+      //         certificate_type: "车船使用税",
+      //         expire_date: "2022-01-11"
+      //       },
+      //       {
+      //         vehicle_certificate_type_code: "2107",
+      //         certificate_type: "二级维护证明",
+      //         expire_date: "2021-02-11"
+      //       }
+      //     ]
+      //   },
+      //   accessory: {
+      //     all: [
+      //       {
+      //         vehicle_certificate_type_code: "2204",
+      //         certificate_type: "灭火器",
+      //         expire_date: "2021-02-11"
+      //       }
+      //     ],
+      //     lessTen: [
+      //       {
+      //         vehicle_certificate_type_code: "",
+      //         certificate_type: "",
+      //         expire_date: ""
+      //       }
+      //     ],
+      //     ten_to_thirty: [
+      //       {
+      //         vehicle_certificate_type_code: "",
+      //         certificate_type: "",
+      //         expire_date: ""
+      //       }
+      //     ],
+      //     thirty_to_ninety: [
+      //       {
+      //         vehicle_certificate_type_code: "",
+      //         certificate_type: "",
+      //         expire_date: ""
+      //       }
+      //     ],
+      //     greaterNinety: [
+      //       {
+      //         vehicle_certificate_type_code: "2204",
+      //         certificate_type: "灭火器",
+      //         expire_date: "2021-02-11"
+      //       }
+      //     ]
+      //   },
+      //   car: {
+      //     all: [
+      //       {
+      //         vehicle_certificate_type_code: "",
+      //         certificate_type: "",
+      //         expire_date: ""
+      //       }
+      //     ],
+      //     lessTen: [
+      //       {
+      //         vehicle_certificate_type_code: "",
+      //         certificate_type: "",
+      //         expire_date: ""
+      //       }
+      //     ],
+      //     ten_to_thirty: [
+      //       {
+      //         vehicle_certificate_type_code: "",
+      //         certificate_type: "",
+      //         expire_date: ""
+      //       }
+      //     ],
+      //     thirty_to_ninety: [
+      //       {
+      //         vehicle_certificate_type_code: "",
+      //         certificate_type: "",
+      //         expire_date: ""
+      //       }
+      //     ],
+      //     greaterNinety: [
+      //       {
+      //         vehicle_certificate_type_code: "",
+      //         certificate_type: "",
+      //         expire_date: ""
+      //       }
+      //     ]
+      //   }
+      // }
+      // alertList1: [
+      //   { name: "行驶证书", value: "10天" },
+      //   { name: "道路运输证", value: "1个月" },
+      //   { name: "起源地准入证", value: "2个月" },
+      //   { name: "安全证书", value: "1个月" },
+      //   { name: "驾驶证", value: "10天" }
+      // ],
+      // alertList2: [
+      //   { name: "安全证书", value: "2个月" },
+      //   { name: "驾驶证", value: "10天" },
+      //   { name: "行驶证书", value: "1个月" },
+      //   { name: "道路运输证", value: "2个月" },
+      //   { name: "起源地准入证", value: "10天" }
+      // ],
+      // alertList3: [
+      //   { name: "起源地准入证", value: "1个月" },
+      //   { name: "行驶证书", value: "10天" },
+      //   { name: "道路运输证", value: "1个月" },
+      //   { name: "安全证书", value: "2个月" },
+      //   { name: "驾驶证", value: "2个月" }
+      // ]
+    };
+  },
+  computed: {
+    ...mapState("caralertinfo", ["carAlertPopUpShow"]),
+    ...mapState("caralertinfo", ["carAlertInftData"]),
+    getAlertList() {
+      const tenTime = 10 * 24 * 3600 * 1000;
+      const thirtyTime = 30 * 24 * 3600 * 1000;
+      const ninetyTime = 90 * 24 * 3600 * 1000;
+
+      this.alertList1 =
+        this.carAlertInftData &&
+        this.carAlertInftData !== null &&
+        this.carAlertInftData !== undefined &&
+        this.carAlertInftData.certificate &&
+        this.carAlertInftData.certificate.all &&
+        this.carAlertInftData.certificate.all.map(o => {
+          let timeDifference = new Date(o.expire_date) - new Date();
+          return {
+            name: o.certificate_type && o.certificate_type,
+            value: o.expire_date,
+            color:
+              timeDifference < tenTime
+                ? "red"
+                : timeDifference < thirtyTime
+                  ? "yellow"
+                  : timeDifference < ninetyTime ? "green" : ""
+          };
+        });
+      this.alertList2 =
+        this.carAlertInftData &&
+        this.carAlertInftData !== null &&
+        this.carAlertInftData !== undefined &&
+        this.carAlertInftData.accessory &&
+        this.carAlertInftData.accessory.all &&
+        this.carAlertInftData.accessory.all.map(o => {
+          let timeDifference = new Date(o.expire_date) - new Date();
+          return {
+            name: o.certificate_type && o.certificate_type,
+            value: o.expire_date,
+            color:
+              timeDifference < tenTime
+                ? "red"
+                : timeDifference < thirtyTime
+                  ? "yellow"
+                  : timeDifference < ninetyTime ? "green" : ""
+          };
+        });
+      this.alertList3 =
+        this.carAlertInftData &&
+        this.carAlertInftData !== null &&
+        this.carAlertInftData !== undefined &&
+        this.carAlertInftData.car &&
+        this.carAlertInftData.car.all &&
+        this.carAlertInftData.car.all.map(o => {
+          let timeDifference = new Date(o.expire_date) - new Date();
+          return {
+            name: o.certificate_type && o.certificate_type,
+            value: o.expire_date,
+            color:
+              timeDifference < tenTime
+                ? "red"
+                : timeDifference < thirtyTime
+                  ? "yellow"
+                  : timeDifference < ninetyTime ? "green" : ""
+          };
+        });
+      return "";
+    }
+    // getColor1() {
+    //   if (
+    //     this.alertList1 &&
+    //     this.alertList1 !== undefined &&
+    //     this.alertList1 !== null
+    //   ) {
+    // const color = this.alertList1.map(o => {
+    //   let colorSelf = "";
+    //   if (o.value && o.value == "2个月") {
+    //     colorSelf = "green";
+    //   } else if (o.value && o.value == "1个月") {
+    //     colorSelf = "yellow";
+    //   } else if (o.value && o.value == "10天") {
+    //     colorSelf = "red";
+    //   } else {
+    //     colorSelf = "";
+    //   }
+    // });
+
+    // let colorSelf = [];
+    // for (var i = 0; i < this.alertList1.lenght; i++) {
+    //   if (o.value && o.value == "2个月") {
+    //     colorSelf.push("green");
+    //   } else if (o.value && o.value == "1个月") {
+    //     // colorSelf = "yellow";
+    //     colorSelf.push("yellow");
+    //   } else if (o.value && o.value == "10天") {
+    //     colorSelf.push("red");
+    //   }
+    // }
+    // console.log("colorSelf", colorSelf);
+
+    //     return color;
+    //   }
+    //   return "";
+    // }
+    // ...mapMutations("warningCarouselpopupContainer", [
+    //   "getTermialSelectedInfo"
+    // ]),
+    // getLessOneMonthLists() {
+    //   // console.log('--------------2-------')
+    //   // console.log('carAlertLists', this.carAlertLists)
+    //   const lessOneMonthLists =
+    //     this.carAlertLists &&
+    //     this.carAlertLists.filter(item => {
+    //       const difDate = new Date(item.endDate) - new Date();
+    //       // console.log('difDate', difDate)
+    //       return difDate > 0 && difDate < 30 * 24 * 3600 * 1000;
+    //     });
+    //   // console.log('lessOneMonthLists', lessOneMonthLists)
+    //   return lessOneMonthLists;
+    // }
+  },
+  methods: {
+    ...mapMutations("caralertinfo", ["setcarAlertPopUpShow"]),
+    close() {
+      this.setcarAlertPopUpShow(false);
+    },
+    toggleTab(i) {
+      this.nowIndex = i;
+    },
+    type() {
+      if (this.title === "全部") {
+        const tenTime = 10 * 24 * 3600 * 1000;
+        const thirtyTime = 30 * 24 * 3600 * 1000;
+        const ninetyTime = 90 * 24 * 3600 * 1000;
+        this.alertList1 =
+          this.carAlertInftData &&
+          this.carAlertInftData !== null &&
+          this.carAlertInftData !== undefined &&
+          this.carAlertInftData.certificate &&
+          this.carAlertInftData.certificate.all &&
+          this.carAlertInftData.certificate.all.map(o => {
+            let timeDifference = new Date(o.expire_date) - new Date();
+            return {
+              name: o.certificate_type && o.certificate_type,
+              value: o.expire_date,
+              color:
+                timeDifference < tenTime
+                  ? "red"
+                  : timeDifference < thirtyTime
+                    ? "yellow"
+                    : timeDifference < ninetyTime ? "green" : ""
+            };
+          });
+        this.alertList2 =
+          this.carAlertInftData &&
+          this.carAlertInftData !== null &&
+          this.carAlertInftData !== undefined &&
+          this.carAlertInftData.accessory &&
+          this.carAlertInftData.accessory.all &&
+          this.carAlertInftData.accessory.all.map(o => {
+            let timeDifference = new Date(o.expire_date) - new Date();
+            return {
+              name: o.certificate_type && o.certificate_type,
+              value: o.expire_date,
+              color:
+                timeDifference < tenTime
+                  ? "red"
+                  : timeDifference < thirtyTime
+                    ? "yellow"
+                    : timeDifference < ninetyTime ? "green" : ""
+            };
+          });
+        this.alertList3 =
+          this.carAlertInftData &&
+          this.carAlertInftData !== null &&
+          this.carAlertInftData !== undefined &&
+          this.carAlertInftData.car &&
+          this.carAlertInftData.car.all &&
+          this.carAlertInftData.car.all.map(o => {
+            let timeDifference = new Date(o.expire_date) - new Date();
+            return {
+              name: o.certificate_type && o.certificate_type,
+              value: o.expire_date,
+              color:
+                timeDifference < tenTime
+                  ? "red"
+                  : timeDifference < thirtyTime
+                    ? "yellow"
+                    : timeDifference < ninetyTime ? "green" : ""
+            };
+          });
+      } else if (this.title === "10天") {
+        this.alertList1 =
+          this.carAlertInftData &&
+          this.carAlertInftData !== null &&
+          this.carAlertInftData !== undefined &&
+          this.carAlertInftData.certificate &&
+          this.carAlertInftData.certificate.lessTen &&
+          this.carAlertInftData.certificate.lessTen.map(o => {
+            return {
+              name: o.certificate_type && o.certificate_type,
+              value: o.expire_date,
+              color: "red"
+            };
+          });
+        this.alertList2 =
+          this.carAlertInftData &&
+          this.carAlertInftData !== null &&
+          this.carAlertInftData !== undefined &&
+          this.carAlertInftData.accessory &&
+          this.carAlertInftData.accessory.lessTen &&
+          this.carAlertInftData.accessory.lessTen.map(o => {
+            return {
+              name: o.certificate_type && o.certificate_type,
+              value: o.expire_date,
+              color: "red"
+            };
+          });
+        this.alertList3 =
+          this.carAlertInftData &&
+          this.carAlertInftData !== null &&
+          this.carAlertInftData !== undefined &&
+          this.carAlertInftData.car &&
+          this.carAlertInftData.car.lessTen &&
+          this.carAlertInftData.car.lessTen.map(o => {
+            return {
+              name: o.certificate_type && o.certificate_type,
+              value: o.expire_date,
+              color: "red"
+            };
+          });
+      } else if (this.title === "30天") {
+        this.alertList1 =
+          this.carAlertInftData &&
+          this.carAlertInftData !== null &&
+          this.carAlertInftData !== undefined &&
+          this.carAlertInftData.certificate &&
+          this.carAlertInftData.certificate.ten_to_thirty &&
+          this.carAlertInftData.certificate.ten_to_thirty.map(o => {
+            return {
+              name: o.certificate_type && o.certificate_type,
+              value: o.expire_date,
+              color: "yellow"
+            };
+          });
+        this.alertList2 =
+          this.carAlertInftData &&
+          this.carAlertInftData !== null &&
+          this.carAlertInftData !== undefined &&
+          this.carAlertInftData.accessory &&
+          this.carAlertInftData.accessory.ten_to_thirty &&
+          this.carAlertInftData.accessory.ten_to_thirty.map(o => {
+            return {
+              name: o.certificate_type && o.certificate_type,
+              value: o.expire_date,
+              color: "yellow"
+            };
+          });
+        this.alertList3 =
+          this.carAlertInftData &&
+          this.carAlertInftData !== null &&
+          this.carAlertInftData !== undefined &&
+          this.carAlertInftData.car &&
+          this.carAlertInftData.car.ten_to_thirty &&
+          this.carAlertInftData.car.ten_to_thirty.map(o => {
+            return {
+              name: o.certificate_type && o.certificate_type,
+              value: o.expire_date,
+              color: "yellow"
+            };
+          });
+      } else if (this.title === "90天") {
+        this.alertList1 =
+          this.carAlertInftData &&
+          this.carAlertInftData !== null &&
+          this.carAlertInftData !== undefined &&
+          this.carAlertInftData.certificate &&
+          this.carAlertInftData.certificate.thirty_to_ninety &&
+          this.carAlertInftData.certificate.thirty_to_ninety.map(o => {
+            return {
+              name: o.certificate_type && o.certificate_type,
+              value: o.expire_date,
+              color: "green"
+            };
+          });
+        this.alertList2 =
+          this.carAlertInftData &&
+          this.carAlertInftData !== null &&
+          this.carAlertInftData !== undefined &&
+          this.carAlertInftData.accessory &&
+          this.carAlertInftData.accessory.thirty_to_ninety &&
+          this.carAlertInftData.accessory.thirty_to_ninety.map(o => {
+            return {
+              name: o.certificate_type && o.certificate_type,
+              value: o.expire_date,
+              color: "green"
+            };
+          });
+        this.alertList3 =
+          this.carAlertInftData &&
+          this.carAlertInftData !== null &&
+          this.carAlertInftData !== undefined &&
+          this.carAlertInftData.car &&
+          this.carAlertInftData.car.thirty_to_ninety &&
+          this.carAlertInftData.car.thirty_to_ninety.map(o => {
+            return {
+              name: o.certificate_type && o.certificate_type,
+              value: o.expire_date,
+              color: "green"
+            };
+          });
+      }
+    }
+    // ...mapMutations("warningCarouselpopupContainer", ["warningDetails"]),
+    // getCarouselDetails(params) {
+    //   // console.log('title:', params)
+    //   this.warningDetails(params);
+    // }
+  }
+};
+</script>
+
+<style lang="scss">
+@mixin size($width, $height) {
+  width: $width;
+  height: $height;
+}
+.clearfix {
+  &:before,
+  &:after {
+    content: "";
+    display: table;
+  }
+  &:after {
+    clear: both;
+    overflow: hidden;
+  }
+}
+.carAlertInfoPopUp {
+  @include size(400px, 276px);
+  background: rgba(9, 10, 11, 0.9);
+  border: 4px solid rgba(5, 208, 235, 0.8);
+  padding: 10px;
+  box-sizing: border-box;
+  //   position: absolute;
+  //   top: 100px;
+  //   left: -500px;
+  .close {
+    @include size(36px, 36px);
+    line-height: 28px;
+    text-align: center;
+    color: rgba(5, 208, 235, 0.5);
+    font-size: 36px;
+    //   border: 2px solid rgba(5, 208, 235, 0.8);
+    background: rgba(9, 10, 11, 0.9) url("../../assets/car/guanbi.png")
+      no-repeat 0 0;
+    background-size: 36px 36px;
+    box-sizing: border-box;
+    position: absolute;
+    top: -22px;
+    right: -22px;
+    cursor: pointer;
+  }
+  .content {
+    @include size(372px, 248px);
+    background: rgba(9, 122, 206, 0.2);
+    .contentTit {
+      @include size(310px, 24px);
+      background: rgba(129, 217, 229, 0.3);
+      padding-left: 22px;
+      box-sizing: border-box;
+      color: #89dddf;
+      font-size: 16px;
+      line-height: 24px;
+      margin-top: 10px;
+      margin-left: 6px;
+    }
+    .tabToggle {
+      @include size(360px, 30px);
+      margin-top: 10px;
+      margin-left: 6px;
+      .tab1 {
+        @include size(180px, 30px);
+        float: left;
+        background: rgba(5, 208, 235, 0.2);
+        color: #ffffff;
+        font-size: 16px;
+        text-align: center;
+        line-height: 30px;
+        border: 1px solid rgba(5, 208, 235, 0.5);
+        box-sizing: border-box;
+        cursor: pointer;
+      }
+      .tab2 {
+        @include size(180px, 30px);
+        float: left;
+        background: rgba(5, 208, 235, 0.2);
+        color: #ffffff;
+        font-size: 16px;
+        text-align: center;
+        line-height: 30px;
+        border: 1px solid rgba(5, 208, 235, 0.5);
+        box-sizing: border-box;
+        cursor: pointer;
+      }
+      .tab3 {
+        @include size(120px, 30px);
+        float: left;
+        background: rgba(5, 208, 235, 0.2);
+        color: #ffffff;
+        font-size: 16px;
+        text-align: center;
+        line-height: 30px;
+        border: 1px solid rgba(5, 208, 235, 0.5);
+        box-sizing: border-box;
+        cursor: pointer;
+      }
+      .activeTab {
+        background: rgba(5, 208, 235, 0.5);
+      }
+    }
+    .contentSmallTit {
+      @include size(360px, 30px);
+      margin-top: 10px;
+      margin-left: 6px;
+      .contentSmallTitLeft {
+        @include size(174px, 30px);
+        float: left;
+        color: #89dddf;
+        text-align: center;
+        font-size: 14px;
+        line-height: 30px;
+        border: 1px solid rgba(5, 208, 235, 0.5);
+        box-sizing: border-box;
+      }
+      .contentSmallTitRight {
+        @include size(174px, 30px);
+        float: left;
+        color: #89dddf;
+        text-align: center;
+        font-size: 14px;
+        line-height: 30px;
+        margin-left: 9px;
+        border: 1px solid rgba(5, 208, 235, 0.5);
+        box-sizing: border-box;
+        div {
+          float: right;
+          line-height: 26px;
+          margin-right: 10px;
+        }
+        select {
+          float: right;
+          height: 26px;
+          width: 92px;
+          margin-top: 1px;
+          box-sizing: border-box;
+          outline: none;
+          border: 1px solid rgba(5, 208, 235, 0.5);
+          background: #000000;
+          color: #d5d5d5;
+          appearance: none;
+          -moz-appearance: none;
+          -webkit-appearance: none;
+          background: url("../../assets/driver/select_arrow.png") no-repeat
+            scroll calc(100% - 10px) center #000000;
+          padding-left: 5px;
+        }
+        select:nth-child(2) {
+          margin-right: 10px;
+        }
+      }
+    }
+    ul {
+      @include size(100%, 130px);
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      position: relative;
+      top: 0px;
+      left: 0;
+      overflow: hidden;
+      overflow-y: scroll;
+      box-sizing: border-box;
+      margin-top: 10px;
+      li {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        @include size(100%, 27px);
+        line-height: 20px;
+        font-size: 14px;
+        margin-left: 6px;
+        background: url("../../assets/car/hengxian.png") no-repeat 0px 25px;
+        margin-top: 5px;
+        cursor: pointer;
+        .liLift {
+          @include size(48%, 20px);
+          float: left;
+          background: rgba(5, 208, 235, 0.2);
+          color: #89dddf;
+          text-align: center;
+          font-size: 14px;
+          line-height: 20px;
+        }
+        .liRight {
+          @include size(48%, 20px);
+          float: left;
+          background: rgba(81, 81, 81, 0.5);
+          color: #89dddf;
+          text-align: center;
+          font-size: 14px;
+          line-height: 20px;
+          margin-left: 6px;
+        }
+        .red {
+          background: rgba(196, 2, 39, 0.5);
+        }
+        .yellow {
+          background: rgba(196, 191, 5, 0.5);
+        }
+        .green {
+          background: rgba(10, 160, 2, 0.5);
+        }
+      }
+    }
+    ul::-webkit-scrollbar {
+      width: 3px;
+      background: #69a3b1;
+    }
+    ul::-webkit-scrollbar-thumb {
+      background: #05f0eb;
+    }
+  }
+}
+// .carAlertInfo:hover {
+//   background: url(~assets/car/css_sprite_car-01.png) no-repeat -880px -128px;
+// }
+</style>

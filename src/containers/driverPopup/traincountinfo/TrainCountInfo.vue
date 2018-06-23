@@ -1,0 +1,238 @@
+<template>
+  <div class="trainCountInfoContent">
+    <pop-up-widget title="培训统计信息"
+                   detailsBtnShow="true"
+                   @popUpdetailsBtn="popTraindetail = true"></pop-up-widget>
+
+    <!-- 内容部分 -->
+    <div class="trainCon">
+      <!-- 标题 -->
+      <div class="selectCon clearfix">
+        <div class="itemCon fl clearfix">
+          <div class="fl">培训类型</div>
+          <div class="fl">
+            <key-value-select width="120px"
+                              :data="trainOption"
+                              @select='select("training_type_code",$event)'></key-value-select>
+          </div>
+        </div>
+        <div class="itemCon fl clearfix">
+          <div class="fl">培训主题</div>
+          <div class="fl">
+            <key-value-select width="120px"
+                              :data="themeOption"
+                              @select='select("training_theme_code",$event)'></key-value-select>
+          </div>
+        </div>
+        <div class="itemCon fl clearfix">
+          <div class="fl">统计周期</div>
+          <div class="fl">
+            <key-value-select width="120px"
+                              :data="yearOption"
+                               @select='select("year",$event)'></key-value-select>
+
+          </div>
+          <div class="fl" style="margin-left: 10px;">
+           <key-value-select 
+                        :data='monthOption'
+                        width='120px'
+                        @select='select("month",$event)'></key-value-select>
+          </div>
+          
+        </div>
+      </div>
+
+      <!-- 数据类型 -->
+      <div class="dataTypeCon clearfix">
+        <div :class="{dataTypeActive:currentDataTypeIndex === 0}"
+             @click="dataTypeActive(0)">培训次数</div>
+        <div :class="{dataTypeActive:currentDataTypeIndex === 1}"
+             @click="dataTypeActive(1)">培训时长</div>
+        <div :class="{dataTypeActive:currentDataTypeIndex === 2}"
+             @click="dataTypeActive(2)">培训通过率</div>
+      </div>
+
+      <!-- 图表 -->
+      <div class="chartsCon">
+        <line-chart chartTheme="dark"
+                    :data="trainCountInfo"
+                    :color="lineChartColor"
+                    yaxisName="%"
+                    v-if="trainCountInfo"></line-chart>
+      </div>
+
+    </div>
+
+    <!-- 三级弹窗 -->
+    <div class="trainDetailsInfoContainer"
+         v-if="popTraindetail">
+      <pop-up-frame @close="popTraindetail = false">
+        <train-details-info></train-details-info>
+      </pop-up-frame>
+    </div>
+  </div>
+</template>
+
+<script type="text/javascript">
+import { mapState, mapActions } from 'vuex'
+import PopUpFrame from '../../../components/PopUpFrame'
+import PopUpWidget from '../../../components/PopUpWidget'
+import KeyValueSelect from '../../../components/KeyValueSelect'
+import LineChart from '../../../components/charts/lineChart'
+import LineDataZoom from '../../../components/charts/lineDataZoom'
+
+// 三级弹窗
+import TrainDetailsInfo from '../../driverPopup/traindetailsinfo/TrainDetailsInfo'
+import Dictionary from '../../../util/dictionary'
+
+const {
+  date: { year, month },
+  trainingThemeCode,
+  trainingTypeCode,
+} = Dictionary
+export default {
+  name: 'TrainCountInfo',
+  components: {
+    PopUpFrame,
+    PopUpWidget,
+    KeyValueSelect,
+    LineChart,
+    LineDataZoom,
+    TrainDetailsInfo,
+  },
+  data() {
+    return {
+      yearOption: year,
+      monthOption: month,
+      themeOption: trainingThemeCode,
+      trainOption: trainingTypeCode,
+
+      year: 2014,
+      month: 1,
+      theme: 10,
+      train: 12,
+      training_type_code: 12,
+      training_theme_code: 10,
+      type: '培训时长',
+
+      currentDataTypeIndex: 0,
+
+      lineChartColor: [
+        '#05d0eb',
+        '#81d9e5',
+        '#f6ffcb',
+        '#e75029',
+        '#038bfc',
+        '#006a55',
+      ],
+      // 三级开关
+      popTraindetail: false,
+    }
+  },
+  computed: {
+    ...mapState('traincountinfo', ['trainCountInfo']),
+    ...mapState('driverbase', ['ryjb']),
+    fetchData() {
+      return {
+        driver_id: this.ryjb.driver_id,
+        year: this.year,
+        month: this.month,
+        training_type_code: this.training_type_code,
+        training_theme_code: this.training_theme_code,
+        type: ['培训次数', '培训时长', '培训通过率'][this.currentDataTypeIndex],
+      }
+    },
+  },
+  methods: {
+    ...mapActions('traincountinfo', ['getTrainCountInfo']),
+    select(name, item) {
+      this[name] = item.value
+      this.getTrainCountInfo(this.fetchData)
+    },
+    dataTypeActive(index) {
+      this.currentDataTypeIndex = index
+      this.getTrainCountInfo(this.fetchData)
+    },
+  },
+}
+</script>
+
+<style lang="scss" scoped>
+// 公用样式
+@mixin size($w,$h) {
+  width: $w;
+  height: $h;
+}
+
+// 组件包裹
+.trainCountInfoContent {
+  // 内容包裹
+  .trainCon {
+    position: relative;
+    // 下拉框包裹
+    .selectCon {
+      @include size(100%,25px);
+      color: #b5b5b5;
+      font-size: 14px;
+      line-height: 25px;
+      .itemCon {
+        div:nth-child(2) {
+          margin-left: 10px;
+        }
+      }
+      .itemCon:nth-child(1) {
+        margin-left: 2px;
+      }
+      .itemCon:nth-child(n + 2) {
+        margin-left: 10px;
+      }
+    }
+
+    // 切换数据
+    .dataTypeCon {
+      @include size(100%,25px);
+      margin-top: 10px;
+      // background: green;
+      div {
+        @include size(160px,25px);
+        box-sizing: border-box;
+        text-align: center;
+        line-height: 23px;
+        color: #b5b5b5;
+        float: left;
+        background: rgba(0, 191, 229, 0.2);
+        cursor: pointer;
+      }
+      .dataTypeActive {
+        color: #fff;
+        background: rgba(0, 191, 229, 0.5);
+      }
+      div:nth-child(1) {
+        margin-left: 210px;
+      }
+      div:nth-child(n + 2) {
+        margin-left: 10px;
+      }
+    }
+
+    // 图表包裹
+    .chartsCon {
+      @include size(100%,200px);
+      overflow: hidden;
+      margin-top: 10px;
+      // background:green;
+    }
+  }
+
+  // 三级弹窗
+  .trainDetailsInfoContainer {
+    // @include size(750px,350px);
+    // overflow: hidden;
+    width: 750px;
+    background: green;
+    position: absolute;
+    top: -500px;
+    left: 0px;
+  }
+}
+</style>

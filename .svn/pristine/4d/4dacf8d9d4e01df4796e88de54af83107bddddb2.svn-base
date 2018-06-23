@@ -1,0 +1,58 @@
+<template>
+    <div class="box">
+        <Echarts :options="Options" />
+    </div>
+</template>
+<script>
+import Echarts from 'vue-echarts'
+
+export default {
+  components: {
+    Echarts,
+  },
+  data() {
+    return {
+      Options: {
+        tooltip: {
+          trigger: 'item',
+          formatter: '{a} <br/>{b} : {c} ({d}%)',
+        },
+        calculable: true,
+        series: [
+          {
+            name: '车机报警',
+            type: 'pie',
+            radius: ['10%', '80%'],
+            center: ['50%', '50%'],
+            roseType: 'area',
+            width: '50%',
+            max: 40,
+            data: [
+                { value: 5, name: 'rose1' },
+                { value: 10, name: 'rose2' },
+                { value: 15, name: '其他' },
+                { value: 20, name: '离开指定区域' },
+                { value: 25, name: '进入指定区域' },
+                { value: 30, name: '紧急报警' },
+                { value: 35, name: '疲劳驾驶' },
+                { value: 40, name: '超速报警' },
+            ],
+          },
+        ],
+      },
+    }
+  },
+}
+</script>
+<style lang="scss" scoped>
+.box{
+    width: 300px;
+    height: 200px;
+    position: absolute;
+    .echarts{
+        width: 100%;
+        height: 100%;
+    }
+}
+</style>
+

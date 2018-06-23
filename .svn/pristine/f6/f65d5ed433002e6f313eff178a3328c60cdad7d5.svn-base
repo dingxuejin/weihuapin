@@ -1,0 +1,198 @@
+<template>
+  <div class="trend">
+    <div class="header">
+      <htitle data='高危驾驶行为数量变化趋势'></htitle>
+      <div class="headerOpen" @click="openDetail('quantityDriver')"></div>
+    </div>
+    <div class="change">
+      <div>统计周期</div>
+      <div>
+        <key-value-select :data="yearOption"
+                              width="119px"
+                              @select='select("year",$event)'></key-value-select>
+                              <!-- :defaultValue="nowYear" -->
+      </div>
+      <div>
+        <key-value-select :data="monthOption"
+                              width="107px"
+                              @select='select("month",$event)'></key-value-select>
+                              <!-- :defaultValue="nowMonth" -->
+      </div>
+    
+      <div>行为类别</div>
+      <div>
+        <key-value-select :data="dangerOption"
+                              width="235px"
+                              @select='select("type",$event)'></key-value-select>
+      </div>    
+    </div>
+    <div class="echart">
+      <loading :data="driverDangerTrend">
+        <lineChart chartTheme="dark"
+                   :data='driverDangerTrend'
+                   :color="colorData"
+                   yaxisName="占比(%)"></lineChart>
+      </loading>
+                   <!-- :data="driverDangerTrend" -->
+    </div>
+    <!-- 不同周期高危驾驶行为数量 -->
+    <template>
+      <div class="quantityDriver">
+        <quantityDriver></quantityDriver>
+      </div>
+    </template>
+  </div>
+</template>
+<script>
+/* eslint-disable */
+import { mapState, mapActions, mapMutations } from 'vuex'
+import variationTrend from '../../../components/companysecure/variationTrend'
+import Htitle from '../../../components/companysecure/title'
+import KeyValueSelect from '../../../components/KeyValueSelect'
+import lineChart from '../../../components/charts/lineChart'
+import Dictionary from '../../../util/dictionary'
+import quantityDriver from '../../../containers/companysecure/popupSecContainer/quantityDriver'
+
+const { driveEventType: { danger }, date: { year, month } } = Dictionary
+
+export default {
+  components: {
+    variationTrend,
+    Htitle,
+    KeyValueSelect,
+    lineChart,
+    quantityDriver,
+  },
+  computed: {
+    ...mapState('driverTrend', ['driverDangerTrend']),
+    ...mapState('secureMain', ['selectedEntity']),
+    ...mapState('secureMain', ['entity_id']),
+    property() {
+      return [
+        {
+          name: '同比',
+          type: 'line',
+          axis: 0,
+        },
+        {
+          name: '环比',
+          type: 'line',
+          axis: 0,
+        },
+      ]
+    },
+    fetchData() {
+      return {
+        entity_id: this.entity_id,
+        year: this.year,
+        month: this.month,
+        drive_event_type_code: this.type,
+      }
+    },
+  },
+  methods: {
+    ...mapMutations('popupSecContainer', ['getComDetails']),
+    ...mapActions('driverTrend', ['getDriverDangerTrend']),
+    ...mapMutations('companysecure', ['openSecure']),
+    select(name,item){
+      this[name] = item.value
+      this.getDriverDangerTrend(this.fetchData)
+    },
+    openDetail(item) {
+      this.getComDetails(item)
+    },
+  },
+  data: () => ({
+    nowYear:(new Date().getFullYear())+'年',
+    nowMonth:(new Date().getMonth()+1)+'月',
+    colorData:['#05d0eb','#81d9e5','#f6ffcb','#e75029','#038bfc','#006a55'],
+    dangerOption: [{ label: '全部', value: null }, ...danger],
+    yearOption: [{ label: '全部', value: null }, ...year],
+    monthOption: [{ label: '全部', value: null }, ...month],
+    year: null,
+    month: null,
+    type: null,
+    data:[{
+          name: '同比',
+          type: 'line',
+          axis: 0,
+        },
+        {
+          name: '环比',
+          type: 'line',
+          axis: 0,
+        },]
+  }),
+}
+</script>
+<style lang="scss" scoped>
+@mixin size($width, $height) {
+  width: $width;
+  height: $height;
+}
+.trend {
+  width: 100%;
+  height: 260px;
+  position: relative;
+  /* color:#b5b5b5; */
+  .header {
+    // width: 330px;
+    width: 100%;
+    height: 25px;
+    position: relative;
+    .headerOpen{
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: url("../../../assets/driver/drill_icon_off.png") no-repeat center center;
+      top: 2px;
+      right: 5px;
+      cursor: pointer;
+    }
+  }
+  .change {
+    margin-top: 10px;
+    //margin-bottom: 10px;
+    height: 24.3px;
+    font-size: 14px;
+    line-height: 25px;
+    div {
+      float: left;
+      height: 25px;
+      color: #b5b5b5;
+    }  
+    div:nth-child(1) {        
+        width:56px;
+    }    
+    div:nth-child(2) {
+      margin-left:15.8px;
+      width:119px;
+    }
+    div:nth-child(3) {       
+      margin-left:9.5px;
+      width:107px;
+    }    
+    div:nth-child(4) {
+      // clear:both;  
+      width:56px;
+      margin-left: 6px;
+      // margin-top:4.3px;
+    }  
+    div:nth-child(5) {        
+      // margin-left:15.8px;
+      margin-left:10.7px;
+      // margin-top:4.3px;
+      width:235px;
+    }   
+  }
+  .echart {
+    // clear: both;
+    height: 200px;
+    margin-top:10px;
+    // background: lightblue;
+  }
+  .quantityDriver{
+    @include size(200px,300px);
+  }
+}
+</style>

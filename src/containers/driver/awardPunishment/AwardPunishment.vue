@@ -1,0 +1,612 @@
+<template>
+  <div class="awardPunishmentWrap">
+    <div class="awardPunishmentWrap_top">
+      <div class="title">
+        <div class="rewardTitle" @click="rewardCon(1)" :class="rewardConKey===1?'TitleActive':''">奖励信息
+          <i @click="open('rewardInfo')"></i>
+        </div>
+        <div class="punishTitle" @click="rewardCon(2)" :class="rewardConKey===2?'TitleActive':''">惩罚信息
+          <i @click="open('punishInfo')"></i>
+        </div>
+      </div> 
+      <div class="awardWrap" v-if="rewardConKey===1">
+        <div class="safe">
+          <div class="subTitle">
+            安全之星
+          </div>
+          <template v-if="reward&&reward.length>0">
+            <div class="darkColorStar">
+              <div class="highlightStar"
+                  v-for="(item,index) in safeStar"
+                  :key="index"
+                  :class='[item===true?"hightLight":""]'
+                  @click='item===true?chooseSafeOrder(index):null'>
+              </div>
+            </div>
+            <div class="barNumber">
+              {{safeOrder}}
+            </div>
+          </template>
+          <loading :data='reward'></loading>
+        </div>
+        <div class="fuelSaving">
+          <div class="subTitle">
+            节油之星
+          </div>
+          <template v-if="reward&&reward.length>0">
+            <div class="darkColorStar"
+                v-if="reward">
+              <div class="highlightStar"
+                  v-for="(item,index) in saveStar"
+                  :key="index"
+                  :class='[item===true?"hightLight":""]'
+                  @click='chooseSaveOrder(index)'>
+              </div>
+            </div>
+            <div class="barNumber">
+              {{saveOrder}}
+            </div>
+          </template>
+          <loading :data='reward'></loading>
+        </div>
+        <div class="detailsBtn">
+          <div class="detailBtn"
+              :class='{choosed:orderRange == "fleet_reward_ranking"}'
+              @click='chooseRange("fleet_reward_ranking")'>车队</div>
+          <div class="detailBtn"
+              :class='{choosed:orderRange == "company_reward_ranking"}'
+              @click='chooseRange("company_reward_ranking")'>总公司</div>
+        </div>
+        <div class="setting">设置</div>
+      </div>
+      <div class="punishmentWrap" v-if="rewardConKey===2">
+        <div class="contentWrap">
+          <template v-if="punishment&&punishment.length>0">
+            <div class="itemsContent">
+              <div class="itemsTitle">警告</div>
+              <div class="itemsNo">{{punishmentCount("警告")}}
+                <span>次</span>
+                <div class="leftBorder"></div>
+                <div class="rightBorder"></div>
+              </div>
+            </div>
+            <div class="itemsContent">
+              <div class="itemsTitle">通报批评</div>
+              <div class="itemsNo">{{punishmentCount("通报批评")}}
+                <span>次</span>
+                <div class="leftBorder"></div>
+                <div class="rightBorder"></div>
+              </div>
+            </div>
+            <div class="itemsContent">
+              <div class="itemsTitle">记过</div>
+              <div class="itemsNo">{{punishmentCount("记过")}}
+                <span>次</span>
+                <div class="leftBorder"></div>
+                <div class="rightBorder"></div>
+              </div>
+            </div>
+            <div class="itemsContent">
+              <div class="itemsTitle">记大过</div>
+              <div class="itemsNo">{{punishmentCount("记大过")}}
+                <span>次</span>
+                <div class="leftBorder"></div>
+                <div class="rightBorder"></div>
+              </div>
+            </div>
+            <div class="itemsContent">
+              <div class="itemsTitle">降级</div>
+              <div class="itemsNo">{{punishmentCount("降级")}}
+                <span>次</span>
+                <div class="leftBorder"></div>
+                <div class="rightBorder"></div>
+              </div>
+            </div>
+            <div class="itemsContent">
+              <div class="itemsTitle">留用查看</div>
+              <div class="itemsNo">{{punishmentCount("留用查看")}}
+                <span>次</span>
+                <div class="leftBorder"></div>
+                <div class="rightBorder"></div>
+              </div>
+            </div>
+          </template>
+          <loading :data='punishment'></loading>
+        </div>
+      </div>
+    </div>
+    <div class="awardPunishmentWrap_bottom">
+      <div class="SafetyIntegral">
+        <div class="title">安全积分
+          <i @click="open('safetyIntegral')"></i>
+        </div>
+        <div class="contentWrap">
+          <template v-if="safetyIntegral&&safetyIntegral.length>0&&safetyIntegralCount">
+            <div class="itemsContent">
+              <div class="itemsTitle">满分</div>
+              <div class="itemsNo">{{safetyIntegralCount.total_year_score}}
+                <span>分</span>
+                <div class="leftBorder"></div>
+                <div class="rightBorder"></div>
+              </div>
+            </div>
+            <div class="itemsContent">
+              <div class="itemsTitle">剩余安全积分</div>
+              <div class="itemsNo">{{safetyIntegralCount.total_surplus_score}}
+                <span>分</span>
+                <div class="leftBorder"></div>
+                <div class="rightBorder"></div>
+              </div>
+            </div>
+            <div class="itemsContent">
+              <div class="itemsTitle">安全奖金</div>
+              <div class="itemsNo">{{safetyIntegralCount.total_year_amount}}
+                <span class="money">元</span>
+                <div class="leftBorder"></div>
+                <div class="rightBorder"></div>
+              </div>
+            </div>
+            <div class="itemsContent">
+              <div class="itemsTitle">剩余安全奖金</div>
+              <div class="itemsNo">{{safetyIntegralCount.total_surplus_amount}}
+                <span class="money">元</span>
+                <div class="leftBorder"></div>
+                <div class="rightBorder"></div>
+              </div>
+            </div>
+          </template>
+          <loading :data='safetyIntegral'></loading>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+<script>
+/* eslint-disable */
+import _ from 'lodash'
+import { mapActions, mapState, mapMutations } from 'vuex'
+
+export default {
+  components: {},
+  computed: {
+    ...mapState('driverreward', ['jc', 'reward', 'punishment', 'safetyIntegral']),
+    safeStar() {
+      // initial month when begin
+      this.safeOrderMonth = this.reward.filter(
+        star => star.reward_reasons === '安全之星',
+      )[0].month
+
+      return this.months.map((m) => {
+        const index = _.findIndex(
+          this.reward,
+          star => star.month === m && star.reward_reasons === '安全之星',
+        )
+        if (index !== -1) {
+          return true
+        }
+        return false
+      })
+    },
+    saveStar() {
+      // initial month when begin
+      this.saveOrderMonth = this.reward.filter(
+        star => star.reward_reasons === '节油之星',
+      )[0].month
+
+      return this.months.map((m) => {
+        const index = _.findIndex(
+          this.reward,
+          star => star.month === m && star.reward_reasons === '节油之星',
+        )
+        if (index !== -1) {
+          return true
+        }
+        return false
+      })
+    },
+    saveOrder() {
+      return this.reward.filter(
+        star =>
+          star.month === this.saveOrderMonth &&
+          star.reward_reasons === '节油之星',
+      )[0][this.orderRange]
+    },
+    safeOrder() {
+      return this.reward.filter(
+        star =>
+          star.month === this.safeOrderMonth &&
+          star.reward_reasons === '安全之星',
+      )[0][this.orderRange]
+    },
+    punishmentCount() {
+      return function (type) {
+        const p = this.punishment.filter(p => p.cflx.punishment_type === type)
+        if (p.length > 0) {
+          return p[0]['count(driver_id)']
+        }
+        return 0
+      }
+    },
+    safetyIntegralCount() {
+      if (this.safetyIntegral && this.safetyIntegral !== null) {
+        return {
+          total_year_amount: this.safetyIntegral[0].total_year_amount,
+          total_year_score: this.safetyIntegral[0].total_year_score,
+          total_surplus_amount: (Number(this.safetyIntegral[0].total_year_amount) - Number(this.safetyIntegral[0].total_deduction_amount)),
+          total_surplus_score: (this.safetyIntegral[0].total_year_score - this.safetyIntegral[0].total_deduction_score),
+        }
+      }
+      return ''
+    },
+  },
+  methods: {
+    ...mapActions('driverreward', ['getJc']),
+    ...mapMutations('driver', ['open']),
+    chooseSafeOrder(index) {
+      this.safeOrderMonth = this.months[index]
+    },
+    chooseSaveOrder(index) {
+      this.saveOrderMonth = this.months[index]
+    },
+    chooseRange(range) {
+      this.orderRange = range
+    },
+    rewardCon(item) {
+      this.rewardConKey = item
+    },
+  },
+  data() {
+    return {
+      months: [
+        '01',
+        '02',
+        '03',
+        '04',
+        '05',
+        '06',
+        '07',
+        '08',
+        '09',
+        '10',
+        '11',
+        '12',
+      ],
+      safeOrderMonth: '',
+      saveOrderMonth: '',
+      orderRange: 'fleet_reward_ranking',
+      rewardConKey: 1,
+    }
+  },
+}
+</script>
+<style lang="scss" scoped>
+@mixin size($width,$height) {
+  width: $width;
+  height: $height;
+}
+.awardPunishmentWrap {
+  @include size(100%,100%);
+  position: relative;
+  &_top{
+    @include size(100%,250px);
+    .title{
+      @include size(100%,30px);
+      div{
+        @include size(200px,30px);
+        float: left;
+        line-height: 30px;
+        font-size: 18px;
+        font-weight: bold;
+        background: #2F484F;
+        color: #84AFAF;
+        padding-left: 22px;
+        box-sizing: border-box;
+        position: relative;
+        cursor: pointer;
+        i {
+          @include size(30px,30px);
+          position: absolute;
+          top: 0;
+          right: 0;
+          background: url(../../../assets/driver/drill_icon_on.png) no-repeat
+            center center;
+          cursor: pointer;
+        }
+        &:nth-child(2){
+          float: right;
+        }
+      }
+      .TitleActive{
+        background: #005b7f;
+        color: #89dddf;
+      }
+    }
+    .awardWrap {
+      @include size(100%,210px);
+      margin-top:50px;
+      position: relative;
+      .title {
+        @include size(200px,30px);
+        line-height: 30px;
+        color: #89dddf;
+        font-size: 18px;
+        font-weight: bold;
+        padding-left: 22px;
+        background: #005b7f;
+        box-sizing: border-box;
+        position: relative;
+        i {
+          @include size(30px,30px);
+          position: absolute;
+          top: 0;
+          right: 0;
+          background: url(../../../assets/driver/drill_icon_on.png) no-repeat
+            center center;
+          cursor: pointer;
+        }
+      }
+      .safe {
+        @include size(100%,75px);
+        .subTitle {
+          @include size(150px,25px);
+          line-height: 25px;
+          color: #89dddf;
+          font-size: 16px;
+          padding-left: 22px;
+          margin-top: 10px;
+          background: #2f525b;
+          box-sizing: border-box;
+        }
+        .darkColorStar {
+          @include size(340px,35px);
+          float: left;
+          margin-top: 14px;
+          .highlightStar {
+            @include size(26px,26px);
+
+            margin-right: 2px;
+            float: left;
+            background: url(../../../assets/driver/star_off.png) no-repeat center
+              center;
+
+            &:last-child {
+              margin-right: 0px;
+            }
+          }
+          // .lastStar {
+          // }
+          .hightLight {
+            @include size(26px,26px);
+            cursor: pointer;
+            margin-left: 2px;
+            background: url(../../../assets/driver/star_on.png) no-repeat center
+              center;
+          }
+        }
+        .barNumber {
+          @include size(140px,35px);
+          font-family: "digi" !important;
+          font-size: 36px;
+          font-weight: bold;
+          color: #efca0f;
+          margin-top: 10px;
+          text-align: right;
+          float: left;
+          background: url(../../../assets/driver/rank_2.png) no-repeat 0px center;
+          padding-top: 2.5px;
+          box-sizing: border-box;
+        }
+      }
+      .fuelSaving {
+        @extend .safe;
+        margin-top: 0;
+      }
+      .detailsBtn {
+        @include size(210px,30px);
+        position: absolute;
+        top: -40px;
+        left: -10px;
+        .detailBtn {
+          @include size(95px,30px);
+          line-height: 30px;
+          text-align: center;
+          color: #b5b5b5;
+          font-size: 14px;
+          margin-left: 10px;
+          float: left;
+          border: 1px solid rgba(0, 191, 229, 1);
+          box-sizing: border-box;
+          cursor: pointer;
+          background: rgba(0, 191, 229, 0.2);
+
+          &.choosed {
+            background: rgba(0, 191, 229, 0.5);
+          }
+        }
+      }
+      .setting{
+        @include size(92px,30px);
+        position: absolute;
+        top: -40px;
+        right: 0px;
+        border: 1px solid rgba(0, 191, 229, 1);
+        box-sizing: border-box;
+        cursor: pointer;
+        background: rgba(0, 191, 229, 0.2);
+        line-height: 30px;
+        text-align: center;
+        color: #b5b5b5;
+        font-size: 14px;
+      }
+    }
+    .punishmentWrap {
+      @include size(100%,155px);
+      .title {
+        @include size(200px,30px);
+        line-height: 30px;
+        color: #89dddf;
+        font-size: 18px;
+        font-weight: bold;
+        padding-left: 22px;
+        background: #005b7f;
+        box-sizing: border-box;
+        position: relative;
+        i {
+          @include size(30px,30px);
+          position: absolute;
+          top: 0;
+          right: 0;
+          background: url(../../../assets/driver/drill_icon_on.png) no-repeat
+            center center;
+        }
+      }
+      .contentWrap {
+        @include size(100%,110px);
+        margin-top: 30px;
+        .itemsContent {
+          @include size(225px,30px);
+          float: left;
+          margin-bottom: 30px;
+          .itemsTitle {
+            @include size(95px,30px);
+            line-height: 30px;
+            color: #89dddf;
+            font-size: 16px;
+            text-align: center;
+
+            float: left;
+          }
+          .itemsNo {
+            @include size(130px,28px);
+            line-height: 30px;
+            color: #05d0eb;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            float: left;
+            margin-top: -1px;
+            background: #0a0f13;
+            position: relative;
+            span {
+              font-size: 14px;
+              line-height: 16px;
+              color: #fff;
+              position: absolute;
+              top: 8px;
+              right: 30px;
+            }
+            .leftBorder {
+              @include size(19px,28px);
+              border: 1px solid #89dddf;
+              border-right: none;
+              position: absolute;
+              top: -1px;
+              left: 0;
+              // box-sizing: border-box;
+            }
+            .rightBorder {
+              @include size(19px,28px);
+              border: 1px solid #89dddf;
+              border-left: none;
+              position: absolute;
+              top: -1px;
+              right: 0;
+            }
+          }
+        }
+        .itemsContent:nth-child(2n) {
+          margin-left: 10px;
+        }
+      }
+    }
+  }
+  &_bottom{
+    @include size(100%,200px);
+    .SafetyIntegral {
+      @include size(100%,155px);
+      .title {
+        @include size(200px,30px);
+        line-height: 30px;
+        color: #89dddf;
+        font-size: 18px;
+        font-weight: bold;
+        padding-left: 22px;
+        background: #005b7f;
+        box-sizing: border-box;
+        position: relative;
+        i {
+          @include size(30px,30px);
+          position: absolute;
+          top: 0;
+          right: 0;
+          background: url(../../../assets/driver/drill_icon_on.png) no-repeat
+            center center;
+          cursor: pointer;
+        }
+      }
+      .contentWrap {
+        @include size(100%,110px);
+        margin-top: 30px;
+        .itemsContent {
+          @include size(240px,30px);
+          float: left;
+          margin-bottom: 30px;
+          .itemsTitle {
+            @include size(110px,30px);
+            line-height: 30px;
+            color: #89dddf;
+            font-size: 16px;
+            text-align: left;
+            box-sizing: border-box;
+            padding-left:10px;
+            float: left;
+          }
+          .itemsNo {
+            @include size(120px,28px);
+            line-height: 30px;
+            color: #05d0eb;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            float: left;
+            margin-top: -1px;
+            background: #0a0f13;
+            position: relative;
+            span {
+              font-size: 14px;
+              line-height: 16px;
+              color: #fff;
+              position: absolute;
+              top: 8px;
+              right: 20px;
+            }
+            .money{
+              right:5px;
+            }
+            .leftBorder {
+              @include size(19px,28px);
+              border: 1px solid #89dddf;
+              border-right: none;
+              position: absolute;
+              top: -1px;
+              left: 0;
+              // box-sizing: border-box;
+            }
+            .rightBorder {
+              @include size(19px,28px);
+              border: 1px solid #89dddf;
+              border-left: none;
+              position: absolute;
+              top: -1px;
+              right: 0;
+            }
+          }
+        }
+        .itemsContent:nth-child(2n) {
+          margin-left: 0px;
+        }
+      }
+    }
+  }
+}
+</style>

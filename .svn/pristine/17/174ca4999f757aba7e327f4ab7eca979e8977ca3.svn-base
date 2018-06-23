@@ -1,0 +1,23 @@
+import * as CompanyAPI from '@/api/companymanage'
+
+const state = {
+  costData: null,
+}
+const mutations = {
+  setData(state, data) {
+    state.costData = data.data
+    // console.log(state.costData)
+  },
+}
+const actions = {
+  async getCost({ commit }) {
+    const costRatio = await CompanyAPI.getRunReal()
+    commit('setData', costRatio)
+  },
+}
+export default {
+  namespaced: true,
+  state,
+  actions,
+  mutations,
+}

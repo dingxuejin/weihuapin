@@ -1,0 +1,176 @@
+<template>
+  <div class="lineRanking">
+    <div class="title">
+      <span>货物流量流向统计</span>
+      <div class="btn"
+           @click="getDetails"></div>
+    </div>
+
+    <div class="type">
+      <key-value-select :data='cargoOptions'
+                        @select='selectType'
+                        defaultValue='天然气[含甲烷的;液化的]'></key-value-select>
+    </div>
+
+    <div class="labeltype">货物类型</div>
+
+    <div class="year">
+      <key-value-select :data='yearOptions'
+                        @select='selectYear'></key-value-select>
+    </div>
+    <div class="labelyear">统计周期</div>
+    <div class="goodsTjechart">
+      <!-- tubiao -->
+      <lineDoubleAxis v-if="cargoFlow"
+                      chartTheme="dark"
+                      :data="cargoFlow"
+                      :color="[
+                        '#05d0eb',
+                        '#81d9e5',
+                        '#f6ffcb',
+                        '#e75029',
+                        '#038bfc',
+                        '#006a55',
+                      ]"
+                      dataZoom=false
+                      :property='property'
+                      yaxisNameL="货物量(吨)"
+                      yaxisNameR="百分比(%)"></lineDoubleAxis>
+      <loading :data='cargoFlow'></loading>
+    </div>
+  </div>
+</template>
+
+<script>
+import { mapState, mapActions, mapMutations } from 'vuex'
+import KeyValueSelect from '../../../components/KeyValueSelect'
+import lineDoubleAxis from '../../../components/charts/lineDoubleAxis'
+import Dictionary from '../../../util/dictionary'
+
+const { date } = Dictionary
+export default {
+  components: {
+    KeyValueSelect,
+    lineDoubleAxis,
+  },
+  mounted() {
+    this.getCargoId_name()
+  },
+  computed: {
+    ...mapState('manageGoodsTj', ['cargoFlow']),
+    ...mapState('maintitlemsg', ['selectedEntity']),
+    ...mapState('companyManage', ['cargoId_name']),
+    property() {
+      const p = [
+        {
+          name: '货物量',
+          type: 'bar',
+          axis: 0,
+        },
+        {
+          name: '货物量环比',
+          type: 'line',
+          axis: 1,
+        },
+        {
+          name: '货物量同比',
+          type: 'line',
+          axis: 1,
+        },
+      ]
+      return p
+    },
+  },
+  watch: {
+    cargoId_name() {
+      this.cargoOptions = this.cargoId_name
+      console.log('cargoId_name', this.cargoId_name)
+    },
+  },
+  methods: {
+    ...mapActions('manageGoodsTj', ['getCargoFlow']),
+    ...mapMutations('popupContainer', ['getComDetails']),
+    ...mapActions('companyManage', ['getCargoId_name']),
+    getDetails() {
+      this.getComDetails('goodstj')
+    },
+    requestCargoFlow() {
+      this.getCargoFlow({
+        // entity_id: this.selectedEntity ? this.selectedEntity.entity_id : 1310000010000000,
+        entity_id: this.selectedEntity && this.selectedEntity,
+        year: this.year,
+        cargo_id: this.cargo_id,
+      })
+    },
+    selectType(item) {
+      this.cargo_id = item.value
+      this.requestCargoFlow()
+    },
+    selectYear(item) {
+      this.year = item.value
+      this.requestCargoFlow()
+    },
+  },
+  data: () => ({
+    yearOptions: date.year,
+    cargoOptions: this.cargoId_name,
+    year: 2018,
+    cargo_id: '1',
+  }),
+}
+</script>
+
+<style lang="scss" scoped>
+.lineRanking {
+  width: 100%;
+  height: 100%;
+  .title {
+    width: 568px;
+    height: 25px;
+    margin-bottom: 5px;
+    line-height: 25px;
+    background: rgba(129, 217, 229, 0.3);
+    text-indent: 20px;
+    font-size: 16px;
+    color: #89dddf;
+    position: relative;
+    .btn {
+      position: absolute;
+      width: 20px;
+      height: 6px;
+      background: url("../../../assets/driver/drill_icon_on.png") no-repeat;
+      top: 10px;
+      right: 10px;
+      cursor: pointer;
+    }
+  }
+  .type,
+  .year {
+    float: right;
+    width: 210px;
+    height: 25px;
+    color: #b5b5b5;
+    margin-bottom: 10px;
+  }
+  .type {
+    width: 199px;
+  }
+  .labeltype,
+  .labelyear {
+    width: 64px;
+    height: 20px;
+    float: right;
+    line-height: 20px;
+    margin: 0 10px;
+    color: #b5b5b5;
+  }
+  .labelyear {
+    margin: 0 10px 0 0;
+  }
+  .goodsTjechart {
+    height: 138px;
+    clear: both;
+    // background: lightblue;
+  }
+}
+</style>

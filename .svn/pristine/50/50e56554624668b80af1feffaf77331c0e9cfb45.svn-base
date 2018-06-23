@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<!-- 通过entity_id查询TB_SUBJECT_QY_NDTXCB和TB_SUBJECT_QY_NDRLCB表中最新数据-->
+<mapper namespace="com.mobiusVision.dao.TbSubject.TbSubjectQyNdbycbTDJMapper" >
+
+    <resultMap id="BaseResultMap" type="com.mobiusVision.pojo.TbSubject.TbSubjectQyNdbycb" >
+        <!-- column代表数据库 property代表pojo-->
+        <id column="tb_subject_qy_ndbycb_id" property="tb_subject_qy_ndbycb_id" jdbcType="INTEGER" />
+        <result column="year" property="year" jdbcType="VARCHAR" />
+        <result column="entity_id" property="entity_id" jdbcType="VARCHAR" />
+        <result column="maintain_times" property="maintain_times" jdbcType="VARCHAR" />
+        <result column="maintain_cost" property="maintain_cost" jdbcType="VARCHAR" />
+        <result column="maintaintimes_tenthousand_km" property="maintaintimes_tenthousand_km" jdbcType="VARCHAR" />
+        <result column="maintaincost_tenthousand_km" property="maintaincost_tenthousand_km" jdbcType="VARCHAR" />
+        <result column="maintaincost_per_waybill" property="maintaincost_per_waybill" jdbcType="VARCHAR" />
+        <result column="million_turnover_cost" property="million_turnover_cost" jdbcType="VARCHAR" />
+    </resultMap>
+    <resultMap id="TbSubjectQyNdByAndJcAndWxcbTDJ" type="TbSubjectQyNdbycbTDJ" extends="BaseResultMap"   >
+        <association property="tbSubjectQyNdjccb" javaType="TbSubjectQyNdjccb" >
+            <id column="tb_subject_qy_ndjccb_id" property="tb_subject_qy_ndjccb_id" jdbcType="INTEGER" />
+            <result column="fuel_quantity" property="fuel_quantity" jdbcType="VARCHAR" />
+            <result column="test_type_code" property="test_type_code" jdbcType="VARCHAR" />
+            <result column="test_times" property="test_times" jdbcType="VARCHAR" />
+            <result column="test_cost" property="test_cost" jdbcType="VARCHAR" />
+            <result column="pass_rate" property="pass_rate" jdbcType="VARCHAR" />
+        </association>
+        <association property="tbSubjectQyNdwxcb" javaType="TbSubjectQyNdwxcb" >
+            <id column="tb_subject_qy_ndwxcb_id" property="tb_subject_qy_ndwxcb_id" jdbcType="INTEGER" />
+            <result column="repair_times" property="repair_times" jdbcType="VARCHAR" />
+            <result column="repair_cost" property="repair_cost" jdbcType="VARCHAR" />
+            <result column="repairtimes_tenthousand_km" property="repairtimes_tenthousand_km" jdbcType="VARCHAR" />
+            <result column="repaircost_tenthousand_km" property="repaircost_tenthousand_km" jdbcType="VARCHAR" />
+            <result column="repaircost_per_waybill" property="repaircost_per_waybill" jdbcType="VARCHAR" />
+            <result column="million_turnover_cost" property="million_turnover_cost" jdbcType="VARCHAR" />
+        </association>
+    </resultMap>
+
+    <!--通过entity_id查询TB_SUBJECT_QY_NDTXCB和TB_SUBJECT_QY_NDRLCB表中最新数据-->
+    <cache  eviction="LRU" flushInterval="60000"  size="512" readOnly="true"/>
+    <select id="findAllByEntityId" resultMap="TbSubjectQyNdByAndJcAndWxcbTDJ">
+        select t1.*,t2.*,t3.* from tb_subject_qy_ndbycb t1,tb_subject_qy_ndjccb t2,tb_subject_qy_ndwxcb t3 where t1.entity_ID=#{entity_id} and t2.entity_id=#{entity_id}
+         and t3.entity_ID=#{entity_id} order by t1.Year
+    </select>
+
+</mapper>

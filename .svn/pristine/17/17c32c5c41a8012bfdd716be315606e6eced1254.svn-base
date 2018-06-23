@@ -1,0 +1,267 @@
+<template>
+    <div class="normal">
+        <div v-drag class="home">
+            <PopUpFrame  @close="onCloseHome">
+                <div class="content">
+                    <div class="left">
+                        <div class="left_top">
+                            <div class="left_top_totalBox">
+                                <span>总报警车辆数</span>
+                                <div>3115</div>
+                            </div>
+                            <!-- <div class="left_top_rankBtn" @click="statisticsIndex=2">
+                                <p :class="statisticsIndex==2?'active':''">报警排名TOP5</p>
+                            </div> -->
+                            <header>预警统计</header>
+                            <ul class="left_top_title">
+                                <li :class="statisticsIndex==0?'active':''" @click="statisticsIndex=0">车机报警</li>
+                                <li class="left_top_title_pulldown" @mouseleave="showStatPullDown=false">
+                                    <p :class="statisticsIndex==1?'active':''" @mouseover="showStatPullDown=true">
+                                        ADAS报警<i class="el-icon-arrow-down" />
+                                    </p>
+                                    <ul v-if="showStatPullDown">
+                                        <li :class="ADASIndex==0?'active':''" @click="ADASIndex=0;statisticsIndex=1">驾驶行为报警</li>
+                                        <li :class="ADASIndex==1?'active':''" @click="ADASIndex=1;statisticsIndex=1">违规行为报警</li>
+                                    </ul>
+                                </li>
+                                <li :class="statisticsIndex==2?'active':''" @click="statisticsIndex=2">报警排名TOP5</li>
+                            </ul>
+                            <div class="date_select">
+                                <span>统计周期</span>
+                                <div>
+                                    <key-value-select width="100px" :data="yearData" defaultValue="2017年" @select='select("year",$event)'>
+                                    </key-value-select>
+                                </div>
+                                <div>
+                                    <key-value-select width='80px' :data='monthData' @select='select("month",$event)'> 
+                                    </key-value-select>
+                                </div>
+                                <div>
+                                    <key-value-select width='80px' :data='dayData' @select='select("day",$event)'> 
+                                    </key-value-select>
+                                </div>
+                            </div>
+                            <WarningBarRank v-if="statisticsIndex==2"></WarningBarRank>
+                            <WarningPieTotal v-else></WarningPieTotal>
+                        </div>
+                        <div class="left_bottom">
+                            <header>报警信息变动趋势</header>
+                            <ul class="left_top_title left_bottom_title">
+                                <li :class="InfoIndex==0?'active':''" @click="InfoIndex=0">车机报警</li>
+                                <li class="left_top_title_pulldown" @mouseleave="showInfoPullDown=false">
+                                    <p :class="InfoIndex==1?'active':''" @mouseover="showInfoPullDown=true">
+                                        ADAS报警<i class="el-icon-arrow-down" />
+                                    </p>
+                                    <ul v-if="showInfoPullDown">
+                                        <li :class="ADASIndex==0?'active':''" @click="ADASIndex=0;InfoIndex=1">驾驶行为报警</li>
+                                        <li :class="ADASIndex==1?'active':''" @click="ADASIndex=1;InfoIndex=1">违规行为报警</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                            <div class="date_select">
+                                <span>统计周期</span>
+                                <div>
+                                    <key-value-select width="100px" :data="yearData" defaultValue="2017年" @select='select("year",$event)'>
+                                    </key-value-select>
+                                </div>
+                                <div>
+                                    <key-value-select width='80px' :data='monthData' @select='select("month",$event)'> 
+                                    </key-value-select>
+                                </div>
+                            </div>
+                            <WarningBarInfoChange></WarningBarInfoChange>
+                        </div>
+                    </div>
+                    <div class="right">
+                        <header>处理统计</header>
+                        <WarningPieDispose></WarningPieDispose>
+                        <DisposeRankList></DisposeRankList>
+                    </div>
+                </div>
+            </PopUpFrame>
+        </div>
+    </div>
+</template>
+<script>
+/* eslint-disable */
+import PopUpFrame from '@/components/PopUpFrame'
+import KeyValueSelect from '@/components/KeyValueSelect'
+import Dictionary from '@/util/dictionary'
+import WarningBarRank from './WarningBarRank.vue'
+import WarningPieTotal from './WarningPieTotal.vue'
+import WarningBarInfoChange from './WarningBarInfoChange.vue'
+import WarningPieDispose from './WarningPieDispose.vue'
+import DisposeRankList from  './DisposeRankList.vue'
+
+const { date: { year, month,day } } = Dictionary
+export default {
+    components:{
+        PopUpFrame,
+        KeyValueSelect,
+        WarningBarRank,
+        WarningPieTotal,
+        WarningBarInfoChange,
+        WarningPieDispose,
+        DisposeRankList
+    },
+    data(){
+        return {
+            yearData: year,
+            monthData: [{ label: '全年', value: null }, ...month],
+            dayData:[{ label: '全部', value: null }, ...day],
+            changeInfoDate:"",
+            statisticsIndex:0,
+            ADASIndex:null,
+            showStatPullDown:false,
+            InfoIndex:0,
+            showInfoPullDown:false,
+            pickerOptions:{
+                disabledDate(time) {
+                    return time.getTime() > Date.now();
+                }
+            }
+        }
+    },
+    methods: {
+        onCloseHome() {
+            this.$emit('onCloseHome')
+        },
+        onChangeDate(d){
+            console.log(d)
+        },
+        select() {
+
+        },
+    },
+}
+</script>
+<style lang="scss" scoped>
+.home{
+    right: 90px;
+    top: 75px;
+    .content{
+        display: table;
+        width: 100%;
+        background-color: rgba(9,122,206,0.2);
+        padding: 6px;
+        box-sizing: border-box;
+        border-collapse: separate;
+        border-spacing: 5px;
+        .left{
+            display: table-cell;
+            width: 450px;
+            &_top{
+                background-color: rgba(9,122,206,0.3);
+                height: 300px;
+                position: relative;
+                &_totalBox{
+                    position: absolute;
+                    top: 110px;
+                    left: 10px;
+                    span{
+                        color: #89dddf;
+                    }
+                    div{
+                        margin-top: 5px;
+                        width: 120px;
+                        height: 20px;
+                        background: rgba(3, 139, 252, 0.4);
+                        font-weight: bold;
+                        color: #05d0eb;
+                        text-align: center;
+                        line-height: 20px;
+                    }
+                }
+                &_rankBtn{
+                    position: absolute;
+                    bottom: 5px;
+                    right: 5px;
+                    p{         
+                        background-color: rgba(5,208,235,0.20);
+                        border: 1px solid rgba(5,208,235,0.40);
+                        border-radius: 5px;
+                        padding: 5px 20px;
+                        cursor: pointer;
+                    }
+                }
+                &_title{
+                    width:430px;
+                    background-color: rgba(5,208,235,0.20);
+                    border: 1px solid rgba(5,208,235,0.40);
+                    box-sizing: border-box;
+                    border-radius: 3px;
+                    margin: 5px 10px;
+                    display: flex;
+                    justify-content: center;
+                    > li{
+                        width: 100%;
+                        height: 28px;
+                        line-height: 28px;
+                        text-align: center;
+                        cursor: pointer;
+                        border-left: 1px solid rgba(5,208,235,0.40);
+                        i{margin-left: 15px;}
+                    }
+                    li:first-child{
+                        border-left: none;
+                    }
+                    &_pulldown{
+                        position: relative;
+                        ul{
+                            position: absolute;
+                            width: 100%;
+                            background-color:#23455e;
+                            z-index: 11;
+                            border-radius: 5px;
+                            li{
+                                margin: 5px 0;
+                            }
+                            li:hover{
+                                background-color: #0892ae;
+                            }
+                        }
+                    }
+                }
+                &_node{
+                    border-radius: 5px;
+                    background-color: rgba(5,208,235,0.1);
+                    li{
+                        height: 24px;
+                        line-height: 24px;
+                        font-size: 15px;
+                    }
+                }
+            }
+            &_bottom{
+                margin-top: 5px;
+                background-color: rgba(9,122,206,0.3);
+                height: 300px;
+                &_title{
+                    width: 284px;
+                }
+            }
+            .active{
+                background-color: rgba(5,208,235,0.60);
+            }
+        }
+        .right{
+            display: table-cell;
+            width: 370px;
+            position: relative;
+            background-color: rgba(9,122,206,0.3);
+        }
+        header{
+            background-color: rgba(129,217,229,0.2);
+            margin: 0 10px;
+            padding: 5px 10px;
+        }
+    }
+}
+.date_select{
+    display: table;
+    margin: 0 10px;
+    > div{
+        display: table-cell;
+    }
+}
+</style>

@@ -1,0 +1,32 @@
+import * as DriverAPI from '@/api/driver'
+
+const state = {
+  jc: null,
+  reward: null,
+  punishment: null,
+}
+const mutations = {
+  setJc(state, data) {
+    state.reward = data.reward
+    state.punishment = data.punishment
+  },
+}
+
+const actions = {
+  async getJc({ commit }, param) {
+    commit('setJc', {
+      reward: null,
+      punishment: null,
+    })
+
+    const jc = await DriverAPI.getJc(param)
+    commit('setJc', jc.data)
+  },
+}
+
+export default {
+  namespaced: true,
+  state,
+  mutations,
+  actions,
+}

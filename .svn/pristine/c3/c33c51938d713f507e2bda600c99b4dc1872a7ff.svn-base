@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head><title></title>
+    <link rel="stylesheet" href="/stylesheets/style.css">
+</head>
+<body><h1>unsupported charset &quot;GBK&quot;</h1>
+<h2>415</h2>
+<pre>UnsupportedMediaTypeError: unsupported charset &quot;GBK&quot;
+    at urlencodedParser (F:\project\safe-project\code\dctserver_v9\node_modules\_body-parser@1.17.2@body-parser\lib\types\urlencoded.js:108:12)
+    at Layer.handle [as handle_request] (F:\project\safe-project\code\dctserver_v9\node_modules\_express@4.15.5@express\lib\router\layer.js:95:5)
+    at trim_prefix (F:\project\safe-project\code\dctserver_v9\node_modules\_express@4.15.5@express\lib\router\index.js:317:13)
+    at F:\project\safe-project\code\dctserver_v9\node_modules\_express@4.15.5@express\lib\router\index.js:284:7
+    at Function.process_params (F:\project\safe-project\code\dctserver_v9\node_modules\_express@4.15.5@express\lib\router\index.js:335:12)
+    at next (F:\project\safe-project\code\dctserver_v9\node_modules\_express@4.15.5@express\lib\router\index.js:275:10)
+    at jsonParser (F:\project\safe-project\code\dctserver_v9\node_modules\_body-parser@1.17.2@body-parser\lib\types\json.js:112:7)
+    at Layer.handle [as handle_request] (F:\project\safe-project\code\dctserver_v9\node_modules\_express@4.15.5@express\lib\router\layer.js:95:5)
+    at trim_prefix (F:\project\safe-project\code\dctserver_v9\node_modules\_express@4.15.5@express\lib\router\index.js:317:13)
+    at F:\project\safe-project\code\dctserver_v9\node_modules\_express@4.15.5@express\lib\router\index.js:284:7
+    at Function.process_params (F:\project\safe-project\code\dctserver_v9\node_modules\_express@4.15.5@express\lib\router\index.js:335:12)
+    at next (F:\project\safe-project\code\dctserver_v9\node_modules\_express@4.15.5@express\lib\router\index.js:275:10)
+    at logger (F:\project\safe-project\code\dctserver_v9\node_modules\_morgan@1.8.2@morgan\index.js:144:5)
+    at Layer.handle [as handle_request] (F:\project\safe-project\code\dctserver_v9\node_modules\_express@4.15.5@express\lib\router\layer.js:95:5)
+    at trim_prefix (F:\project\safe-project\code\dctserver_v9\node_modules\_express@4.15.5@express\lib\router\index.js:317:13)
+    at F:\project\safe-project\code\dctserver_v9\node_modules\_express@4.15.5@express\lib\router\index.js:284:7
+    at Function.process_params (F:\project\safe-project\code\dctserver_v9\node_modules\_express@4.15.5@express\lib\router\index.js:335:12)
+    at next (F:\project\safe-project\code\dctserver_v9\node_modules\_express@4.15.5@express\lib\router\index.js:275:10)
+    at expressInit (F:\project\safe-project\code\dctserver_v9\node_modules\_express@4.15.5@express\lib\middleware\init.js:40:5)
+    at Layer.handle [as handle_request] (F:\project\safe-project\code\dctserver_v9\node_modules\_express@4.15.5@express\lib\router\layer.js:95:5)
+    at trim_prefix (F:\project\safe-project\code\dctserver_v9\node_modules\_express@4.15.5@express\lib\router\index.js:317:13)
+    at F:\project\safe-project\code\dctserver_v9\node_modules\_express@4.15.5@express\lib\router\index.js:284:7</pre>
+</body>
+</html>

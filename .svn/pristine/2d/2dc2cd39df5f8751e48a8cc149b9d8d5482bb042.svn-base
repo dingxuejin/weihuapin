@@ -1,0 +1,191 @@
+<template>
+  <div class="trend">
+    <div class="header">
+      <htitle data='违法行为数量变化趋势'></htitle>
+      <div class="headerOpen" @click="openDetail('quantityIllegal')"></div>
+    </div>
+    <div class="change">
+      <div>统计周期</div>
+      <div>
+        <key-value-select width='119px'
+                          :data='yearOption'
+                          @select='selectYear'></key-value-select>
+      </div>
+      <div>
+        <key-value-select width='107px'
+                          :data='monthOption'
+                          @select='selectMonth'></key-value-select>
+      </div>
+      <div>行为类别</div>
+      <div>
+        <key-value-select width='235px'
+                          :data='dangerOption'
+                          @select='selectType'></key-value-select>
+      </div>
+    </div>
+    <div class="echart">
+      <loading :data='driverIllegalTrend'>
+        <lineChart chartTheme="dark"
+                   :data="driverIllegalTrend"
+                   :color="[
+                        '#05d0eb',
+                        '#81d9e5',
+                        '#f6ffcb',
+                        '#e75029',
+                        '#038bfc',
+                        '#006a55',
+                      ]"
+                   yaxisName="占比(%)"></lineChart>
+      </loading>
+    </div>
+    <!-- 不同周期违法行为数量 -->
+    <template>
+      <div class="quantityIllegal">
+        <quantityIllegal></quantityIllegal>
+      </div>
+    </template>
+  </div>
+</template>
+<script>
+import { mapState, mapActions, mapMutations } from 'vuex'
+import variationTrend from '../../../components/companysecure/variationTrend'
+import Htitle from '../../../components/companysecure/title'
+import KeyValueSelect from '../../../components/KeyValueSelect'
+import lineChart from '../../../components/charts/lineChart'
+import Dictionary from '../../../util/dictionary'
+
+import quantityIllegal from '../../../containers/companysecure/popupSecContainer/quantityIllegal'
+
+const { driveEventType: { illegal }, date: { year, month } } = Dictionary
+
+export default {
+  components: {
+    variationTrend,
+    Htitle,
+    KeyValueSelect,
+    lineChart,
+    quantityIllegal,
+  },
+  computed: {
+    ...mapState('illegalTrend', ['driverIllegalTrend']),
+    ...mapState('secureMain', ['entity_id']),
+    property() {
+      return [
+        {
+          name: '同比',
+          type: 'line',
+          axis: 0,
+        },
+        {
+          name: '环比',
+          type: 'line',
+          axis: 0,
+        },
+      ]
+    },
+    fetchData() {
+      return {
+        entity_id: this.entity_id,
+        year: this.year,
+        month: this.month,
+        drive_event_type_code: this.type,
+      }
+    },
+  },
+  methods: {
+    ...mapActions('illegalTrend', ['getDriverIllegalTrend']),
+    ...mapMutations('popupSecContainer', ['getComDetails']),
+    openDetail(item) {
+      this.getComDetails(item)
+    },
+    selectYear(item) {
+      this.year = item.value
+      this.getDriverIllegalTrend(this.fetchData)
+    },
+    selectMonth(item) {
+      this.month = item.value
+      this.getDriverIllegalTrend(this.fetchData)
+    },
+    selectType(item) {
+      this.type = item.value
+      this.getDriverIllegalTrend(this.fetchData)
+    },
+  },
+  data: () => ({
+    dangerOption: [{ label: '全部', value: null }, ...illegal],
+    yearOption: [{ label: '全部', value: null }, ...year],
+    monthOption: [{ label: '全部', value: null }, ...month],
+    year: null,
+    month: null,
+    type: null,
+    // year: 2017,
+    // month: 11,
+    // type: 30100,
+  }),
+}
+</script>
+<style lang="scss" scoped>
+@mixin size($width, $height) {
+  width: $width;
+  height: $height;
+}
+.trend {
+  width: 100%;
+  height: 260px;
+  /* color:#b5b5b5; */
+  .header {
+    width: 100%;
+    height: 25px;
+    position: relative;
+    .headerOpen{
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: url("../../../assets/driver/drill_icon_off.png") no-repeat center center;
+      top: 2px;
+      right: 5px;
+      cursor: pointer;
+    }
+  }
+  .change {
+    margin-top: 10px;
+    //margin-bottom: 10px;
+    height: 34.2px;
+    font-size: 14px;
+    div {
+      float: left;
+      height: 25px;
+      color: #b5b5b5;
+    }
+    div:nth-child(1) {
+      line-height: 25px;
+    }
+    div:nth-child(2) {
+      width: 119px;
+      margin-left: 15.8px;
+      margin-right: 9.5px;
+    }
+    div:nth-child(3) {
+      width: 107px;
+    }
+    div:nth-child(4) {
+      line-height: 25px;
+      margin-left:6px;
+      // margin-top: 4.2px;
+    }
+    div:nth-child(5) {
+      width: 235px;
+      // margin-top: 4.2px;
+      margin-left: 10.7px;
+    }
+  }
+  .echart {
+    clear: both;
+    height: 200px;
+    // background: lightblue;
+  }
+  .quantityIllegal{
+    @include size(200px,300px);
+  }
+}
+</style>

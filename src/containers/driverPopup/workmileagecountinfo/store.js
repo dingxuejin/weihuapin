@@ -1,0 +1,23 @@
+import * as DriverAPI from '@/api/driver'
+
+const state = {
+  workMileageCountInfo: null,
+}
+const mutations = {
+  setWorkMileageCountInfo(state, data) {
+    state.workMileageCountInfo = data
+  },
+}
+const actions = {
+  async getWorkMileageCountInfo({ commit }, param) {
+    commit('setWorkMileageCountInfo', null)
+    const workMileageCountInfo = await DriverAPI.getWorkMileageCountInfo(param)
+    commit('setWorkMileageCountInfo', workMileageCountInfo.data)
+  },
+}
+export default {
+  namespaced: true,
+  state,
+  actions,
+  mutations,
+}

@@ -1,0 +1,507 @@
+<template>
+  <div class="dbase">
+    <div class="title">驾驶员基本信息</div>
+    <!-- 搜索框 -->
+    <div class="searchCon">
+      <input type="text"
+             name="searchInput"
+             v-model="searchData"
+             placeholder="输入驾驶员姓名、工号"
+             @keyup.enter="search" />
+      <div class="searchBtn"
+           @click='search'></div>
+    </div>
+
+    <!-- 驾驶员信息 -->
+    <div class="driver_infoCon clearfix"
+         v-if="ryjb">
+      <div class="driver_infoCon_left fl">
+        <div class="driverImg"></div>
+        <div class="appraiseTitle"
+             @click="appraiseMsgShowIf()">诚信考核</div>
+        <!-- <div class="appraiseMsg" v-if="appraiseMsgShow">
+          <p class="appraiseLevel">{{`${ryjb.rycxkh.credit_level}( ${ryjb.rycxkh.remark})`}}</p>
+          <p class="appraiseData">{{formatDate(ryjb.assessment_date)}}</p>
+        </div> -->
+        <div class="appraiseHealthy"
+             @click='open("driverHealthy")'
+             :class="healthyState==0?'':(healthyState==3?'healthyStateColorRed':(healthyState==1?'healthyStateColorYellow':''))">健康信息</div>
+        <!-- <div class="appraiseHealthy" @click='open("driverHealthy")' :class="healthyState==0?'':''">健康信息</div> -->
+      </div>
+      <!-- right -->
+      <div class="driver_infoCon_right fl">
+        <div class="driverName">
+          <div class='detailTag'
+               @click='open("driverDetailsTag")'></div>
+          {{ryjb.name}}
+          <div class='detail'
+               @click='open("driverDetailsInfo")'></div>
+        </div>
+        <div class="driver_filterCon">
+          <div class="filterItems clearfix">
+            <div class="fl">工号</div>
+            <div class="fr">{{ryjb.driver_id}}</div>
+          </div>
+          <div class="filterItems">
+            <div class="fl">从属机构</div>
+            <div class="fr">{{ryjb.qy_cdxx.qy_cdxx.entity_name||"亿顺凯危货运输有限公司"}}</div>
+          </div>
+          <div class="filterItems">
+            <div class="fl">从属车队</div>
+            <div class="fr">{{ryjb.qy_cdxx.entity_name}}</div>
+          </div>
+          <div class="filterItems">
+            <div class="fl">岗位</div>
+            <div class="fr">{{ryjb.rylb.employees_type}}</div>
+          </div>
+          <div class="filterItems">
+            <div class="fl">从业资格</div>
+            <div class="fr">{{ryjb.cyzgz.cyzglx.certificate_type}}</div>
+          </div>
+          <div class="filterItems">
+            <div class="fl">从业年限</div>
+            <div class="fr">{{ryjb.employment_years}} 年</div>
+          </div>
+          <div class="filterItems">
+            <div class="fl">企业工龄</div>
+            <div class="fr"> 年</div>
+            <!-- <div class="fr">{{ryjb.employment_years}} 年</div> -->
+          </div>
+        </div>
+        <!-- <div class="driver_switchInfo clearfix">
+          <div class="driver_certificate fl btnChecked"
+               @click="OpenQualification">资格证书</div>
+          <div class="driver_train fl  btnChecked"
+               @click="OpenTraining">培训信息</div>
+        </div> -->
+        <div class="driver_switchInfo clearfix">
+          <div class="driver_certificate fl "
+               @click="OpenQualification">资格证书</div>
+          <div class="driver_train fl  btnChecked"
+               @click="OpenTraining">培训信息</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 驾驶详情 -->
+    <!-- <div class='driverdetail_pop wrap0'
+         :class="[popDetail?'show':'hide']">
+      <pop-up-frame @close='popDetail = false'>
+        <pop-up-driver-info></pop-up-driver-info>
+      </pop-up-frame>
+    </div> -->
+
+    <!-- 资质证件弹窗 -->
+    <!-- <div class='certificate_pop'
+         :class="[qualifyDetail?'show':'hide']">
+      <pop-up-frame @close='qualifyDetail = false'>
+        <pop-up-driver-qualification></pop-up-driver-qualification>
+      </pop-up-frame>
+    </div> -->
+
+  </div>
+</template>
+<script>
+/*eslint-disable */
+import { mapState, mapActions, mapMutations } from "vuex";
+import PopUpFrame from "../../../components/PopUpFrame";
+import formatDate from "../../../util/formatDate.js";
+// import PopUpWidget from '../../../components/PopUpWidget'
+// import PopUpDriverInfo from '../../driver/popupdriverinfo/PopUpDriverInfo'
+// import from '../../driver/popupdriverqualification/PopUpDriverQualification'
+
+export default {
+  components: {
+    PopUpFrame
+    // PopUpWidget,
+    // PopUpDriverInfo,
+    // PopUpDriverQualification,
+  },
+  computed: {
+    ...mapState("driverbase", ["ryjb"]),
+    ...mapState("popupdriverhealthy", ["healthyData"]),
+    healthyState() {
+      if (
+        this.healthyData &&
+        this.healthyData !== null &&
+        this.healthyData !== undefined
+      ) {
+        const time =
+          new Date(this.healthyData.date).getTime() +
+          365 * 2 * 24 * 3600 * 1000 -
+          new Date().getTime();
+        if (
+          30 * 2 * 24 * 3600 * 1000 < time &&
+          time < 90 * 2 * 24 * 3600 * 1000
+        ) {
+          return 3;
+        } else if (0 < time && time < 30 * 2 * 24 * 3600 * 1000) {
+          return 1;
+        } else {
+          return 0;
+        }
+      }
+      return 0;
+    }
+  },
+  methods: {
+    ...mapMutations("driverLine", ["setdriverSmallBellShow"]),
+    ...mapActions("driverbase", ["getRyjb"]),
+    ...mapMutations("driver", ["open"]),
+    search() {
+      this.getRyjb(this.searchData);
+    },
+    // switchBtn(index) {
+    //   this.btnCheckedIndex = index;
+    //   if (index === 0) {
+    //     this.qualifyDetail = true;
+    //   }
+    // },
+    OpenQualification() {
+      // this.open(driverSmallBellShow);
+      // this.setdriverSmallBellShow(true);
+      // console.log("this.driverSmallBellShow", this.driverSmallBellShow);
+      // alert("1111");
+      // this.driverSmallBellShow != this.driverSmallBellShow;
+    },
+    OpenTraining() {}
+  },
+  data() {
+    return {
+      searchData: "",
+      btnCheckedIndex: 0,
+      popDetail: false,
+      qualifyDetail: false
+    };
+  },
+  mounted() {
+    this.getRyjb("高");
+  }
+};
+</script>
+<style lang="scss" scoped>
+@mixin size($width, $height) {
+  width: $width;
+  height: $height;
+}
+// -----------公用样式变量
+@mixin font_level_1() {
+  color: #89dddf;
+  font-size: 18px;
+  font-weight: bold;
+}
+@mixin font_level_4_3() {
+  color: #89dddf;
+  font-size: 14px;
+}
+@mixin font_level_3() {
+  color: #89dddf;
+  font-size: 16px;
+}
+@mixin box_red() {
+  color: #fff;
+  border: 1px solid rgba(231, 80, 41, 1);
+  background: rgba(231, 80, 41, 0.4);
+}
+.dbase {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: rgba(3, 139, 252, 0.2);
+  // --------title
+  .title {
+    width: 220px;
+    height: 30px;
+    overflow: hidden;
+    border: 2px solid rgba(5, 208, 235, 0.8);
+    background: rgba(9, 10, 11, 0.9);
+    text-indent: 20px;
+    line-height: 33px;
+    @include font_level_1();
+    float: left;
+  }
+
+  // ----------------搜索框
+  .searchCon {
+    width: 246px;
+    height: 34px;
+    line-height: 34px;
+    overflow: hidden;
+    // margin-top: 10px;
+    background: rgba(3, 139, 252, 0.2);
+    position: relative;
+    float: left;
+    input {
+      width: 236px;
+      height: 30px;
+      border: 2px solid rgba(0, 191, 229, 0.5);
+      margin-left: 5px;
+      background: rgba(3, 139, 252, 0.2);
+      text-indent: 20px;
+      color: #b5b5b5;
+      font-size: 16px;
+    }
+    // ----------searchBtn
+    .searchBtn {
+      width: 17px;
+      height: 16px;
+      overflow: hidden;
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      background: url("../../../assets/driver/left_icons_magnifier.png")
+        no-repeat;
+      cursor: pointer;
+    }
+  }
+
+  // ----------------驾驶员信息
+  .driver_infoCon {
+    width: 480px;
+    height: 380px;
+    // overflow: hidden;
+    margin-top: 10px;
+    box-sizing: border-box;
+    border: 2px solid rgba(5, 208, 235, 0.8);
+    float: left;
+    // ------------------left
+    .driver_infoCon_left {
+      width: 181.5px;
+      height: 340px;
+      // overflow: hidden;
+      margin: 13px 0px 0px 13px;
+      position: relative;
+      // border:1px solid red;
+      // 驾驶员图片
+      .driverImg {
+        width: 181.5px;
+        height: 240px;
+        overflow: hidden;
+        background: url("../../../assets/driver/diverImg.png") no-repeat;
+        background-size: 100% 100%;
+      }
+      // 考核名称
+      .appraiseTitle {
+        width: 100%;
+        height: 30px;
+        overflow: hidden;
+        margin-top: 10px;
+        background: url("../../../assets/driver/left_information_assessment.png")
+          no-repeat;
+        background-size: 100% 100%;
+        color: #fff;
+        font-size: 18px;
+        font-weight: bold;
+        text-align: center;
+        line-height: 30px;
+        cursor: pointer;
+      }
+      // 考核信息
+      .appraiseMsg {
+        width: 100%;
+        height: 50px;
+        overflow: hidden;
+        margin-top: 10px;
+        box-sizing: border-box;
+        border: 1px solid #81d9e5;
+        text-align: center;
+        background: rgba(9, 10, 11, 0.9);
+        position: absolute;
+        .appraiseLevel {
+          color: #0c9605;
+          font-size: 24px;
+          font-weight: bold;
+        }
+        .appraiseData {
+          @include font_level_4_3();
+          margin-top: 4px;
+        }
+      }
+      // 健康信息
+      .appraiseHealthy {
+        @include size(120px, 30px);
+        background: rgba(0, 91, 127, 0.5);
+        margin-top: 30px;
+        margin-left: 30px;
+        color: #b5b5b5;
+        font-size: 16px;
+        text-align: center;
+        line-height: 30px;
+        text-align: center;
+        cursor: pointer;
+      }
+      .healthyStateColorYellow {
+        background: rgba(196, 191, 5, 0.5);
+      }
+      .healthyStateColorRed {
+        background: rgba(196, 2, 39, 0.5);
+      }
+    }
+
+    // ------------------right
+    .driver_infoCon_right {
+      width: 260px;
+      height: 340px;
+      overflow: hidden;
+      margin: 13px 0px 0px 20px;
+      // background: red;
+      .driverName {
+        width: 100%;
+        height: 40px;
+        overflow: hidden;
+        background: url("../../../assets/driver/left_information_assessment.png")
+          no-repeat;
+        background-size: 100% 100%;
+        color: #fff;
+        font-size: 24px;
+        font-weight: bold;
+        text-align: center;
+        line-height: 40px;
+        position: relative;
+        .detailTag {
+          position: absolute;
+          left: 20px;
+          top: 9px;
+          background: url("../../../assets/driver/detailTag.png") no-repeat
+            center center;
+          // no-repeat -640px -40px
+          height: 22px;
+          width: 18px;
+          cursor: pointer;
+
+          // &:hover {
+          //   background: url("../../../assets/driver/css_sprite_car-01.png")
+          //     no-repeat -700px -40px;
+          //   height: 21.7px;
+          //   width: 18px;
+          // }
+        }
+        .detail {
+          position: absolute;
+          right: 30px;
+          top: 18px;
+          background: url("../../../assets/driver/css_sprite_car-01.png")
+            no-repeat -640px -40px;
+          height: 5px;
+          width: 20px;
+
+          &:hover {
+            background: url("../../../assets/driver/css_sprite_car-01.png")
+              no-repeat -700px -40px;
+            height: 5px;
+            width: 20px;
+          }
+        }
+      }
+      // -------------筛选信息
+      .driver_filterCon {
+        width: 100%;
+        height: 250px;
+        overflow: hidden;
+        margin-top: 10px;
+        // background: pink;
+        .filterItems {
+          width: 100%;
+          height: 29px;
+          line-height: 29px;
+          overflow: hidden;
+          // height: 35px;
+          // background: #0c9605;
+          // line-height: 35px;
+          div:nth-child(1) {
+            @include font_level_3();
+          }
+          div:nth-child(2) {
+            width: 192px;
+            height: 100%;
+            text-align: center;
+            color: #fff;
+            font-size: 14px;
+            // font-weight: bold;
+            background: url("../../../assets/driver/center_frame_route.png")
+              no-repeat;
+            background-size: 100% 100%;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+          }
+        }
+        .filterItems:nth-child(n + 2) {
+          margin-top: 8px;
+        }
+      }
+
+      // ------------------切换筛选条件
+      .driver_switchInfo {
+        width: 100%;
+        height: 30px;
+        overflow: hidden;
+        margin-top: 10px;
+        // background: green;
+        text-align: center;
+        line-height: 30px;
+        color: #b5b5b5;
+        .driver_certificate {
+          width: 120px;
+          height: 100%;
+          overflow: hidden;
+          box-sizing: border-box;
+          font-size: 16px;
+          padding-left: 20px;
+          text-align: left;
+          cursor: pointer;
+          color: #fff;
+          border: 1px solid rgba(231, 80, 41, 1);
+          background: rgba(231, 80, 41, 0.4)
+            url("../../../assets/driver/anniu.png") no-repeat 92px 4px;
+        }
+        .driver_certificate:hover {
+          background: rgba(231, 80, 41, 0.4)
+            url("../../../assets/driver/anniu_2.png") no-repeat 92px 4px;
+        }
+        .driver_train {
+          width: 120px;
+          height: 100%;
+          overflow: hidden;
+          margin-left: 10px;
+          box-sizing: border-box;
+          font-size: 16px;
+          color: #fff;
+          border: 1px solid rgba(231, 80, 41, 1);
+          background: rgba(231, 80, 41, 0.4);
+          cursor: pointer;
+        }
+        .btnChecked {
+          @include box_red();
+        }
+      }
+    }
+  }
+
+  //基本信息弹窗
+  // .driverdetail_pop {
+  //   position: absolute;
+  //   top: 150px;
+  //   left: 600px;
+  //   &.show {
+  //     display: block;
+  //   }
+  //   &.hide {
+  //     display: none;
+  //   }
+  // }
+
+  //--------资质证件弹窗
+  // .certificate_pop {
+  //   position: absolute;
+  //   top: 150px;
+  //   left: 600px;
+  //   &.show {
+  //     display: block;
+  //   }
+  //   &.hide {
+  //     display: none;
+  //   }
+  // }
+}
+</style>

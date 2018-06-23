@@ -1,0 +1,548 @@
+<template>
+  <car-base-info :cljcxxData="cljcxxData"
+                 @close="QAPopupToggle">
+    <div slot="carBaseInfoPopup"
+         class="carBaseInfoPopupWrap"
+         v-if="QAPopupShow">
+      <div class="QAInfoTitleWrap">
+        <div class="titleWrap">
+          <p class="icon"></p>
+          <p class="title">资质证件信息</p>
+        </div>
+        <div class="closeBtn"
+             @click='closeQAInfoDetails'>×</div>
+      </div>
+      <div class="QAInfoDetailsPopupWrap">
+        <!-- 一级弹框 -->
+        <loading :data="getExpireDate">
+          <div class="detailsWrap"
+               v-if="getExpireDate">
+            <div class="item"
+                 @click="showMoreDetails('行驶证')"
+                 v-if="getExpireDate.certificate_xsz">
+              <div class="subTitle">行驶证
+                <i></i>
+              </div>
+              <div class="data remindGreen">有效期止 : {{formatDate(getExpireDate.certificate_xsz||'')}}
+                <div class="rotateBox"></div>
+              </div>
+            </div>
+            <div class="item"
+                 @click="showMoreDetails('道路运输证')"
+                 v-if="getExpireDate.certificate_ysz">
+              <div class="subTitle">道路运输证
+                <i></i>
+              </div>
+              <div class="data remindGreen">有效期止 : {{formatDate(getExpireDate.certificate_ysz||'')}}
+                <div class="rotateBox"></div>
+              </div>
+            </div>
+            <div class="item "
+                 @click="showMoreDetails('道路通行证')"
+                 v-if="getExpireDate.certificate_txz">
+              <div class="subTitle">道路通行证
+                <i></i>
+              </div>
+              <div class="data remindGreen">有效期止 : {{formatDate(getExpireDate.certificate_txz||'')}}
+                <div class="rotateBox"></div>
+              </div>
+            </div>
+            <!-- *********************************************-->
+            <div class="item "
+                 @click="showMoreDetails('环保证')"
+                 v-if="getExpireDate.certificate_hbz">
+              <div class="subTitle">环保证
+                <i></i>
+              </div>
+              <div class="data remindGreen">有效期止 : {{formatDate(getExpireDate.certificate_hbz||'')}}
+                <div class="rotateBox"></div>
+              </div>
+            </div>
+            <div class="item "
+                 @click="showMoreDetails('压力容器检验合格证')"
+                 v-if="getExpireDate.certificate_hgz">
+              <div class="subTitle">压力容器检验合格证
+                <i></i>
+              </div>
+              <div class="data remindGreen">有效期止 : {{formatDate(getExpireDate.certificate_hgz||'')}}
+                <div class="rotateBox"></div>
+              </div>
+            </div>
+            <div class="item lastItem"
+                 @click="showMoreDetails('其它')"
+                 v-if="getExpireDate.certificate_qtz">
+              <div class="subTitle">其它
+                <i></i>
+              </div>
+              <div class="data remindGreen">有效期止 : {{formatDate(getExpireDate.certificate_qtz||'')}}
+                <div class="rotateBox"></div>
+              </div>
+            </div>
+
+            <!-- *********************************************-->
+          </div>
+        </loading>
+        <!-- 二级弹框 -->
+        <div class="moreDetailsWrap"
+             v-if="closeMoreDetalsShow"
+             v-drag
+             @mousedown="move=true"
+             @mouseup="move=false"
+             :style="move?'cursor:move':''">
+          <pop-up-frame @close="closeMoreDetals">
+            <pop-up-widget :title="title+'信息'"
+                           :detailsBtnShow='false'></pop-up-widget>
+            <loading :data="clzzzjxxData">
+              <div class="items"
+                   v-if="clzzzjxxData">
+                <div class="itemWrap">
+                  <div class="subTitle">证件编号</div>
+                  <div class="content"
+                       v-if="clzzzjxxItem">{{clzzzjxxItem.certificate_number}}
+                    <div class="rotateBox"></div>
+                  </div>
+                </div>
+                <div class="itemWrap clearMarginRight">
+                  <div class="subTitle">颁发机构</div>
+                  <div class="content"
+                       v-if="clzzzjxxItem">{{clzzzjxxItem.issued_agency}}
+                    <div class="rotateBox"></div>
+                  </div>
+                </div>
+                <div class="itemWrap">
+                  <div class="subTitle">有效期始</div>
+                  <div class="content"
+                       v-if="clzzzjxxItem">{{formatDate(clzzzjxxItem.effective_date||'')}}
+                    <div class="rotateBox"></div>
+                  </div>
+                </div>
+                <div class="itemWrap clearMarginRight">
+                  <div class="subTitle">有效期止</div>
+                  <div class="content"
+                       v-if="clzzzjxxItem"
+                       :class="{noticeRedStyle:noticeRed}">{{formatDate(clzzzjxxItem?clzzzjxxItem.expire_date:'')}}
+                    <div class="rotateBox"></div>
+                  </div>
+                </div>
+                <div class="itemWrap">
+                  <div class="subTitle">有限期限</div>
+                  <div class="content"
+                       v-if="clzzzjxxItem">{{clzzzjxxItem.valid_period}}年
+                    <div class="rotateBox"></div>
+                  </div>
+                </div>
+                <div class="itemWrap  lastItemWrap"
+                     @click="showScanningCopy">
+                  证件扫描件
+                </div>
+
+              </div>
+            </loading>
+          </pop-up-frame>
+        </div>
+        <!-- 三级弹窗 -->
+        <div class="scanningCopy"
+             v-if="ScanningCopyShow"
+             v-drag
+             @mousedown="move=true"
+             @mouseup="move=false"
+             :style="move?'cursor:move':''">
+          <pop-up-frame @close="ScanningCopy">
+            <pop-up-widget :title="title+'信息'"
+                           :detailsBtnShow='false'></pop-up-widget>
+            <div class="content">
+              <img :src="clzzzjxxItem.storage_location"
+                   alt=""
+                   width="288"
+                   height="133">
+            </div>
+          </pop-up-frame>
+        </div>
+      </div>
+    </div>
+
+  </car-base-info>
+
+</template>
+<script>
+/*eslint-disable */
+import CarBaseInfo from "@/components/car/CarBaseInfo";
+import PopUpFrame from "@/components/PopUpFrame";
+import PopUpWidget from "@/components/PopUpWidget";
+import { mapState } from "vuex";
+
+export default {
+  components: {
+    CarBaseInfo,
+    PopUpFrame,
+    PopUpWidget
+  },
+  data() {
+    return {
+      move: false,
+      QAPopupShow: false,
+      closeMoreDetalsShow: false,
+      title: "",
+      clzzzjxxItem: "",
+      ScanningCopyShow: false
+    };
+  },
+  computed: {
+    ...mapState("carModelsSearchContainer", ["cljcxxData"]),
+    ...mapState("carBaseInfoContainer", ["clzzzjxxData"]),
+    getExpireDate() {
+      if (this.clzzzjxxData.length > 0) {
+        const certificate_xsz = this.clzzzjxxData.filter(
+          item => item.clzj.vehicle_certificate_type === "行驶证"
+        );
+        const certificate_ysz = this.clzzzjxxData.filter(
+          item => item.clzj.vehicle_certificate_type === "道路运输证"
+        );
+        const certificate_txz = this.clzzzjxxData.filter(
+          item => item.clzj.vehicle_certificate_type === "道路通行证"
+        );
+        // ---------------------
+        const certificate_hbz = this.clzzzjxxData.filter(
+          item => item.clzj.vehicle_certificate_type === "环保证"
+        );
+        const certificate_hgz = this.clzzzjxxData.filter(
+          item =>
+            item.clzj.vehicle_certificate_type ===
+            "压力容器或罐体检验合格证（罐车）"
+        );
+        const certificate_qtz = this.clzzzjxxData.filter(
+          item =>
+            item.clzj.vehicle_certificate_type === "其它（系统中有其他证件）"
+        );
+
+        return {
+          certificate_xsz:
+            certificate_xsz &&
+            certificate_xsz[0] &&
+            certificate_xsz[0].expire_date,
+          certificate_ysz:
+            certificate_ysz &&
+            certificate_ysz[0] &&
+            certificate_ysz[0].expire_date,
+          certificate_txz:
+            certificate_txz &&
+            certificate_txz[0] &&
+            certificate_txz[0].expire_date,
+          certificate_hbz:
+            certificate_hbz &&
+            certificate_hbz[0] &&
+            certificate_hbz[0].expire_date,
+          certificate_hgz:
+            certificate_hgz &&
+            certificate_hgz[0] &&
+            certificate_hgz[0].expire_date,
+          certificate_qtz:
+            certificate_qtz &&
+            certificate_qtz[0] &&
+            certificate_qtz[0].expire_date
+        };
+      }
+      return null;
+    },
+    noticeRed() {
+      let difDate = "";
+      if (
+        this.clzzzjxxItem &&
+        this.clzzzjxxItem !== undefined &&
+        this.clzzzjxxItem !== null &&
+        this.clzzzjxxItem.expire_date &&
+        this.clzzzjxxItem.expire_date !== undefined &&
+        this.clzzzjxxItem.expire_date !== null
+      ) {
+        difDate =
+          new Date(this.formatDate(this.clzzzjxxItem.expire_date)) - new Date();
+        return difDate > 0 && difDate < 31 * 24 * 3600 * 1000;
+      }
+      return false;
+    }
+  },
+  methods: {
+    QAPopupToggle() {
+      this.QAPopupShow = !this.QAPopupShow;
+    },
+    closeQAInfoDetails() {
+      this.QAPopupShow = false;
+      this.closeMoreDetalsShow = false;
+    },
+    closeMoreDetals() {
+      this.closeMoreDetalsShow = false;
+    },
+    showMoreDetails(title) {
+      this.closeMoreDetalsShow = true;
+      this.title = title;
+      if (this.clzzzjxxData) {
+        const clzzzjxxItems = this.clzzzjxxData.filter(
+          item => item.clzj.vehicle_certificate_type === title
+        )[0];
+        if (clzzzjxxItems !== undefined) {
+          const clzzzjxxItem = {
+            certificate_number: clzzzjxxItems.certificate_number || "null",
+            effective_date: clzzzjxxItems.effective_date || "null",
+            expire_date: clzzzjxxItems.expire_date || "null",
+            valid_period: clzzzjxxItems.valid_period || "null",
+            issued_agency: clzzzjxxItems.issued_agency || "null",
+            storage_location:
+              "http://" + clzzzjxxItems.storage_location || "null"
+          };
+          this.clzzzjxxItem = clzzzjxxItem;
+        } else {
+          this.clzzzjxxItem = {
+            certificate_number: "null",
+            effective_date: "null",
+            expire_date: "null",
+            valid_period: "null",
+            issued_agency: "null",
+            storage_location: "null"
+          };
+        }
+      }
+    },
+    showScanningCopy() {
+      this.ScanningCopyShow = true;
+    },
+    ScanningCopy() {
+      this.ScanningCopyShow = false;
+    }
+  }
+};
+</script>
+<style lang="scss" scoped>
+.clearfix {
+  &:before,
+  &:after {
+    content: "";
+    display: table;
+  }
+  &:after {
+    clear: both;
+    overflow: hidden;
+  }
+}
+@mixin size($width, $height) {
+  width: $width;
+  height: $height;
+}
+.carBaseInfoPopupWrap {
+  @include size(100%, 100%);
+  .QAInfoTitleWrap {
+    @include size(350px, 40px);
+    line-height: 40px;
+    border: 2px solid rgba(5, 208, 235, 0.8);
+    background: rgba(9, 10, 11, 0.9);
+    box-sizing: border-box;
+    .titleWrap {
+      height: 36px;
+      .icon {
+        width: 40px;
+        height: 36px;
+        margin-left: 40px;
+        float: left;
+        background: url(../../../assets/car/css_sprite_car-01.png) no-repeat -940px -84px;
+      }
+      .title {
+        height: 36px;
+        line-height: 36px;
+        font-size: 18px;
+        font-weight: bold;
+        color: #fff;
+        float: left;
+        margin-left: 10px;
+      }
+    }
+    .closeBtn {
+      width: 36px;
+      height: 36px;
+      line-height: 36px;
+      text-align: center;
+      color: rgba(5, 208, 235, 0.5);
+      font-size: 36px;
+      background: rgba(9, 10, 11, 0.9);
+      box-sizing: border-box;
+      position: absolute;
+      top: 2px;
+      right: 172px;
+      cursor: pointer;
+    }
+    .closeBtn:hover {
+      color: #fff;
+    }
+  }
+  .QAInfoDetailsPopupWrap {
+    min-height: 150px;
+    border: 2px solid rgba(5, 208, 235, 0.8);
+    background: rgba(9, 10, 11, 0.9);
+    box-sizing: border-box;
+    margin-top: 10px;
+    padding: 10px;
+    box-sizing: border-box;
+    position: relative;
+    // 一级弹框
+    .detailsWrap {
+      @include size(100%, 100%);
+      background: rgba(9, 122, 206, 0.2);
+      padding: 10px;
+      box-sizing: border-box;
+      .item {
+        height: 40px;
+        background: rgba(129, 217, 229, 0.08);
+        margin-bottom: 20px;
+        cursor: pointer;
+        .subTitle {
+          width: 45%;
+          line-height: 40px;
+          font-size: 16px;
+          color: #89dddf;
+          padding-left: 60px;
+          box-sizing: border-box;
+          float: left;
+          position: relative;
+          i {
+            @include size(40px, 24px);
+            position: absolute;
+            top: 8px;
+            left: 20px;
+            background: url(../../../assets/car/css_sprite_car-01.png) no-repeat -1000px -84px;
+          }
+        }
+        .data {
+          width: 55%;
+          height: 40px;
+          line-height: 40px;
+          color: #fff;
+          font-size: 18px;
+          font-weight: bold;
+          padding-left: 50px;
+          border: 1px solid #81d9e5;
+          box-sizing: border-box;
+          float: left;
+          position: relative;
+          background: #092133;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          .rotateBox {
+            @include size(7px, 7px);
+            position: absolute;
+            top: 16px;
+            left: 19px;
+            transform: rotate(45deg);
+            background: rgba(231, 80, 41, 0.4);
+          }
+        }
+        .remindRed {
+          background: rgba(231, 80, 41, 0.4);
+          border: 1px solid rgba(231, 80, 41, 1);
+          .rotateBox {
+            background: rgba(231, 80, 41, 1);
+          }
+        }
+        .remindYellow {
+          background: rgba(255, 185, 46, 0.4);
+          border: 1px solid rgba(255, 185, 46, 1);
+          .rotateBox {
+            background: rgba(255, 185, 46, 1);
+          }
+        }
+        .remindGreen {
+          background: rgba(5, 208, 235, 0.4);
+          border: 1px solid rgba(5, 208, 235, 1);
+          .rotateBox {
+            background: rgba(5, 208, 235, 1);
+          }
+        }
+      }
+      .lastItem {
+        margin-bottom: 0px;
+      }
+    }
+    // 二级弹框
+    .moreDetailsWrap {
+      width: 750px;
+      position: absolute;
+      top: 260px;
+      left: -100px;
+      .items {
+        width: 100%;
+        overflow: hidden;
+        .itemWrap {
+          @include size(350px, 30px);
+          line-height: 30px;
+          margin-bottom: 10px;
+          margin-right: 10px;
+          float: left;
+          .subTitle {
+            @include size(110px, 30px);
+            line-height: 30px;
+            text-align: left;
+            color: #89dddf;
+            font-size: 14px;
+            float: left;
+          }
+          .content {
+            @include size(240px, 30px);
+            line-height: 30px;
+            padding-left: 30px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: bold;
+            border: 1px solid #89dddf;
+            float: left;
+            position: relative;
+            box-sizing: border-box;
+            .rotateBox {
+              @include size(7px, 7px);
+              position: absolute;
+              top: 11px;
+              left: 10px;
+              transform: rotate(45deg);
+              background: #05d0eb;
+            }
+          }
+          .noticeRedStyle {
+            background: #e75029;
+          }
+        }
+        .clearMarginRight {
+          margin-right: 0;
+        }
+        .lastItemWrap {
+          width: 150px;
+          height: 30px;
+          background: rgba(5, 208, 235, 0.5);
+          font-size: 16px;
+          color: #89dddf;
+          float: left;
+          text-align: center;
+          line-height: 30px;
+          margin-left: 140px;
+          cursor: pointer;
+        }
+      }
+    }
+    //三级弹窗
+    .scanningCopy {
+      width: 390px;
+      position: absolute;
+      top: 443px;
+      left: 37px;
+      .content {
+        width: 310px;
+        height: 155px;
+        border: 1px solid #81d9e5;
+        box-sizing: border-box;
+        padding: 10px;
+        margin: 0 auto;
+        img {
+          width: 288px;
+          height: 133px;
+        }
+      }
+    }
+  }
+}
+</style>

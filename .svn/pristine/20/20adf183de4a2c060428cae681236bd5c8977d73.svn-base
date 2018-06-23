@@ -1,0 +1,125 @@
+<template>
+    <div>
+        <div  v-drag class="home">
+            <PopUpFrame @close="onCloseHome">
+                <div class="home_content">
+                    <header>
+                        <span>过期提醒</span>
+                        <!-- <img @click="showSet=true" src="../../../assets/shezhi.png" alt=""> -->
+                    </header>
+                    <ul class="radio">
+                        <li :class="radioIndex===0?'active':''" @click="radioIndex=0">企业</li> 
+                        <li :class="radioIndex===1?'active':''" @click="radioIndex=1">车辆</li>  
+                        <li :class="radioIndex===2?'active':''" @click="radioIndex=2">人员</li>   
+                    </ul>
+                    <ExpireTipCompany v-if="radioIndex===0"></ExpireTipCompany>
+                    <ExpireTipCar v-else-if="radioIndex===1"></ExpireTipCar>
+                    <ExpireTipPerson v-else-if="radioIndex===2" @onClickAuth="showAuthPop=true"></ExpireTipPerson>
+                </div>
+            </PopUpFrame>
+        </div>
+        <!-- 自行配制信息 -->
+        <!-- <div v-drag v-if="showSet" class="setBox">
+            <PopUpFrame @close="showSet=false">
+                <PopUpWidget title="自行配置信息">
+                    自行配置信息
+                </PopUpWidget>
+            </PopUpFrame>
+        </div> -->
+        <!-- 上游企业装车资质认证 -->
+        <div v-drag v-if="showAuthPop" class="popBox">
+            <PopUpFrame @close="showAuthPop=false">
+                <PopUpWidget title="装资质认证">
+                    <div>装资质认证</div>
+                    <ul>
+                        <li>承运中石化业务经历，并在中石化进行备案</li>
+                    </ul>
+                </PopUpWidget>
+            </PopUpFrame>
+        </div>
+    </div>
+</template>
+<script>
+/* eslint-disable */
+import PopUpFrame from '@/components/PopUpFrame'
+import PopUpWidget from '@/components/PopUpWidget'
+import ExpireTipCompany from './ExpireTipCompany.vue'
+import ExpireTipCar from './ExpireTipCar.vue'
+import ExpireTipPerson from './ExpireTipPerson.vue'
+
+export default {
+  components: {
+    PopUpFrame,
+    PopUpWidget,
+    ExpireTipCompany,
+    ExpireTipCar,
+    ExpireTipPerson
+  },
+  data() {
+    return {
+      radioIndex: 0,
+      showAuthPop:false,
+      showSet:false,
+    }
+  },
+  methods: {
+    onCloseHome() {
+      this.$emit('onCloseHome')
+    },
+  },
+}
+</script>
+<style lang="scss" scoped>
+.home{
+    right: 100px;
+    top: 225px;
+    width: 400px;
+    &_content{
+        background-color: rgba(9,122,206,0.3);
+        padding: 10px;
+        header{
+            background-color: rgba(129,217,229,0.3);
+            padding: 0 15px;
+            border-radius: 3px;
+            height: 30px;
+            line-height: 30px;
+            img{
+                vertical-align: middle;
+                float: right;
+                width: 20px;
+                padding-top: 5px;
+                cursor: pointer;
+            }
+        }
+        .radio{
+            margin-top: 15px;
+            display: table;
+            border: 1px solid rgba(5,208,235,0.50);
+            li{
+                display: table-cell;
+                width: 120px;
+                height: 30px;
+                line-height: 30px;
+                text-align: center;
+                cursor: pointer;
+            }
+            .active{
+                background-color:  rgba(5,208,235,0.50);
+            }
+            li:nth-child(2){
+                border-left: 1px solid rgba(5,208,235,0.50);
+                border-right: 1px solid rgba(5,208,235,0.50);
+            }
+        }
+    }
+}
+.setBox{
+    left: 170px;
+    top: 100px;
+}
+.popBox{
+    right:550px;
+    width: 400px;
+    top: 470px;
+}
+</style>

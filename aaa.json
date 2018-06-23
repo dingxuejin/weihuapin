@@ -1,0 +1,812 @@
+[
+{
+     //  ltsyxx
+	"vehicle_id": "20140002",
+	"tyre_id": "2017000025",
+	"position": "H224",
+	"install_date": "20161215",
+	"total_drived_time": "583",
+	"total_drived_km": "9634",
+	"ltwz": {
+		"tire_position_code": "H224",
+		"tire_position": "货车右中2外",
+		"remark": ""
+	},
+	"cllt": {  //  cllt
+		"vehicle_id": null,
+		"tyre_id": null,
+		"position": null,
+		"install_date": null,
+		"tyre_brand": null,
+		"tyre_modle": null,
+		"purchase_date": null,
+		"rated_load": null,
+		"rated_km": null,
+		"purchase_channel": null,
+		"price": null,
+		"ltpp": {
+			"tire_brand_code": null,
+			"tire_brand": null,
+			"remark": null
+		},
+		"ltcgqd": {
+			"tire_supply_channel_code": null,
+			"tire_supply_channel": null,
+			"remark": null
+		}
+	},
+	"ltwxxx": {  //  维修信息
+		"vehicle_id": "20140002",
+		"tire_id": "2017000025",
+		"tire_position_code": "H210",
+		"install_date": "20150402",
+		"repair_date": "20160626",
+		"repair_times": "3",
+		"repair_position_code": "1",
+		"repair_amount": "217",
+		"partner_id_code": "1",
+		"ltwz": {
+			"tire_position_code": "H210",
+			"tire_position": "货车左前",
+			"remark": ""
+		},
+		"btwz": {
+			"tire_repair_location_code": "1",
+			"tire_repair_location": "正面",
+			"remark": null
+		}
+	}
+},
+
+
+
+
+{
+	"vehicle_id": "20140002",
+	"tyre_id": "2017000027",
+	"position": "H226",
+	"install_date": "20170109",
+	"total_drived_time": "317",
+	"total_drived_km": "9791",
+	"ltwz": {
+		"tire_position_code": "H226",
+		"tire_position": "货车右后外",
+		"remark": ""
+	},
+	"cllt": {
+		"vehicle_id": null,
+		"tyre_id": null,
+		"position": null,
+		"install_date": null,
+		"tyre_brand": null,
+		"tyre_modle": null,
+		"purchase_date": null,
+		"rated_load": null,
+		"rated_km": null,
+		"purchase_channel": null,
+		"price": null,
+		"ltpp": {
+			"tire_brand_code": null,
+			"tire_brand": null,
+			"remark": null
+		},
+		"ltcgqd": {
+			"tire_supply_channel_code": null,
+			"tire_supply_channel": null,
+			"remark": null
+		}
+	},
+	"ltwxxx": {
+		"vehicle_id": "20140002",
+		"tire_id": "2017000027",
+		"tire_position_code": "H212",
+		"install_date": "20150425",
+		"repair_date": "20160726",
+		"repair_times": "3",
+		"repair_position_code": "1",
+		"repair_amount": "172",
+		"partner_id_code": "9",
+		"ltwz": {
+			"tire_position_code": "H212",
+			"tire_position": "货车左中1外",
+			"remark": ""
+		},
+		"btwz": {
+			"tire_repair_location_code": "1",
+			"tire_repair_location": "正面",
+			"remark": null
+		}
+	}
+}, 
+ 
+ 
+ 
+ {
+	"vehicle_id": "20140002",
+	"tyre_id": "2017000026",
+	"position": "H225",
+	"install_date": "20161217",
+	"total_drived_time": "418",
+	"total_drived_km": "9823",
+	"ltwz": {
+		"tire_position_code": "H225",
+		"tire_position": "货车右后内",
+		"remark": ""
+	},
+	"cllt": {
+		"vehicle_id": null,
+		"tyre_id": null,
+		"position": null,
+		"install_date": null,
+		"tyre_brand": null,
+		"tyre_modle": null,
+		"purchase_date": null,
+		"rated_load": null,
+		"rated_km": null,
+		"purchase_channel": null,
+		"price": null,
+		"ltpp": {
+			"tire_brand_code": null,
+			"tire_brand": null,
+			"remark": null
+		},
+		"ltcgqd": {
+			"tire_supply_channel_code": null,
+			"tire_supply_channel": null,
+			"remark": null
+		}
+	},
+	"ltwxxx": {
+		"vehicle_id": "20140002",
+		"tire_id": "2017000026",
+		"tire_position_code": "H211",
+		"install_date": "20150418",
+		"repair_date": "20160721",
+		"repair_times": "3",
+		"repair_position_code": "2",
+		"repair_amount": "286",
+		"partner_id_code": "1",
+		"ltwz": {
+			"tire_position_code": "H211",
+			"tire_position": "货车左中1内",
+			"remark": ""
+		},
+		"btwz": {
+			"tire_repair_location_code": "2",
+			"tire_repair_location": "侧面",
+			"remark": null
+		}
+	}
+},
+ 
+ 
+ {
+	"vehicle_id": "20140002",
+	"tyre_id": "2017000014",
+	"position": "H210",
+	"install_date": "20151108",
+	"total_drived_time": "1243",
+	"total_drived_km": "9616",
+	"ltwz": {
+		"tire_position_code": "H210",
+		"tire_position": "货车左前",
+		"remark": ""
+	},
+	"cllt": {
+		"vehicle_id": null,
+		"tyre_id": null,
+		"position": null,
+		"install_date": null,
+		"tyre_brand": null,
+		"tyre_modle": null,
+		"purchase_date": null,
+		"rated_load": null,
+		"rated_km": null,
+		"purchase_channel": null,
+		"price": null,
+		"ltpp": {
+			"tire_brand_code": null,
+			"tire_brand": null,
+			"remark": null
+		},
+		"ltcgqd": {
+			"tire_supply_channel_code": null,
+			"tire_supply_channel": null,
+			"remark": null
+		}
+	},
+	"ltwxxx": {
+		"vehicle_id": "20140003",
+		"tire_id": "2017000014",
+		"tire_position_code": "Q311",
+		"install_date": "20140928",
+		"repair_date": "20160420",
+		"repair_times": "4",
+		"repair_position_code": "1",
+		"repair_amount": "197",
+		"partner_id_code": "3",
+		"ltwz": {
+			"tire_position_code": null,
+			"tire_position": null,
+			"remark": null
+		},
+		"btwz": {
+			"tire_repair_location_code": "1",
+			"tire_repair_location": "正面",
+			"remark": null
+		}
+	}
+},
+
+{
+	"vehicle_id": "20140002",
+	"tyre_id": "2017000017",
+	"position": "H213",
+	"install_date": "20160401",
+	"total_drived_time": "694",
+	"total_drived_km": "9359",
+	"ltwz": {
+		"tire_position_code": "H213",
+		"tire_position": "货车左中2内",
+		"remark": ""
+	},
+	"cllt": {
+		"vehicle_id": null,
+		"tyre_id": null,
+		"position": null,
+		"install_date": null,
+		"tyre_brand": null,
+		"tyre_modle": null,
+		"purchase_date": null,
+		"rated_load": null,
+		"rated_km": null,
+		"purchase_channel": null,
+		"price": null,
+		"ltpp": {
+			"tire_brand_code": null,
+			"tire_brand": null,
+			"remark": null
+		},
+		"ltcgqd": {
+			"tire_supply_channel_code": null,
+			"tire_supply_channel": null,
+			"remark": null
+		}
+	},
+	"ltwxxx": {
+		"vehicle_id": "20140003",
+		"tire_id": "2017000017",
+		"tire_position_code": "Q314",
+		"install_date": "20150127",
+		"repair_date": "20160504",
+		"repair_times": "3",
+		"repair_position_code": "1",
+		"repair_amount": "262",
+		"partner_id_code": "3",
+		"ltwz": {
+			"tire_position_code": null,
+			"tire_position": null,
+			"remark": null
+		},
+		"btwz": {
+			"tire_repair_location_code": "1",
+			"tire_repair_location": "正面",
+			"remark": null
+		}
+	}
+},
+ {
+	"vehicle_id": "20140002",
+	"tyre_id": "2017000018",
+	"position": "H214",
+	"install_date": "20160509",
+	"total_drived_time": "718",
+	"total_drived_km": "9272",
+	"ltwz": {
+		"tire_position_code": "H214",
+		"tire_position": "货车左中2外",
+		"remark": ""
+	},
+	"cllt": {
+		"vehicle_id": null,
+		"tyre_id": null,
+		"position": null,
+		"install_date": null,
+		"tyre_brand": null,
+		"tyre_modle": null,
+		"purchase_date": null,
+		"rated_load": null,
+		"rated_km": null,
+		"purchase_channel": null,
+		"price": null,
+		"ltpp": {
+			"tire_brand_code": null,
+			"tire_brand": null,
+			"remark": null
+		},
+		"ltcgqd": {
+			"tire_supply_channel_code": null,
+			"tire_supply_channel": null,
+			"remark": null
+		}
+	},
+	"ltwxxx": {
+		"vehicle_id": "20140003",
+		"tire_id": "2017000018",
+		"tire_position_code": "Q320",
+		"install_date": "20150128",
+		"repair_date": "20160506",
+		"repair_times": "3",
+		"repair_position_code": "1",
+		"repair_amount": "110",
+		"partner_id_code": "1",
+		"ltwz": {
+			"tire_position_code": null,
+			"tire_position": null,
+			"remark": null
+		},
+		"btwz": {
+			"tire_repair_location_code": "1",
+			"tire_repair_location": "正面",
+			"remark": null
+		}
+	}
+}, 
+{
+	"vehicle_id": "20140002",
+	"tyre_id": "2017000019",
+	"position": "H215",
+	"install_date": "20160810",
+	"total_drived_time": "575",
+	"total_drived_km": "9222",
+	"ltwz": {
+		"tire_position_code": "H215",
+		"tire_position": "货车左后内",
+		"remark": ""
+	},
+	"cllt": {
+		"vehicle_id": null,
+		"tyre_id": null,
+		"position": null,
+		"install_date": null,
+		"tyre_brand": null,
+		"tyre_modle": null,
+		"purchase_date": null,
+		"rated_load": null,
+		"rated_km": null,
+		"purchase_channel": null,
+		"price": null,
+		"ltpp": {
+			"tire_brand_code": null,
+			"tire_brand": null,
+			"remark": null
+		},
+		"ltcgqd": {
+			"tire_supply_channel_code": null,
+			"tire_supply_channel": null,
+			"remark": null
+		}
+	},
+	"ltwxxx": {
+		"vehicle_id": "20140003",
+		"tire_id": "2017000019",
+		"tire_position_code": "Q321",
+		"install_date": "20150215",
+		"repair_date": "20160507",
+		"repair_times": "4",
+		"repair_position_code": "1",
+		"repair_amount": "164",
+		"partner_id_code": "1",
+		"ltwz": {
+			"tire_position_code": null,
+			"tire_position": null,
+			"remark": null
+		},
+		"btwz": {
+			"tire_repair_location_code": "1",
+			"tire_repair_location": "正面",
+			"remark": null
+		}
+	}
+}, 
+{
+	"vehicle_id": "20140002",
+	"tyre_id": "2017000020",
+	"position": "H216",
+	"install_date": "20160821",
+	"total_drived_time": "574",
+	"total_drived_km": "9078",
+	"ltwz": {
+		"tire_position_code": "H216",
+		"tire_position": "货车左后外",
+		"remark": ""
+	},
+	"cllt": {
+		"vehicle_id": null,
+		"tyre_id": null,
+		"position": null,
+		"install_date": null,
+		"tyre_brand": null,
+		"tyre_modle": null,
+		"purchase_date": null,
+		"rated_load": null,
+		"rated_km": null,
+		"purchase_channel": null,
+		"price": null,
+		"ltpp": {
+			"tire_brand_code": null,
+			"tire_brand": null,
+			"remark": null
+		},
+		"ltcgqd": {
+			"tire_supply_channel_code": null,
+			"tire_supply_channel": null,
+			"remark": null
+		}
+	},
+	"ltwxxx": {
+		"vehicle_id": "20140003",
+		"tire_id": "2017000020",
+		"tire_position_code": "Q322",
+		"install_date": "20150312",
+		"repair_date": "20160525",
+		"repair_times": "4",
+		"repair_position_code": "1",
+		"repair_amount": "289",
+		"partner_id_code": "3",
+		"ltwz": {
+			"tire_position_code": null,
+			"tire_position": null,
+			"remark": null
+		},
+		"btwz": {
+			"tire_repair_location_code": "1",
+			"tire_repair_location": "正面",
+			"remark": null
+		}
+	}
+}, 
+{
+	"vehicle_id": "20140002",
+	"tyre_id": "2017000015",
+	"position": "H211",
+	"install_date": "20151122",
+	"total_drived_time": "1211",
+	"total_drived_km": "9373",
+	"ltwz": {
+		"tire_position_code": "H211",
+		"tire_position": "货车左中1内",
+		"remark": ""
+	},
+	"cllt": {
+		"vehicle_id": null,
+		"tyre_id": null,
+		"position": null,
+		"install_date": null,
+		"tyre_brand": null,
+		"tyre_modle": null,
+		"purchase_date": null,
+		"rated_load": null,
+		"rated_km": null,
+		"purchase_channel": null,
+		"price": null,
+		"ltpp": {
+			"tire_brand_code": null,
+			"tire_brand": null,
+			"remark": null
+		},
+		"ltcgqd": {
+			"tire_supply_channel_code": null,
+			"tire_supply_channel": null,
+			"remark": null
+		}
+	},
+	"ltwxxx": {
+		"vehicle_id": "20140003",
+		"tire_id": "2017000015",
+		"tire_position_code": "Q312",
+		"install_date": "20141018",
+		"repair_date": "20160424",
+		"repair_times": "3",
+		"repair_position_code": "2",
+		"repair_amount": "166",
+		"partner_id_code": "2",
+		"ltwz": {
+			"tire_position_code": null,
+			"tire_position": null,
+			"remark": null
+		},
+		"btwz": {
+			"tire_repair_location_code": "2",
+			"tire_repair_location": "侧面",
+			"remark": null
+		}
+	}
+},
+ {
+	"vehicle_id": "20140002",
+	"tyre_id": "2017000016",
+	"position": "H212",
+	"install_date": "20160227",
+	"total_drived_time": "609",
+	"total_drived_km": "9246",
+	"ltwz": {
+		"tire_position_code": "H212",
+		"tire_position": "货车左中1外",
+		"remark": ""
+	},
+	"cllt": {
+		"vehicle_id": null,
+		"tyre_id": null,
+		"position": null,
+		"install_date": null,
+		"tyre_brand": null,
+		"tyre_modle": null,
+		"purchase_date": null,
+		"rated_load": null,
+		"rated_km": null,
+		"purchase_channel": null,
+		"price": null,
+		"ltpp": {
+			"tire_brand_code": null,
+			"tire_brand": null,
+			"remark": null
+		},
+		"ltcgqd": {
+			"tire_supply_channel_code": null,
+			"tire_supply_channel": null,
+			"remark": null
+		}
+	},
+	"ltwxxx": {
+		"vehicle_id": "20140003",
+		"tire_id": "2017000016",
+		"tire_position_code": "Q313",
+		"install_date": "20141101",
+		"repair_date": "20160425",
+		"repair_times": "3",
+		"repair_position_code": "2",
+		"repair_amount": "147",
+		"partner_id_code": "3",
+		"ltwz": {
+			"tire_position_code": null,
+			"tire_position": null,
+			"remark": null
+		},
+		"btwz": {
+			"tire_repair_location_code": "2",
+			"tire_repair_location": "侧面",
+			"remark": null
+		}
+	}
+},
+ {
+	"vehicle_id": "20140002",
+	"tyre_id": "2017000022",
+	"position": "H221",
+	"install_date": "20160831",
+	"total_drived_time": "641",
+	"total_drived_km": "9825",
+	"ltwz": {
+		"tire_position_code": "H221",
+		"tire_position": "货车右中1内",
+		"remark": ""
+	},
+	"cllt": {
+		"vehicle_id": null,
+		"tyre_id": null,
+		"position": null,
+		"install_date": null,
+		"tyre_brand": null,
+		"tyre_modle": null,
+		"purchase_date": null,
+		"rated_load": null,
+		"rated_km": null,
+		"purchase_channel": null,
+		"price": null,
+		"ltpp": {
+			"tire_brand_code": null,
+			"tire_brand": null,
+			"remark": null
+		},
+		"ltcgqd": {
+			"tire_supply_channel_code": null,
+			"tire_supply_channel": null,
+			"remark": null
+		}
+	},
+	"ltwxxx": {
+		"vehicle_id": "20140003",
+		"tire_id": "2017000022",
+		"tire_position_code": "Q324",
+		"install_date": "20150317",
+		"repair_date": "20160606",
+		"repair_times": "4",
+		"repair_position_code": "2",
+		"repair_amount": "205",
+		"partner_id_code": "2",
+		"ltwz": {
+			"tire_position_code": null,
+			"tire_position": null,
+			"remark": null
+		},
+		"btwz": {
+			"tire_repair_location_code": "2",
+			"tire_repair_location": "侧面",
+			"remark": null
+		}
+	}
+}, 
+{
+	"vehicle_id": "20140002",
+	"tyre_id": "2017000021",
+	"position": "H220",
+	"install_date": "20160824",
+	"total_drived_time": "459",
+	"total_drived_km": "9151",
+	"ltwz": {
+		"tire_position_code": "H220",
+		"tire_position": "货车右前",
+		"remark": ""
+	},
+	"cllt": {
+		"vehicle_id": null,
+		"tyre_id": null,
+		"position": null,
+		"install_date": null,
+		"tyre_brand": null,
+		"tyre_modle": null,
+		"purchase_date": null,
+		"rated_load": null,
+		"rated_km": null,
+		"purchase_channel": null,
+		"price": null,
+		"ltpp": {
+			"tire_brand_code": null,
+			"tire_brand": null,
+			"remark": null
+		},
+		"ltcgqd": {
+			"tire_supply_channel_code": null,
+			"tire_supply_channel": null,
+			"remark": null
+		}
+	},
+	"ltwxxx": {
+		"vehicle_id": "20140003",
+		"tire_id": "2017000021",
+		"tire_position_code": "Q323",
+		"install_date": "20150314",
+		"repair_date": "20160606",
+		"repair_times": "4",
+		"repair_position_code": "9",
+		"repair_amount": "163",
+		"partner_id_code": "1",
+		"ltwz": {
+			"tire_position_code": null,
+			"tire_position": null,
+			"remark": null
+		},
+		"btwz": {
+			"tire_repair_location_code": "9",
+			"tire_repair_location": "其他",
+			"remark": null
+		}
+	}
+}, 
+{
+	"vehicle_id": "20140002",
+	"tyre_id": "2017000023",
+	"position": "H222",
+	"install_date": "20160901",
+	"total_drived_time": "649",
+	"total_drived_km": "9591",
+	"ltwz": {
+		"tire_position_code": "H222",
+		"tire_position": "货车右中1外",
+		"remark": ""
+	},
+	"cllt": {
+		"vehicle_id": null,
+		"tyre_id": null,
+		"position": null,
+		"install_date": null,
+		"tyre_brand": null,
+		"tyre_modle": null,
+		"purchase_date": null,
+		"rated_load": null,
+		"rated_km": null,
+		"purchase_channel": null,
+		"price": null,
+		"ltpp": {
+			"tire_brand_code": null,
+			"tire_brand": null,
+			"remark": null
+		},
+		"ltcgqd": {
+			"tire_supply_channel_code": null,
+			"tire_supply_channel": null,
+			"remark": null
+		}
+	},
+	"ltwxxx": {
+		"vehicle_id": null,
+		"tire_id": null,
+		"tire_position_code": null,
+		"install_date": null,
+		"repair_date": null,
+		"repair_times": null,
+		"repair_position_code": null,
+		"repair_amount": null,
+		"partner_id_code": null,
+		"ltwz": {
+			"tire_position_code": null,
+			"tire_position": null,
+			"remark": null
+		},
+		"btwz": {
+			"tire_repair_location_code": null,
+			"tire_repair_location": null,
+			"remark": null
+		}
+	}
+}, 
+{
+	"vehicle_id": "20140002",
+	"tyre_id": "2017000024",
+	"position": "H223",
+	"install_date": "20160911",
+	"total_drived_time": "661",
+	"total_drived_km": "9159",
+	"ltwz": {
+		"tire_position_code": "H223",
+		"tire_position": "货车右中2内",
+		"remark": ""
+	},
+	"cllt": {
+		"vehicle_id": null,
+		"tyre_id": null,
+		"position": null,
+		"install_date": null,
+		"tyre_brand": null,
+		"tyre_modle": null,
+		"purchase_date": null,
+		"rated_load": null,
+		"rated_km": null,
+		"purchase_channel": null,
+		"price": null,
+		"ltpp": {
+			"tire_brand_code": null,
+			"tire_brand": null,
+			"remark": null
+		},
+		"ltcgqd": {
+			"tire_supply_channel_code": null,
+			"tire_supply_channel": null,
+			"remark": null
+		}
+	},
+	"ltwxxx": {
+		"vehicle_id": null,
+		"tire_id": null,
+		"tire_position_code": null,
+		"install_date": null,
+		"repair_date": null,
+		"repair_times": null,
+		"repair_position_code": null,
+		"repair_amount": null,
+		"partner_id_code": null,
+		"ltwz": {
+			"tire_position_code": null,
+			"tire_position": null,
+			"remark": null
+		},
+		"btwz": {
+			"tire_repair_location_code": null,
+			"tire_repair_location": null,
+			"remark": null
+		}
+	}
+}
+
+]

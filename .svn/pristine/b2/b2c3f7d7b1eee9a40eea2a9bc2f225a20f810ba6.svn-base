@@ -1,0 +1,106 @@
+/* 公共样式 */
+.fl {
+  float: left;
+}
+.fr {
+  float: right;
+}
+.clearfix {
+  zoom: 1;
+}
+.clearfix:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+* {
+  padding: 0px;
+  margin: 0px;
+  list-style: none;
+}
+
+.over{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space:nowrap;
+}
+/* 引入字体 */
+@font-face {
+  font-family: digi;
+  src: url("../../src/assets/font/DS-DIGI.ttf");
+}
+
+/* bmap logo */
+.anchorBL {
+  display: none;
+}
+
+/* 到期提醒 */
+.box_red {
+  background: rgba(231, 80, 41, 0.4) !important;
+  border: 1px solid rgba(231, 80, 41, 1) !important;
+}
+.box_yellow {
+  background: rgba(255, 185, 46, 0.4) !important;
+  border: 1px solid rgba(255, 185, 46, 1) !important;
+}
+.box_green {
+  background: rgba(5, 208, 235, 0.4) !important;
+  border: 1px solid rgba(5, 208, 235, 1) !important;
+}
+
+/* 首页公共样式：start */
+/* 1. 搜索框样式 */
+.el-input__inner {
+  background: rgba(3, 139, 252, 0.2);
+  border: 2px solid rgba(3, 139, 252,0.2);
+  color:#fff;
+}
+/* 轨迹信息下拉选择框样式 */
+/* 自定义选框高度 */
+.trajectoryInfoPopup_select_speed_sel :global(.el-select .el-input .el-input__inner){
+  height: 26.5px;
+}
+/* 自定义日期背景 */
+.el-date-editor .el-range-input, .el-date-editor .el-range-separator{
+  background: rgba(3, 139, 252, 0.2);
+  color:#b5b5b5;
+}
+.el-date-editor--daterange.el-input, .el-date-editor--daterange.el-input__inner, .el-date-editor--timerange.el-input, .el-date-editor--timerange.el-input__inner {
+  width: 245px;
+  height:26px;
+  background: rgba(3,139,252,0.2);
+}
+.el-date-editor .el-range__icon {
+  line-height: 17px;
+}
+.el-date-editor .el-range-separator {
+  line-height: 17px;
+}
+.el-progress-bar__outer{
+  background-color: rgba(3, 139, 252, 0.4);
+}
+/* 下拉 */
+.el-popper .popper__arrow{
+  display: none;
+}
+/* el-scrollbar__wrap */
+.el-select-dropdown{
+  border:1px solid #00bfe5;
+}
+.el-select-dropdown__wrap{
+  background-color:#000;
+} 
+.el-select-dropdown__item{
+  color: #fff;
+}
+.el-select-dropdown__item.hover, .el-select-dropdown__item:hover{
+  background-color: #038bfc;
+}
+/* 首页公共样式：end */
+
+/* 地图 */
+
+.BMap_pop img{
+  /* display: none; */
+}

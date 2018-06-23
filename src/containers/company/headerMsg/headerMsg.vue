@@ -1,0 +1,67 @@
+<template>
+  <div class="top_name">
+    <select @change='select'>
+      <option :value="item.entity_id"
+              v-for='(item,index) in entities' :key="index">{{item.entity_name}}</option>
+    </select>
+    <div class="top_btn"></div>
+  </div>
+</template>
+
+<script>
+import { mapActions, mapState } from 'vuex'
+
+export default {
+  data() {
+    return {
+      entity_name: '亿顺凯危货运输有限公司',
+    }
+  },
+  computed: {
+    ...mapState('headerMsgStore', ['entities']),
+  },
+  methods: {
+    ...mapActions('headerMsgStore', ['getHeader', 'selectEntity']),
+    select(e) {
+      this.selectEntity({
+        entity_id: e.target.value,
+      })
+    },
+  },
+  mounted() {
+    this.getHeader()
+  },
+}
+</script>
+
+<style lang="scss" scoped>
+.top_name {
+  height: 100px;
+  margin: 15px 20px 10px;
+  background: url("../../../assets/company/company_bg.png") no-repeat;
+  line-height: 104px;
+  text-indent: 50px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #89dddf;
+  position: relative;
+  select {
+    width: 327px;
+    color: #89dddf;
+    background: rgba(0, 0, 0, 0);
+    list-style: none;
+    border: 0;
+    outline: none;
+    cursor: pointer;
+  }
+  .top_btn {
+    width: 29px;
+    height: 20px;
+    position: absolute;
+    top: 44px;
+    right: 10px;
+    background: url("../../../assets/company/selecet.png") no-repeat;
+    pointer-events: none;
+  }
+}
+</style>

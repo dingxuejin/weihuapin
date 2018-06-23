@@ -1,0 +1,476 @@
+import axios from 'axios'
+
+// const baseURL = 'http://172.30.7.105:3033'
+// const baseURL = process.env.NODE_ENV === 'production' ? 'http://172.16.5.51:3033' : 'http://172.30.6.147:3033'
+// const baseURL = process.env.NODE_ENV === 'production' ? 'http://www.mobius-vision.com:3033' : 'http://172.30.7.103:3033'
+const baseURL = process.env.NODE_ENV === 'production' ? 'http://39.104.89.57:3034' : 'http://172.30.7.103:3033'
+const baseURL1 = process.env.NODE_ENV === 'production' ? 'http://172.30.7.114:8080' : 'http://39.104.89.57:8081'
+// 事故浏览（事故详情）
+export async function getAccidentList(entity_id) {
+  return axios.get(`${baseURL1}/TbBusinessYzsgByEId`, {
+    params: {
+      entity_id,
+    },
+  })
+}
+// 报警事件排名（风险因素排名）(高频不良驾驶行为)
+export async function getBadSteering({ entity_id, year, month }) {
+  return axios.get(`${baseURL1}/TbSubjectQyCdgwNandYslTDJ`, {
+    params: {
+      entity_id,
+      year,
+      month,
+    },
+  })
+}
+// 报警事件排名（风险因素排名）(高频违规行为)
+export async function getIrregularities({ entity_id, year, month }) {
+  return axios.get(`${baseURL1}/TbSubjectQyCdwgNandYslTDJ`, {
+    params: {
+      entity_id,
+      year,
+      month,
+    },
+  })
+}
+// 报警事件排名（风险因素排名）(高频违法行为)
+export async function getIllegality({ entity_id, year, month }) {
+  return axios.get(`${baseURL1}/TbSubjectQyCdwfNandYslTDJ`, {
+    params: {
+      entity_id,
+      year,
+      month,
+    },
+  })
+}
+// 安全情况总览
+export async function getSecureStatusOverview({ entity_id, year, month }) {
+  return axios.get(`${baseURL}/company_secure_status_overview`, {
+    params: { entity_id, year, month },
+  })
+}
+
+// 机构得分变化趋势
+export async function getEntityScoreTrend({ entity_id, year }) {
+  return axios.get(`${baseURL}/company_secure_entity_score_trend`, {
+    params: { entity_id, year },
+  })
+}
+
+// 安全驾驶排名
+export async function getSecureDriverOrder({ entity_id, month, year }) {
+  return axios.get(`${baseURL}/company_secure_drive_order`, {
+    params: { entity_id, month, year },
+  })
+}
+
+// 高危 违规 违法 事故
+export async function getBehaviorScore({ entity_id, month, year }) {
+  return axios.get(`${baseURL}/company_secure_driver_behavior_count`, {
+    params: { entity_id, month, year },
+  })
+}
+
+// 高危驾驶行为数量变化趋势
+export async function getDriverDangerTrend({
+  entity_id,
+  month,
+  year,
+  drive_event_type_code,
+}) {
+  return axios.get(`${baseURL}/company_secure_driver_danger_trend`, {
+    params: { entity_id, month, year, drive_event_type_code },
+  })
+}
+
+// 违规行为数量变化趋势
+export async function getDriverIrregularityTrend({
+  entity_id,
+  month,
+  year,
+  drive_event_type_code,
+}) {
+  return axios.get(`${baseURL}/company_secure_driver_irregularity_trend`, {
+    params: { entity_id, month, year, drive_event_type_code },
+  })
+}
+
+// 违法行为数量变化趋势
+export async function getDriverIllegalTrend({
+  entity_id,
+  month,
+  year,
+  drive_event_type_code,
+}) {
+  return axios.get(`${baseURL}/company_secure_driver_illegal_trend`, {
+    params: { entity_id, month, year, drive_event_type_code },
+  })
+}
+
+// 事故时段分布
+export async function getDriverAccidentTrend({
+  entity_id,
+  year,
+  month,
+  accident_level_code,
+  type,
+}) {
+  return axios.get(`${baseURL}/company_secure_driver_accident_trend`, {
+    params: { entity_id, month, year, accident_level_code, type },
+  })
+}
+
+// 不同周期高危驾驶行为数量
+export async function getDriverDangerCount({ entity_id, year, month }) {
+  return axios.get(`${baseURL}/company_secure_driver_danger_count_by_period`, {
+    params: {
+      entity_id,
+      year,
+      month,
+    },
+  })
+}
+// 不同周期违规行为数量
+export async function getDriverIrregualarityCount({ entity_id, year, month }) {
+  return axios.get(
+    `${baseURL}/company_secure_driver_irregularity_count_by_period`,
+    {
+      params: {
+        entity_id,
+        year,
+        month,
+      },
+    },
+  )
+}
+// 不同周期违法行为数量
+export async function getDriverIllegalCount({ entity_id, year, month }) {
+  return axios.get(`${baseURL}/company_secure_driver_illegal_count_by_period`, {
+    params: {
+      entity_id,
+      year,
+      month,
+    },
+  })
+}
+// 事故区域分布
+export async function getDriverAccidentAreaCount({
+  entity_id,
+  year,
+  month,
+  region_code,
+}) {
+  return axios.get(`${baseURL}/company_secure_driver_accident_area_by_period`, {
+    params: {
+      entity_id,
+      year,
+      month,
+      region_code,
+    },
+  })
+}
+// 不同类型事故区域分布
+export async function getAccidentDistributeTrendArea({
+  entity_id,
+  year,
+  month,
+  region_code,
+}) {
+  return axios.get(`${baseURL}/company_secure_driver_accident_distribute_trend_area`, {
+    params: {
+      entity_id,
+      year,
+      month,
+      region_code,
+    },
+  })
+}
+// 高驾行为区域分布
+export async function getDriverAreaDistribute({
+  entity_id,
+  year,
+  month,
+  region_code,
+}) {
+  return axios.get(`${baseURL}/company_secure_driver_danger_distribute_area`, {
+    params: {
+      entity_id,
+      year,
+      month,
+      region_code,
+    },
+  })
+}
+// 高驾行为时段分布
+export async function getDriverIntervalDistribute({ entity_id, year, month }) {
+  return axios.get(
+    `${baseURL}/company_secure_driver_danger_distribute_interval`,
+    {
+      params: {
+        entity_id,
+        year,
+        month,
+      },
+    },
+  )
+}
+// 违规行为区域分布
+export async function getIrregularityAreaDistribute({
+  entity_id,
+  year,
+  month,
+  region_code,
+}) {
+  return axios.get(
+    `${baseURL}/company_secure_driver_irregularity_distribute_area`,
+    {
+      params: {
+        entity_id,
+        year,
+        month,
+        region_code,
+      },
+    },
+  )
+}
+// 违规行为时段分布
+export async function getIrregularityIntervalDistribute({
+  entity_id,
+  year,
+  month,
+}) {
+  return axios.get(
+    `${baseURL}/company_secure_driver_irregularity_distribute_interval`,
+    {
+      params: {
+        entity_id,
+        year,
+        month,
+      },
+    },
+  )
+}
+// 违法行为区域分布
+export async function getIllegalAreaDistribute({
+  entity_id,
+  year,
+  month,
+  region_code,
+}) {
+  return axios.get(`${baseURL}/company_secure_driver_illegal_distribute_area`, {
+    params: {
+      entity_id,
+      year,
+      month,
+      region_code,
+    },
+  })
+}
+// 违法行为区域分布变化趋势
+// export async function getIllegalAreaDistribute({
+//   entity_id,
+//   year,
+//   month,
+//   region_code,
+// }) {
+//   return axios.get(`${baseURL}/company_secure_driver_illegal_distribute_area`, {
+//     params: {
+//       entity_id,
+//       year,
+//       month,
+//       region_code,
+//     },
+//   })
+// }
+// 违法行为时段分布
+export async function getIllegalIntervalDistribute({ entity_id, year, month }) {
+  return axios.get(
+    `${baseURL}/company_secure_driver_illegal_distribute_interval`,
+    {
+      params: {
+        entity_id,
+        year,
+        month,
+      },
+    },
+  )
+}
+// 事故区域总览
+// export async function getAccidentList() {
+//   return axios.get(`${baseURL}/tb_business_yzsg`)
+// }
+
+export async function getAccidentDistributeTrendInterval({
+  entity_id,
+  year,
+  month,
+  accident_level_code,
+}) {
+  return axios.get(
+    `${baseURL}/company_secure_driver_accident_distribute_trend_interval`,
+    {
+      params: {
+        entity_id,
+        year,
+        month,
+        accident_level_code,
+      },
+    },
+  )
+}
+
+// 高危驾驶行为/违规行为/违法行为/事故记录得分
+export async function gettb_subject_qy_qyaqfz({ entity_id, year, month }) {
+  return axios.get(`${baseURL}/tb_subject_qy_qyaqfz`, {
+    params: {
+      entity_id,
+      year,
+      month,
+    },
+  })
+}
+
+// 所有企业安全弹框数据：
+// 获取驾驶行为所有信息
+export async function gettb_subject_qy_gwqy({ entity_id }) {
+  return axios.get(`${baseURL}/tb_subject_qy_gwqy`, {
+    params: {
+      entity_id,
+    },
+  })
+}
+
+// 1.高危驾驶行为区域分布变化趋势
+
+export async function getdriver_danger_distribute_trend_area({
+  entity_id,
+  year,
+  month,
+  region_code,
+}) {
+  return axios.get(
+    `${baseURL}/company_secure_driver_danger_distribute_trend_area`,
+    {
+      params: {
+        entity_id,
+        year,
+        month,
+        region_code,
+      },
+    },
+  )
+}
+// 2.高危驾驶行为时段分布变化趋势
+export async function getdriver_danger_distribute_trend_interval({
+  entity_id,
+  year,
+  month,
+  drive_event_type_code,
+}) {
+  return axios.get(
+    `${baseURL}/company_secure_driver_danger_distribute_trend_interval`,
+    {
+      params: {
+        entity_id,
+        year,
+        month,
+        drive_event_type_code,
+      },
+    },
+  )
+}
+// 3.违规行为区域分布变化趋势
+export async function getdriver_irregularity_distribute_trend_area({
+  entity_id,
+  year,
+  month,
+  region_code,
+}) {
+  return axios.get(
+    `${baseURL}/company_secure_driver_irregularity_distribute_trend_area`,
+    {
+      params: {
+        entity_id,
+        year,
+        month,
+        region_code,
+      },
+    },
+  )
+}
+// 4.违规行为时段分布变化趋势
+export async function getdriver_irregularity_distribute_trend_interval({
+  entity_id,
+  year,
+  month,
+  drive_event_type_code,
+}) {
+  return axios.get(
+    `${baseURL}/company_secure_driver_irregularity_distribute_trend_interval`,
+    {
+      params: {
+        entity_id,
+        year,
+        month,
+        drive_event_type_code,
+      },
+    },
+  )
+}
+// 5.违法行为区域分布变化趋势
+export async function getdriver_illegal_distribute_trend_area({
+  entity_id,
+  year,
+  month,
+  region_code,
+}) {
+  return axios.get(
+    `${baseURL}/company_secure_driver_illegal_distribute_trend_area`,
+    {
+      params: {
+        entity_id,
+        year,
+        month,
+        region_code,
+      },
+    },
+  )
+}
+// 6.违法行为时段分布变化趋势
+export async function getdriver_illegal_distribute_trend_interval({
+  entity_id,
+  year,
+  month,
+  drive_event_type_code,
+}) {
+  return axios.get(
+    `${baseURL}/company_secure_driver_illegal_distribute_trend_interval`,
+    {
+      params: {
+        entity_id,
+        year,
+        month,
+        drive_event_type_code,
+      },
+    },
+  )
+}
+
+// 7.事故详情tb_business_yzsg
+export async function gettb_business_yzsg({
+  driver_id,
+  year,
+  month,
+}) {
+  return axios.get(
+    `${baseURL}/tb_business_yzsg`,
+    {
+      params: {
+        driver_id,
+        year,
+        month,
+      },
+    },
+  )
+}
+export default {}

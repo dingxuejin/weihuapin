@@ -1,0 +1,75 @@
+<template>
+    <div class="normal">
+        <div v-drag class="home">
+            <PopUpFrame  @close="onCloseHome">
+                <div class="content">
+                    <div class="left">
+                        <div class="left_top">
+                            <header>预警统计</header>
+
+                        </div>
+                        <div class="left_bottom">
+                            <header>报警信息变动趋势</header>
+
+                        </div>
+                    </div>
+                    <div class="right">
+                        <header>处理统计</header>
+
+                    </div>
+                </div>
+            </PopUpFrame>
+        </div>
+    </div>
+</template>
+<script>
+/* eslint-disable */
+import PopUpFrame from '@/components/PopUpFrame'
+export default {
+    components:{
+        PopUpFrame
+    },
+    methods: {
+        onCloseHome() {
+        this.$emit('onCloseHome')
+        },
+    },
+}
+</script>
+<style lang="scss" scoped>
+.home{
+    right: 100px;
+    top: 150px;
+    width: 800px;
+    .content{
+        display: table;
+        width: 100%;
+        background-color: rgba(9,122,206,0.2);
+        padding: 6px;
+        box-sizing: border-box;
+        border-collapse: separate;
+        border-spacing: 5px;
+        .left{
+            display: table-cell;
+            &_top{
+                background-color: rgba(9,122,206,0.3);
+                height: 300px;
+            }
+            &_bottom{
+                margin-top: 5px;
+                background-color: rgba(9,122,206,0.3);
+                height: 300px;
+            }
+        }
+        .right{
+            display: table-cell;
+            background-color: rgba(9,122,206,0.3);
+        }
+        header{
+            background-color: rgba(129,217,229,0.2);
+            margin: 0 10px;
+            padding: 5px 10px;
+        }
+    }
+}
+</style>

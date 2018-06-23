@@ -1,0 +1,136 @@
+<template>
+  <div class="company_manage_waybill_content_statistic_wrap">
+    <!-- 日期选择 -->
+    <div class="dateSelectedWrap clearfix">
+      <div class="dateSelecteContent">
+        <div class="monthWrap">
+          <key-value-select width="100px"
+                            :data="monthOption"
+                            :defaultValue='monthLabel'
+                            @select="selectMonth"></key-value-select>
+        </div>
+        <div class="yearWrap">
+          <key-value-select width="100px"
+                            :data="yearOption"
+                            :defaultValue='yearLabel'
+                            @select="selectYear"></key-value-select>
+        </div>
+        <div class="dateTypeTitle">统计周期</div>
+      </div>
+    </div>
+    <!-- Bar图 -->
+    <div class="company_manage_waybill_content_statistic_bar_wrap">
+      <loading :data="waybillStatistics">
+        <bar chartTheme="dark"
+           :data="waybillStatistics[0].data"
+           yaxisName="运单数(单)"
+           v-if="waybillStatistics"></bar>
+      </loading>
+    </div>
+  </div>
+</template>
+<script>
+import { mapState, mapActions } from 'vuex'
+import KeyValueSelect from '../../../components/KeyValueSelect'
+import bar from '../../../components/charts/bar'
+import Dictionary from '../../../util/dictionary'
+import keyGetValue from '../../../util/keyGetValue'
+
+const { date: { year, month } } = Dictionary
+export default {
+  components: {
+    bar,
+    KeyValueSelect,
+  },
+  mounted() {
+    this.fetchData()
+  },
+  computed: {
+    ...mapState('waybillStatistics', ['waybillStatistics']),
+    ...mapState('maintitlemsg', ['selectedEntity']),
+    yearLabel() {
+      const defaultYear = keyGetValue('value', this.year, 'label', this.yearOption)
+      return defaultYear[0]
+    },
+    monthLabel() {
+      const defaultMonth = keyGetValue('value', this.month, 'label', this.monthOption)
+      return defaultMonth[0]
+    },
+  },
+  data: () => ({
+    yearOption: year,
+    monthOption: [{ label: '全年', value: null }, ...month],
+    year: Dictionary.nowYear,
+    month: Dictionary.nowMonth,
+  }),
+  methods: {
+    ...mapActions('waybillStatistics', ['getWaybillStatistics']),
+    fetchData() {
+      this.getWaybillStatistics({
+        entity_id: this.selectedEntity,
+        year: this.year,
+        month: this.month,
+        // cargo_type_code: this.cargo_type_code,
+      })
+    },
+    selectYear(item) {
+      this.year = item.value
+      this.fetchData()
+    },
+    selectMonth(item) {
+      this.month = item.value
+      this.fetchData()
+    },
+  },
+}
+</script>
+<style lang="scss" scoped>
+@mixin size($width,$height) {
+  width: $width;
+  height: $height;
+}
+.company_manage_waybill_content_statistic_wrap {
+  @include size(100%,235px);
+  margin-top: 10px;
+  margin-bottom: 20px;
+  .dateSelectedWrap {
+    width: 100%;
+    position: relative;
+    .dateSelecteContent {
+      @include size(426px,25px);
+      float: right;
+      .dateTypeTitle {
+        width: 100px;
+        text-align: center;
+        line-height: 25px;
+        float: right;
+        color: #b5b5b5;
+        font-size: 14px;
+        margin-right: 10px;
+      }
+      .yearWrap {
+        width: 100px;
+        height: 25px;
+        float: right;
+        margin-right: 5px;
+      }
+      .monthWrap {
+        width: 100px;
+        height: 25px;
+        float: right;
+        margin-right: 5px;
+      }
+      .dayWrap {
+        width: 100px;
+        height: 25px;
+        float: right;
+        margin-right: 5px;
+      }
+    }
+  }
+  .company_manage_waybill_content_statistic_bar_wrap {
+    @include size(100%,200px);
+    margin-top: 10px;
+  }
+}
+</style>

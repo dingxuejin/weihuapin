@@ -1,0 +1,234 @@
+<template>
+  <div class="company_secure_driver_accident_details_wrap"
+       v-if="accidentDetails_show">
+    <popup-out-frame title="事故详情">
+      <!-- 内容： -->
+      <div class="accident_details">
+         <div class="detailsContent">
+          <div class="titleWrap">
+            <div class="accidentTitle">事故时间</div>
+            <div class="accidentTitle">事故地点</div>
+            <div class="accidentTitle">事故等级</div>
+            <div class="accidentTitle">事故责任</div>
+            <div class="accidentTitle">事故致因</div>
+            <div class="accidentTitle">事故损失</div>
+            <div class="accidentTitle">事故处理状态</div>
+          </div>
+          <div class="detailListWrap">
+            <ul v-if="gettb_business_yzsg_data">
+              <li v-for="(o,index) in gettb_business_yzsg_data"
+                  :key=index>
+                <ul>
+                  <li :title="o.accidenttype_time">{{o.accidenttype_time}}</li>
+                  <li :title="o.accident_location">{{o.accident_location}}</li>
+                  <li>{{o.sgdj.accident_level}}</li>
+                  <li>{{o.sgzr.accident_responsibility}}</li>
+                  <li :title="o.accident_cause">{{o.accident_cause}}</li>
+                  <li :title="o.accident_loss">{{o.accident_loss}}</li>
+                  <li :title="o.accident_status">{{o.accident_status}}</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </popup-out-frame>
+
+  </div>
+</template>
+<script>
+import KeyValueSelect from '@/components/KeyValueSelect'
+import lineChart from '@/components/charts/lineChart'
+import xxx from '../../../util/dictionary'
+import PopupOutFrame from './PopupOutFrame'
+import { mapState, mapActions } from '../../../../node_modules/_vuex@3.0.1@vuex'
+
+export default {
+  name: '',
+  components: {
+    KeyValueSelect,
+    xxx,
+    lineChart,
+    PopupOutFrame,
+  },
+  data() {
+    return {
+      accidentDetailsData: [
+        {
+          driver_id: '201408000001',
+          waybill_code: '20171008440544520001',
+          vehicle_id: '20130652',
+          accidenttype_time: '20171008201200',
+          accident_location: '广东省汕头市潮南区潮南峡山客运站附近广汕公路',
+          longitude: '116.446025',
+          latitude: '23.243409',
+          accident_level_code: '4',
+          accident_responsibility_code: '4',
+          if_hm_release_code: '2',
+          accident_cause: '变道时没给后车留出足够的安全距离，造成追尾',
+          accident_loss: '支付对方车辆维修费用10000元，误工费500元',
+          accident_status: '交警部门已出具事故责任认定书，正在由我方保险公司进行定损理赔',
+          sgdj: {
+            accident_level_code: '4',
+            accident_level: '轻微事故',
+            remark: null,
+          },
+          sgzr: {
+            accident_responsibility_code: '4',
+            accident_responsibility: '完全责任',
+            remark: null,
+          },
+          sfxl: {
+            if_hm_release_code: '2',
+            if_hm_release: '否',
+            remark: null,
+          },
+        },
+      ],
+    }
+  },
+  computed: {
+    ...mapState('popupSecContainer', [
+      // 弹框显示/隐藏：
+      'detailsShow',
+      'accidentDetails_show',
+      'tb_business_yzsg',
+    ]),
+        // 获取数据
+    gettb_business_yzsg_data() {
+      if (this.tb_business_yzsg) {
+        return this.tb_business_yzsg
+      }
+      return null
+    },
+    // 设置参数
+    getQueryParams() {
+      return {
+        driver_id: '201408000001',
+        year: '',
+        month: '',
+      }
+    },
+  },
+  methods: {
+    ...mapActions('popupSecContainer', ['gettb_business_yzsg']),
+  },
+  mounted() {
+    this.gettb_business_yzsg(this.getQueryParams)
+  },
+}
+</script>
+
+<style lang="scss" scoped>
+@mixin size($width,$height) {
+  width: $width;
+  height: $height;
+}
+.clearfix {
+  &:before,
+  &:after {
+    content: "";
+    display: table;
+  }
+  &:after {
+    clear: both;
+    overflow: hidden;
+  }
+}
+.company_secure_driver_accident_details_wrap {
+  width: 750px;
+  position: absolute;
+  top: 395px;
+  left: 1240px;
+  z-index:3;
+  .accident_details {
+    width: 100%;
+    margin-top: 10px;
+   .detailsContent {
+      width: 100%;
+      height: 265px;
+      overflow: hidden;
+      border: 1px solid #81d9e5;
+      box-sizing: border-box;
+      .titleWrap {
+        @include size(100%,25px);
+        margin-top: 10px;
+        margin-bottom: 5px;
+        background: rgba(5, 208, 235, 0.2);
+        .accidentTitle {
+          @include size(100px,25px);
+          line-height: 25px;
+          text-align: center;
+          color: #89dddf;
+          font-size: 14px;
+          float: left;
+        }
+      }
+      .detailListWrap {
+        width: 100%;
+        ul {
+          width: 703px;
+          height: 220px;
+          list-style: none;
+          margin: 0;
+          padding: 0;
+          overflow: hidden;
+          overflow-y: scroll;
+          li {
+            width: 99.3%;
+            height: 20px;
+            overflow: hidden;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            margin-bottom: 5px;
+            background: rgba(129, 217, 229, 0.1);
+            ul {
+              width: 100%;
+              height: 20px;
+              overflow: hidden;
+              list-style: none;
+              margin: 0;
+              padding: 0;
+              li {
+                width: (100%/7);
+                height: 20px;
+                line-height: 20px;
+                text-align: center;
+                color: #b5b5b5;
+                font-size: 14px;
+                float: left;
+                list-style: none;
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+              }
+            }
+            ul:hover {
+              background: rgba(129, 217, 229, 0.5);
+            }
+            ul:hover {
+              li {
+                color: #fff;
+              }
+            }
+          }
+        }
+        ul::-webkit-scrollbar {
+          @include size(5px,220px);
+          background: url(~assets/car/scroll.png) no-repeat center center;
+          position: relative;
+          right: 10px;
+          top: 5px;
+          background-size: 5px 220px;
+        }
+        ul::-webkit-scrollbar-thumb {
+          background: rgba(5, 208, 235, 1);
+        }
+      }
+    }
+  }
+}
+</style>

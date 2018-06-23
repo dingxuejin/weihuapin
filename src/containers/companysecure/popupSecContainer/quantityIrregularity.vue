@@ -1,0 +1,134 @@
+<template>
+  <div class="trend"
+       v-if="quantityIrregularity_show">
+    <!-- <popup-out-frame title="不同周期违规行为数量"> -->
+    <div class="company_secure_driver_danger_outframe_wrap"
+         v-drag
+         @mousedown="move=true"
+         @mouseup="move=false"
+         :style="move?'cursor:move':''">
+      <pop-up-frame @close='closeDetails'>
+        <pop-up-widget title="不同周期违规行为数量"></pop-up-widget>
+        <div class="change">
+          <div>统计周期</div>
+          <div>
+            <key-value-select width='141px'
+                              :data='yearOption'
+                              @select='selectYear'></key-value-select>
+          </div>
+          <div>
+            <key-value-select width='83px'
+                              :data='monthOption'
+                              @select='selectMonth'></key-value-select>
+          </div>
+        </div>
+        <div class="echart">
+          <loading :data='driverIrregularityCount'>
+            <bar-stack chartTheme="dark"
+                       :data='driverIrregularityCount'></bar-stack>
+          </loading>
+        </div>
+        <!-- </popup-out-frame> -->
+      </pop-up-frame>
+    </div>
+  </div>
+</template>
+<script>
+/*eslint-disable */
+import { mapState, mapActions, mapMutations } from "vuex";
+import htitle from "../../../components/companysecure/title";
+import KeyValueSelect from "../../../components/KeyValueSelect";
+import BarStack from "../../../components/charts/BarStack";
+import Dictionary from "../../../util/dictionary";
+import PopupOutFrame from "../../../containers/companysecure/popupSecContainer/PopupOutFrame";
+import PopUpFrame from "@/components/PopUpFrame";
+import PopUpWidget from "@/components/PopUpWidget";
+
+const { date: { year, month } } = Dictionary;
+export default {
+  components: {
+    htitle,
+    KeyValueSelect,
+    BarStack,
+    PopupOutFrame,
+    PopUpWidget,
+    PopUpFrame
+  },
+  computed: {
+    ...mapState('popupSecContainer', ['driverIrregularityCount']),
+    ...mapState('secureMain', ['selectedEntity']),
+    ...mapState('popupSecContainer', ['quantityIrregularity_show']),
+  },
+  methods: {
+    ...mapMutations("popupSecContainer", ["setquantityIrregularity_show"]),
+    ...mapActions("popupSecContainer", ["getDriverIrregualarityCount"]),
+    closeDetails() {
+      this.setquantityIrregularity_show(false);
+    },
+    selectYear(item) {
+      this.year = item.value;
+      this.fetchData();
+    },
+    selectMonth(item) {
+      this.month = item.value;
+      this.fetchData();
+    },
+    fetchData() {
+      this.getDriverIrregualarityCount({
+        entity_id: this.selectedEntity,
+        year: this.year,
+        month: this.month
+      });
+    }
+  },
+  data: () => ({
+    move: false,
+    yearOption: [{ label: "全部", value: null }, ...year],
+    monthOption: [{ label: "全部", value: null }, ...month],
+    year: null,
+    month: null
+  })
+};
+</script>
+<style lang="scss" scoped>
+.trend {
+  width: 750px;
+  height: 240px;
+  .company_secure_driver_danger_outframe_wrap {
+    width: 750px;
+  }
+  .header {
+    width: 710px;
+    height: 25px;
+  }
+  .change {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    height: 25px;
+    //float: right;
+    font-size: 14px;
+    div {
+      float: left;
+      height: 25px;
+      color: #b5b5b5;
+    }
+    div:nth-child(1) {
+      line-height: 25px;
+    }
+    div:nth-child(2) {
+      width: 141px;
+      margin-left: 17.4px;
+      margin-right: 12.6px;
+    }
+    div:nth-child(3) {
+      width: 83px;
+    }
+  }
+  .echart {
+    clear: both;
+    width: 560px;
+    height: 200px;
+    // background: lightblue;
+  }
+}
+</style>

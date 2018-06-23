@@ -1,0 +1,143 @@
+<template>
+  <div>
+    <div class="dateSelectedWrap clearfix">
+      <div class="dateSelecteContent">
+        <div class="title">货物类型</div>
+        <div class="typeWrap">
+          <key-value-select width="100px"
+                            :data="cargoOption"
+                            @select="select('cargo_type_code',$event)"></key-value-select>
+        </div>
+      </div>
+    </div>
+    <!-- bar图 -->
+    <div class="volume_statistics_day_night_bar_wrap">
+      <lineDoubleAxis chartTheme="dark"
+                      :data="result"
+                      :property="property"
+                      :dataZoom = false
+                      yaxisNameL="货运量(吨)"
+                      yaxisNameR="占比(%)"
+                      v-if="volumeStatisticsDayNight"></lineDoubleAxis>
+      <Loading :data='volumeStatisticsDayNight'></Loading>
+    </div>
+  </div>
+</template>
+<script>
+import { mapState, mapActions } from 'vuex'
+import KeyValueSelect from '../../../components/KeyValueSelect'
+import lineDoubleAxis from '../../../components/charts/lineDoubleAxis'
+// import Dictionary from '../../../util/dictionary'
+
+// const { cargoTypeCode } = Dictionary
+export default {
+  components: {
+    KeyValueSelect,
+    lineDoubleAxis,
+  },
+  mounted() {
+    this.getCargoId_name()
+  },
+  computed: {
+    ...mapState('volumeStatisticsDayNight', ['volumeStatisticsDayNight']),
+    ...mapState('maintitlemsg', ['selectedEntity']),
+    ...mapState('companyManage', ['cargoId_name']),
+    property() {
+      return [
+        {
+          name: '白天货运量',
+          type: 'bar',
+          axis: 0,
+        },
+        {
+          name: '夜晚货运量',
+          type: 'bar',
+          axis: 0,
+        },
+        {
+          name: '昼夜比',
+          type: 'line',
+          axis: 1,
+        },
+      ]
+    },
+    result() {
+      return this.volumeStatisticsDayNight.result
+    },
+  },
+  watch: {
+    cargoId_name() {
+      this.cargoOption = this.cargoId_name
+    },
+  },
+  data: () => ({
+    cargoOption: this.cargoId_name,
+    cargo_type_code: '03110',
+  }),
+  methods: {
+    ...mapActions('volumeStatisticsDayNight', ['getVolumeStatisticDayNight']),
+    ...mapActions('companyManage', ['getCargoId_name']),
+    fetchData() {
+      this.getVolumeStatisticDayNight({
+        // entity_id: this.selectedEntity ? this.selectedEntity.entity_id : 1310000010000000,
+        entity_id: this.selectedEntity ? this.selectedEntity : 1310000010000000,
+        cargo_id: this.cargo_type_code,
+
+      })
+    },
+    select(name, item) {
+      this[name] = item.value
+      this.fetchData()
+    },
+  },
+
+}
+</script>
+<style lang="scss" scoped>
+@mixin size($width,$height) {
+  width: $width;
+  height: $height;
+}
+.dateSelectedWrap {
+  width: 100%;
+  position: relative;
+  margin-top: 10px;
+  .dateSelecteContent {
+    @include size(226px,25px);
+    float: right;
+    .title {
+      width: 100px;
+      text-align: center;
+      line-height: 25px;
+      float: left;
+      color: #b5b5b5;
+      font-size: 14px;
+      margin-right: 10px;
+      margin-left: 10px;
+    }
+    .yearWrap {
+      width: 100px;
+      height: 25px;
+      float: left;
+      margin-right: 5px;
+    }
+    .monthWrap {
+      width: 100px;
+      height: 25px;
+      float: left;
+      margin-right: 5px;
+    }
+    .typeWrap {
+      width: 100px;
+      height: 25px;
+      float: left;
+      margin-right: 5px;
+    }
+  }
+}
+.volume_statistics_day_night_bar_wrap {
+  width: 100%;
+  height: 200px;
+  margin-top: 10px;
+}
+</style>

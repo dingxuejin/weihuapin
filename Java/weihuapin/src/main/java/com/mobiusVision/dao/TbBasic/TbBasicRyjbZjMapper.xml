@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobiusVision.dao.TbBasic.TbBasicRyjbZjMapper" >
+<!--人员信息-->
+    <resultMap id="RyjbBaseResultMap" type="TbBasicRyjb" >
+        <id column="tb_basic_ryjb_id" property="tb_basic_ryjb_id" jdbcType="INTEGER" />
+        <result column="Driver_ID" property="driver_ID" jdbcType="VARCHAR" />
+        <result column="Name" property="name" jdbcType="VARCHAR" />
+        <result column="phone" property="phone" jdbcType="VARCHAR" />
+        <result column="Photo" property="photo" jdbcType="VARCHAR" />
+        <result column="IDCertificate_Number" property="IDCertificate_Number" jdbcType="VARCHAR" />
+        <result column="Gender_Code" property="gender_Code" jdbcType="VARCHAR" />
+        <result column="Birth_Date" property="birth_Date" jdbcType="VARCHAR" />
+        <result column="Marital_Status_Code" property="marital_Status_Code" jdbcType="VARCHAR" />
+        <result column="Education_Code" property="education_Code" jdbcType="VARCHAR" />
+        <result column="Employees_Type_Code" property="employees_Type_Code" jdbcType="VARCHAR" />
+        <result column="Drive_Age" property="drive_Age" jdbcType="VARCHAR" />
+        <result column="Employment_Years" property="employment_Years" jdbcType="VARCHAR" />
+        <result column="Corporate_Service" property="corporate_Service" jdbcType="VARCHAR" />
+        <result column="Entity_Id" property="entity_Id" jdbcType="VARCHAR" />
+        <result column="Credit_Level_Code" property="credit_Level_Code" jdbcType="VARCHAR" />
+        <result column="Assessment_Date" property="assessment_Date" jdbcType="VARCHAR" />
+        <result column="Nationality" property="nationality" jdbcType="VARCHAR" />
+        <result column="Address" property="address" jdbcType="VARCHAR" />
+    </resultMap>
+<!--证件-->
+    <resultMap id="ZjBaseResultMap" type="com.mobiusVision.pojo.TbBasic.TbBasicZj" >
+        <id column="tb_basic_zj_id" property="tb_basic_zj_id" jdbcType="INTEGER" />
+        <result column="Driver_ID" property="driver_ID" jdbcType="VARCHAR" />
+        <result column="certificate_type_code" property="certificate_type_code" jdbcType="VARCHAR" />
+        <result column="Certificate_Number" property="certificate_Number" jdbcType="VARCHAR" />
+        <result column="InitialCollection_Date" property="initialCollection_Date" jdbcType="VARCHAR" />
+        <result column="Effective_Date" property="effective_Date" jdbcType="VARCHAR" />
+        <result column="Expire_Date" property="expire_Date" jdbcType="VARCHAR" />
+        <result column="Valid_Period" property="valid_Period" jdbcType="VARCHAR" />
+        <result column="Issuing_Authority" property="issuing_Authority" jdbcType="VARCHAR" />
+        <result column="Allow_Driving_Type_Code" property="allow_Driving_Type_Code" jdbcType="VARCHAR" />
+        <result column="File_No" property="file_No" jdbcType="VARCHAR" />
+        <result column="CertificateAbbreviation" property="certificateAbbreviation" jdbcType="VARCHAR" />
+        <result column="Certificate_status_code" property="certificate_status_code" jdbcType="VARCHAR" />
+        <result column="Photo" property="photo" jdbcType="VARCHAR" />
+    </resultMap>
+<!--证件类型-->
+    <resultMap id="ZjlxBaseResultMap" type="com.mobiusVision.pojo.TbDictionary.TbDictionaryZjlx" >
+        <id column="tb_dictionary_zjlx_id" property="tb_dictionary_zjlx_id" jdbcType="INTEGER" />
+        <result column="certificate_type_code" property="certificate_type_code" jdbcType="VARCHAR" />
+        <result column="certificate_type" property="certificate_type" jdbcType="VARCHAR" />
+        <result column="remark" property="remark" jdbcType="VARCHAR" />
+    </resultMap>
+<!--证件状态-->
+    <resultMap id="ZjztBaseResultMap" type="com.mobiusVision.pojo.TbDictionary.TbDictionaryZjzt" >
+        <id column="tb_dictionary_zjzt_id" property="tb_dictionary_zjzt_id" jdbcType="INTEGER" />
+        <result column="certificate_status_code" property="certificate_status_code" jdbcType="VARCHAR" />
+        <result column="certificate_status" property="certificate_status" jdbcType="VARCHAR" />
+        <result column="remark" property="remark" jdbcType="VARCHAR" />
+    </resultMap>
+    <!--基础证件-->
+    <resultMap id="BasicRyZjZjlxZjzt" type="TbBasicRyjbBasicZj" extends="RyjbBaseResultMap"   >
+        <collection property="basicZj" ofType="com.mobiusVision.pojo.TbBasic.TbBasicZjAlxAzt"
+                    javaType="java.util.ArrayList">
+            <id column="tb_basic_zj_id" property="tb_basic_zj_id" jdbcType="INTEGER" />
+            <result column="Driver_ID" property="driver_ID" jdbcType="VARCHAR" />
+            <result column="certificate_type_code" property="certificate_type_code" jdbcType="VARCHAR" />
+            <result column="Certificate_Number" property="certificate_Number" jdbcType="VARCHAR" />
+            <result column="InitialCollection_Date" property="initialCollection_Date" jdbcType="VARCHAR" />
+            <result column="Effective_Date" property="effective_Date" jdbcType="VARCHAR" />
+            <result column="Expire_Date" property="expire_Date" jdbcType="VARCHAR" />
+            <result column="Valid_Period" property="valid_Period" jdbcType="VARCHAR" />
+            <result column="Issuing_Authority" property="issuing_Authority" jdbcType="VARCHAR" />
+            <result column="Allow_Driving_Type_Code" property="allow_Driving_Type_Code" jdbcType="VARCHAR" />
+            <result column="File_No" property="file_No" jdbcType="VARCHAR" />
+            <result column="CertificateAbbreviation" property="certificateAbbreviation" jdbcType="VARCHAR" />
+            <result column="Certificate_status_code" property="certificate_status_code" jdbcType="VARCHAR" />
+            <result column="Photo" property="photo" jdbcType="VARCHAR" />
+            <result column="Expire_Days" property="expire_days" jdbcType="VARCHAR" />
+            <association property="zjlx" javaType="TbDictionaryZjlx" >
+                <id column="tb_dictionary_zjlx_id" property="tb_dictionary_zjlx_id" jdbcType="INTEGER" />
+                <result column="certificate_type_code" property="certificate_type_code" jdbcType="VARCHAR" />
+                <result column="certificate_type" property="certificate_type" jdbcType="VARCHAR" />
+                <result column="remark" property="remark" jdbcType="VARCHAR" />
+            </association>
+            <association property="zjzt" javaType="TbDictionaryZjzt" >
+                <id column="tb_dictionary_zjzt_id" property="tb_dictionary_zjzt_id" jdbcType="INTEGER" />
+                <result column="certificate_status_code" property="certificate_status_code" jdbcType="VARCHAR" />
+                <result column="certificate_status" property="certificate_status" jdbcType="VARCHAR" />
+                <result column="remark" property="remark" jdbcType="VARCHAR" />
+            </association>
+        </collection>
+    </resultMap>
+    <!--业务证件-->
+    <resultMap id="BusinessRyZjZjlxZjzt" type="TbBasicRyjbBusinessZj" extends="RyjbBaseResultMap"   >
+        <collection property="businessZj" ofType="TbBasicZjAlxAzt"
+                    javaType="java.util.ArrayList">
+            <id column="tb_basic_zj_id" property="tb_basic_zj_id" jdbcType="INTEGER" />
+            <result column="Driver_ID" property="driver_ID" jdbcType="VARCHAR" />
+            <result column="certificate_type_code" property="certificate_type_code" jdbcType="VARCHAR" />
+            <result column="Certificate_Number" property="certificate_Number" jdbcType="VARCHAR" />
+            <result column="InitialCollection_Date" property="initialCollection_Date" jdbcType="VARCHAR" />
+            <result column="Effective_Date" property="effective_Date" jdbcType="VARCHAR" />
+            <result column="Expire_Date" property="expire_Date" jdbcType="VARCHAR" />
+            <result column="Valid_Period" property="valid_Period" jdbcType="VARCHAR" />
+            <result column="Issuing_Authority" property="issuing_Authority" jdbcType="VARCHAR" />
+            <result column="Allow_Driving_Type_Code" property="allow_Driving_Type_Code" jdbcType="VARCHAR" />
+            <result column="File_No" property="file_No" jdbcType="VARCHAR" />
+            <result column="CertificateAbbreviation" property="certificateAbbreviation" jdbcType="VARCHAR" />
+            <result column="Certificate_status_code" property="certificate_status_code" jdbcType="VARCHAR" />
+            <result column="Photo" property="photo" jdbcType="VARCHAR" />
+            <result column="Expire_Days" property="expire_days" jdbcType="VARCHAR" />
+            <association property="zjlx" javaType="TbDictionaryZjlx" >
+                <id column="tb_dictionary_zjlx_id" property="tb_dictionary_zjlx_id" jdbcType="INTEGER" />
+                <result column="certificate_type_code" property="certificate_type_code" jdbcType="VARCHAR" />
+                <result column="certificate_type" property="certificate_type" jdbcType="VARCHAR" />
+                <result column="remark" property="remark" jdbcType="VARCHAR" />
+            </association>
+            <association property="zjzt" javaType="TbDictionaryZjzt" >
+                <id column="tb_dictionary_zjzt_id" property="tb_dictionary_zjzt_id" jdbcType="INTEGER" />
+                <result column="certificate_status_code" property="certificate_status_code" jdbcType="VARCHAR" />
+                <result column="certificate_status" property="certificate_status" jdbcType="VARCHAR" />
+                <result column="remark" property="remark" jdbcType="VARCHAR" />
+            </association>
+        </collection>
+    </resultMap>
+    <!--mapper缓存参数设定-->
+    <cache  eviction="LRU" flushInterval="60000"  size="512" readOnly="true"/>
+    <!--通过driver_id查询TB_BASIC_RYJB users,TB_BASIC_ZJ zj,TB_DICTIONARY_ZJZT zt,TB_DICTIONARY_ZJLX lx表中基础证件数据-->
+    <select id="findAllBaiscZjByDriverId" resultMap="BasicRyZjZjlxZjzt">
+        select users.*,zj.*,zt.*,lx.*,datediff(date(zj.Expire_Date),current_date()) as Expire_Days
+        from TB_BASIC_RYJB users,TB_BASIC_ZJ zj,TB_DICTIONARY_ZJZT zt,TB_DICTIONARY_ZJLX lx
+        where users.Driver_ID=#{driver_id}
+        and users.Driver_ID=zj.Driver_ID
+        and zj.certificate_type_code=lx.certificate_type_code
+        and zj.Certificate_status_code=zt.Certificate_status_code
+        and CONVERT(zj.certificate_type_code,SIGNED) between 3000 and 3200
+    </select>
+
+    <!--通过driver_id查询TB_BASIC_RYJB users,TB_BASIC_ZJ zj,TB_DICTIONARY_ZJZT zt,TB_DICTIONARY_ZJLX lx表中业务证件数据-->
+    <select id="findAllBusinessZjByDriverId" resultMap="BusinessRyZjZjlxZjzt">
+        select users.*,zj.*,zt.*,lx.*,datediff(date(zj.Expire_Date),current_date()) as Expire_Days
+        from TB_BASIC_RYJB users,TB_BASIC_ZJ zj,TB_DICTIONARY_ZJZT zt,TB_DICTIONARY_ZJLX lx
+        where users.Driver_ID=#{driver_id}
+        and users.Driver_ID=zj.Driver_ID
+        and zj.certificate_type_code=lx.certificate_type_code
+        and zj.Certificate_status_code=zt.Certificate_status_code
+        and CONVERT(zj.certificate_type_code,SIGNED) between 3200 and 3300
+    </select>
+
+</mapper>

@@ -1,0 +1,261 @@
+<template>
+  <div class="costchang_content">
+    <div class="title">变动成本</div>
+    <!-- 切换数据 -->
+    <div class="switchCon clearfix">
+      <div class="fl"
+           :class="{active:level1 === '通行费情况'}"
+           @click="level1Switch('通行费情况')">通行费情况</div>
+      <div class="fl"
+           :class="{active:level1 === '燃油消耗情况'}"
+           @click="level1Switch('燃油消耗情况')">燃油消耗情况</div>
+    </div>
+    <!-- 下拉 -->
+    <div class="dropDown clearfix">
+      <div class="selectCon fr">
+        <keyValueSelect :data="level2Option"
+                        @up='change'></keyValueSelect>
+      </div>
+    </div>
+
+    <!-- 图表 -->
+    <div class="chartsCon"
+         v-if="variableCost">
+      <lineDoubleAxis chartTheme="dark"
+                      :data="targetData"
+                      :color="lineDoubleAxisColor"
+                      dataZoom=false
+                      :property='property'
+                      yaxisNameL="费用(万元)"
+                      yaxisNameR="数量(万个)"></lineDoubleAxis>
+    </div>
+  </div>
+</template>
+
+<script type="text/javascript">
+import { mapState } from 'vuex'
+// 下拉框
+import SelectComponent from '../../../components/companymanage/SelectComponent'
+import keyValueSelect from '../../../components/KeyValueSelect'
+import lineDoubleAxis from '../../../components/charts/costLineDoubleAxis'
+
+const options = {
+  通行费情况: [
+    { label: '通行费用', value: '通行费用' },
+    { label: '百公里通行费用', value: '百公里通行费用' },
+    { label: '平均运单通行费用', value: '平均运单通行费用' },
+    { label: '周转量成本', value: '周转量成本' },
+  ],
+  燃油消耗情况: [
+    { label: '燃料成本', value: '燃料成本' },
+    { label: '百公里燃料成本', value: '百公里燃料成本' },
+    { label: '每运单燃料成本', value: '每运单燃料成本' },
+    { label: '周转量成本', value: '周转量成本' },
+  ],
+}
+
+export default {
+  name: 'CostChange',
+  components: {
+    SelectComponent,
+    keyValueSelect,
+    lineDoubleAxis,
+  },
+  computed: {
+    ...mapState('manageCostChange', ['variableCost']),
+    targetData() {
+      return this.variableCost[this.level1][this.level2]
+    },
+    level2Option() {
+      return options[this.level1]
+    },
+    property() {
+      const p = {
+        通行费情况: {
+          通行费用: [
+            {
+              name: '通行费用',
+              type: 'bar',
+              axis: 0,
+            },
+          ],
+          百公里通行费用: [
+            {
+              name: '百公里通行费用',
+              type: 'bar',
+              axis: 0,
+            },
+          ],
+          平均运单通行费用: [
+            {
+              name: '平均运单通行费用',
+              type: 'bar',
+              axis: 0,
+            },
+          ],
+          周转量成本: [
+            {
+              name: '周转量成本',
+              type: 'bar',
+              axis: 0,
+            },
+          ],
+        },
+        燃油消耗情况: {
+          燃料成本: [
+            {
+              name: '燃料成本',
+              type: 'bar',
+              axis: 0,
+            },
+            {
+              name: '燃料数量',
+              type: 'line',
+              axis: 1,
+            },
+          ],
+          百公里燃料成本: [
+            {
+              name: '百公里燃料成本',
+              type: 'bar',
+              axis: 0,
+            },
+            {
+              name: '百公里燃料数量',
+              type: 'line',
+              axis: 1,
+            },
+          ],
+          每运单燃料成本: [
+            {
+              name: '每运单燃料成本',
+              type: 'bar',
+              axis: 0,
+            },
+          ],
+          周转量成本: [
+            {
+              name: '周转量成本',
+              type: 'bar',
+              axis: 0,
+            },
+          ],
+        },
+      }
+      return p[this.level1][this.level2]
+    },
+  },
+  methods: {
+    change(value) {
+      this.level2 = value
+    },
+    level1Switch(value) {
+      this.level1 = value
+      this.level2 = options[this.level1][0].label
+    },
+  },
+  data() {
+    return {
+      lineDoubleAxisColor: [
+        '#05d0eb',
+        '#81d9e5',
+        '#f6ffcb',
+        '#e75029',
+        '#038bfc',
+        '#006a55',
+      ],
+      level1: '通行费情况',
+      level2: '通行费用',
+    }
+  },
+}
+</script>
+
+<style lang="scss" scoped>
+// 公用样式
+@mixin font_level_3 {
+  color: #89dddf;
+  font-size: 16px;
+}
+@mixin box_on {
+  color: #fff;
+  font-size: 14px;
+  border: 1px solid rgba(0, 191, 229, 1);
+  background: rgba(0, 191, 229, 0.5);
+}
+@mixin box_off {
+  color: #b5b5b5;
+  font-size: 14px;
+  border: 1px solid rgba(0, 191, 229, 1);
+  background: rgba(0, 191, 229, 0.2);
+}
+.costchang_content {
+  width: 100%;
+  height: 100%;
+  // overflow: hidden;
+  //   background: green;
+
+  // 标题
+  .title {
+    width: 440px;
+    height: 25px;
+    overflow: hidden;
+    background: rgba(129, 217, 229, 0.3);
+    text-indent: 20px;
+    line-height: 25px;
+    @include font_level_3;
+  }
+
+  //   切换数据
+  .switchCon {
+    width: 210px;
+    height: 25px;
+    overflow: hidden;
+    margin-top: 10px;
+    float:left;
+    // background: red;
+    div {
+      width: 100px;
+      height: 25px;
+      box-sizing: border-box;
+      overflow: hidden;
+      text-align: center;
+      line-height: 23px;
+      cursor: pointer;
+      // background: pink;
+      @include box_off;
+    }
+    div:nth-child(2) {
+      margin-left: 10px;
+    }
+    .active {
+      color: #fff;
+      background: rgba(0, 191, 229, 0.5);
+    }
+  }
+
+  // 下拉
+  .dropDown {
+    width: 190px;
+    height: 25px;
+    float:left;
+    // overflow: hidden;
+    margin-top: 10px;
+    // background: green;
+    .selectCon {
+      width: 180px;
+      height: 25px;
+      // overflow: hidden;
+      // background: red;
+    }
+  }
+
+  //   图表
+  .chartsCon {
+    width: 100%;
+    height: 210px;
+    // overflow: hidden;
+    margin-top: 50px;
+  }
+}
+</style>

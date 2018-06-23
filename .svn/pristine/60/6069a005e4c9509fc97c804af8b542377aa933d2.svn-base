@@ -1,0 +1,133 @@
+<template>
+  <div class="runReal">
+    <div class="title">
+      <htitle data='实时运行情况'></htitle>
+    </div>
+    <div class="border borderl" v-if='costData'>
+      <div class="x x1">
+        <runReal1 now='在班人员' all='总从业人员数' dw='人' :nownum='parseFloat(costData.onduty_employee).toLocaleString()' :allnum='parseFloat(costData.total_employee).toLocaleString()'></runReal1>
+      </div>
+      <div class="x">
+        <runReal1 now='当日行驶里程' all='总里程' dw='公里' :nownum='parseFloat(costData.current_km).toLocaleString()' :allnum='parseFloat(costData.total_km).toLocaleString()'></runReal1>
+      </div>
+      <div class="x">
+        <runReal1 now='当日货运量' all='总货运量' dw='吨' :nownum='parseFloat(costData.current_volume_ton).toLocaleString()' :allnum='parseFloat(costData.total_volume_ton).toLocaleString()' :detailsBtnShow="true" @openDetail='getComDetails("totalFreight")'></runReal1>
+      </div>
+      <div class="realtitle flex-start" @click=" runRealTitleActive = 0;">
+        <run-real-title title="经营总收入" :isActive='runRealTitleActive==0' @openDetail='getComDetails("incomRanked")' ></run-real-title>
+      </div>
+      <div class="x x4">
+        <runReal3 :name='incomeRankedName.yearName' num='34/500' bg='red'></runReal3>
+      </div>
+    </div>
+    <div class="border" v-if='costData'>
+      <div class="x x1">
+        <runReal2 now='工作车辆' all='总车辆数' dw='辆' :allnum='parseFloat(costData.total_vehicle).toLocaleString()' :nowk='parseFloat(costData.onduty_empty_vehicle).toLocaleString()' :nowz='costData.onduty_empty_vehicle'></runReal2>
+      </div>
+      <div class="x">
+        <runReal1 now='活跃运单数' all='总运单数量' dw='单' :nownum='parseFloat(costData.active_waybill_quantity).toLocaleString()' :allnum='parseFloat(costData.total_waybill_quantity).toLocaleString()' :detailsBtnShow="true" @openDetail='getComDetails("totalCounts")'>
+        </runReal1>
+      </div>
+      <div class="x">
+        <runReal1 now='当日周转量' all='总周转量' dw='万吨公里' :nownum='parseFloat(costData.current_turnover_ton/10000).toLocaleString()' :allnum='parseFloat(costData.total_turnover/10000).toLocaleString()' :detailsBtnShow="true" @openDetail='getComDetails("turnOver")'></runReal1>
+      </div>
+      <div class="realtitle flex-end" @click=" runRealTitleActive = 1;">
+        <run-real-title title="经营单车收入" :isActive='runRealTitleActive==1'  @openDetail='getComDetails("incomRanked")' ></run-real-title>
+      </div>
+      <div class="x x4">
+        <runReal3 :name='incomeRankedName.monthName' num='26/500' bg='green'></runReal3>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import { mapState, mapMutations } from 'vuex'
+import htitle from '../../../components/companysecure/title'
+import runReal1 from '../../../components/companymanage/runReal1'
+import runReal2 from '../../../components/companymanage/runReal2'
+import runReal3 from '../../../components/companymanage/runReal3'
+import RunRealTitle from '../../../components/companymanage/RunRealTitle'
+
+export default {
+  components: {
+    htitle,
+    runReal1,
+    runReal2,
+    runReal3,
+    RunRealTitle,
+  },
+  data() {
+    return {
+      runRealTitleActive: 0,
+
+    }
+  },
+  computed: {
+    ...mapState('maintitlemsg', ['selectedEntity']),
+    ...mapState('manageRunReal', ['costData']),
+    incomeRankedName() {
+      const rankedName1 = {
+        yearName: '经营总收入当年排名',
+        monthName: '经营总收入当月排名',
+      }
+      const rankedName2 = {
+        yearName: '经营单车收入当年排名',
+        monthName: '经营单车收入当月排名',
+      }
+      return this.runRealTitleActive === 0 ? rankedName1 : rankedName2
+    },
+  },
+  methods: {
+    ...mapMutations('popupContainer', ['getComDetails']),
+
+  },
+}
+</script>
+
+<style lang="scss" scoped>
+.runReal {
+  width: 100%;
+  height: 100%;
+  .title {
+    width: 280px;
+    height: 25px;
+  }
+  .borderl {
+    margin-right: 20px;
+  }
+  .border {
+    float: left;
+    width: 402px;
+    .x {
+      height: 120px;
+      box-sizing: border-box;
+      background: rgba(3, 139, 252, 0.04);
+      // border-left: 2px solid rgba(105, 163, 177, 1);
+      // border-right: 2px solid rgba(105, 163, 177, 1);
+      border: 2px solid rgba(105, 163, 177, 1);
+      padding-top: 10px;
+      padding-left: 8px;
+      padding-right: 8px;
+      margin-top: 10px;
+    }
+    .x1 {
+      // border-top: 2px solid rgba(105, 163, 177, 0.5);
+      // border-left: 2px solid rgba(105, 163, 177, 0.5);
+      // border-right: 2px solid rgba(105, 163, 177, 0.5);
+      border-radius: 4px;
+      padding-top: 8px;
+    }
+    .x4 {
+      // border-bottom: 2px solid rgba(105, 163, 177, 0.5);
+      // border-left: 2px solid rgba(105, 163, 177, 0.5);
+      // border-right: 2px solid rgba(105, 163, 177, 0.5);
+      border-radius: 4px;
+      height: 110px;
+    }
+    .realtitle {
+      margin: 23.3px auto 0;
+    }
+  }
+}
+</style>

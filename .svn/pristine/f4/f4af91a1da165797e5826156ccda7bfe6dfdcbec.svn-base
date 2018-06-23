@@ -1,0 +1,28 @@
+import * as CompanyManageAPI from '@/api/companymanage'
+
+const state = {
+  volumeStatisticsDayNight: null,
+}
+const mutations = {
+  setData(state, data) {
+    state.volumeStatisticsDayNight = data
+  },
+}
+const actions = {
+  async getVolumeStatisticDayNight({ commit }, param) {
+    commit('setData', null)
+    console.log(param)
+    const volumeStatisticsDayNight = await CompanyManageAPI.getVolumeStatisticDayNight(
+      param,
+    )
+    // console.log('货物流量昼夜统计', volumeStatisticsDayNight.data)
+    commit('setData', volumeStatisticsDayNight.data)
+  },
+}
+
+export default {
+  namespaced: true,
+  state,
+  actions,
+  mutations,
+}

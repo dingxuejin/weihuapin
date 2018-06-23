@@ -1,0 +1,223 @@
+<template>
+  <div class="dhome">
+    <!-- top layout -->
+    <div class="dhome_top clearfix">
+      <div class="left fl">
+        <!-- <DriverBase></DriverBase> -->
+        <div class="dhome_top_splitLine"></div>
+      </div>
+
+      <div class="center fl">
+        <!-- <DriverLine></DriverLine> -->
+      </div>
+
+      <div class="right fl">
+        <!-- <accumulated-workload-statistics/> -->
+      </div>
+    </div>
+    <!-- splitline -->
+    <div class="dhome_splitline"></div>
+
+    <!-- bottom layout -->
+    <div class="dhome_bottom clearfix">
+      <div class="left fl">
+        <!-- <award-punishment/> -->
+      </div>
+      <!-- <div class="split_line fl">
+      </div> -->
+      <div class="right fl">
+        <!-- <score-and-ranking-of-safety-evaluation/> -->
+      </div>
+    </div>
+    <!-- 不同周期高危驾驶行为数量 -->
+    <!-- <pop-up-train-info></pop-up-train-info> -->
+    <!-- <div class="quantityDriver"
+         v-drag
+         @mousedown="move=true"
+         @mouseup="move=false"
+         :style="move?'cursor:move':''"
+         :class="[quantityDriver?'show':'hide']">
+      <pop-up-frame @close="closeDetails">
+        <quantity-driver></quantity-driver>
+      </pop-up-frame>
+    </div> -->
+
+  </div>
+</template>
+<script>
+/*eslint-disable */
+import { mapState, mapMutations } from "vuex";
+// 驾驶员基本信gggg息
+import DriverBase from "../containers/driver/driverbase/DriverBase";
+import DriverLine from "../containers/driver/driverLine/DriverLine";
+import AwardPunishment from "../containers/driver/awardPunishment/AwardPunishment";
+import AccumulatedWorkloadStatistics from "../containers/driver/accumulatedWorkloadStatistics/AccumulatedWorkloadStatistics";
+import ScoreAndRankingOfSafetyEvaluation from "../containers/driver/scoreAndRankingOfSafetyEvaluation/ScoreAndRankingOfSafetyEvaluation";
+
+// 0303 lfl
+// 弹窗组件
+import PopUpFrame from "../components/PopUpFrame";
+// 培训信息
+import PopUpTrainInfo from "../containers/driverPopup/popuptraininfo/PopUpTrainInfo";
+import quantityDriver from "../containers/companysecure/popupSecContainer/quantityDriver.vue";
+
+export default {
+  components: {
+    DriverBase,
+    DriverLine,
+    AwardPunishment,
+    AccumulatedWorkloadStatistics,
+    ScoreAndRankingOfSafetyEvaluation,
+
+    // 弹窗
+    PopUpFrame,
+    PopUpTrainInfo,
+
+    quantityDriver
+  },
+  data() {
+    return {
+      // popDetail: false,
+      move: false
+    };
+  },
+  computed: {
+    ...mapState("driver", [
+      "driverDetailsInfo",
+      "qualifyDetailInfo",
+      "trainDetailInfo",
+      "rewardInfo",
+      "punishInfo",
+      "workCountInfo",
+      "driverBehavior",
+      "irregalarityBehavior",
+      "illegalBehavior",
+      "blameAccident",
+      "driverLineRealtimeAlarm"
+    ])
+  },
+  methods: {
+    ...mapMutations("driver", ["close"]),
+    ...mapMutations("popupSecContainer", ["setdifferentDateTrend_show"]),
+    closeDetails() {
+      // this.setillegalDistributeTrendInterval_show(false);
+      this.setdifferentDateTrend_show(false);
+    }
+  }
+};
+</script>
+<style lang="scss" scoped>
+.dhome {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  // margin-left: 100px;
+  // margin-top: 40px;
+
+  // 上半部分
+  .dhome_top {
+    width: 100%;
+    height: 480px;
+    overflow: hidden;
+    // background: yellow;
+    // ----------left
+    .left {
+      width: 480px;
+      height: 480px;
+      // border-bottom: 2px solid rgba(129, 217, 229, 0.6);
+      overflow: hidden;
+      // background: pink;
+      .dhome_top_splitLine {
+        width: 100%;
+        height: 2px;
+        background: rgba(129, 217, 229, 0.6);
+        margin-top: 10px;
+        position: relative;
+        left: 0;
+        bottom: 38px;
+      }
+    }
+
+    // ----------center
+    .center {
+      width: 852px;
+      height: 100%;
+      overflow: hidden;
+      margin-left: 20px;
+      // background: red;
+    }
+
+    // -----------right
+    .right {
+      width: 518px;
+      height: 100%;
+      overflow: hidden;
+      margin-left: 20px;
+      background: rgba(3, 139, 252, 0.2);
+      padding: 15px 18px;
+      box-sizing: border-box;
+    }
+  }
+
+  //间隔线
+  .dhome_splitline {
+    width: 100%;
+    height: 25px;
+    overflow: hidden;
+    // background: green;
+  }
+
+  // 底部
+  .dhome_bottom {
+    width: 100%;
+    height: 485px;
+    overflow: hidden;
+    // background: red;
+    // split line
+    .split_line {
+      width: 40px;
+      height: 100%;
+      overflow: hidden;
+      background: url(../assets/driver/people_line_long.png) no-repeat center
+        center;
+      background-size: 40px 365px;
+    }
+    // --------------left
+    .left {
+      width: 480px;
+      height: 100%;
+      overflow: hidden;
+      background: rgba(3, 139, 252, 0.2);
+    }
+
+    // --------------right
+    .right {
+      width: 1390px;
+      height: 470px;
+      overflow: hidden;
+      margin-left: 20px;
+      background: rgba(3, 139, 252, 0.2);
+      margin-top: 15px;
+    }
+  }
+
+  // 培训信息弹窗
+  .quantityDriver {
+    width: 750px;
+    min-height: 200px;
+    position: absolute;
+    top: 500px;
+    left: 420px;
+    &.show {
+      display: block;
+    }
+    &.hide {
+      display: none;
+    }
+    &-test {
+      color: #fff;
+    }
+    background: red;
+  }
+}
+</style>

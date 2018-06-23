@@ -1,0 +1,104 @@
+import * as CompanyAPI from '@/api/company'
+
+const state = {
+  entities: null,
+  selectedEntity: null,
+}
+const mutations = {
+  setData(state, data) {
+    state.entities = data
+  },
+  setSelectedEntity(state, data) {
+    state.selectedEntity = data
+    // console.log('state.selectedEntity:', state.selectedEntity)
+  },
+}
+const actions = {
+  async getHeader({ commit, dispatch }) {
+    commit('setData', null)
+    const entities = await CompanyAPI.getHeaderMsg()
+    commit('setData', entities.data)
+    if (entities.data['0']) {
+      dispatch('selectEntity', { entity_id: 1310000010000000 })
+    }
+  },
+  async selectEntity({ commit, dispatch }, { entity_id }) {
+    commit('setSelectedEntity', entity_id)
+    dispatch('fetchOtherBlock', { entity_id })
+  },
+  async fetchOtherBlock({ commit, dispatch }, { entity_id }) {
+    dispatch(
+      'peopleMsgStore/getPeopleMsg',
+      { entity_id, type: '人员类型' },
+      { root: true },
+    )
+    dispatch(
+      'carMsgStore/getCarMsg',
+      { entity_id, type: '车辆类型' },
+      { root: true },
+    )
+    dispatch(
+      'lineMsgStore/getLineMsg',
+      { entity_id },
+      { root: true },
+    )
+    dispatch(
+      'linePopup/getLineDetail',
+      { entity_id },
+      { root: true },
+    )
+    dispatch(
+      'carPopup/getVehicleTerminal',
+      { entity_id },
+      { root: true },
+    )
+    dispatch('centerMsgStore/getCompanyRegisterInfo', null, { root: true })
+    dispatch('centerMsgStore/getCompanyMsg', { entity_id }, { root: true })
+    dispatch('centerMsgStore/getCompanySecureAbility', null, {
+      root: true,
+    })
+    dispatch('centerMsgStore/getCompanyCargoFlow', { entity_id }, { root: true })
+    dispatch('centerMsgStore/getCompanyCargoFlowMap', { entity_id }, { root: true })
+    dispatch(
+      'centerMsgStore/getCargoHistoryFlow',
+      { entity_id },
+      { root: true },
+    )
+    dispatch('centerMsgStore/getCargoHistoryFlowMap', { entity_id }, { root: true })
+    dispatch(
+      'centerMsgStore/getVehicleState',
+      { entity_id },
+      { root: true },
+    )
+    dispatch(
+      'centerMsgStore/getVehicleStateMap',
+      { entity_id },
+      { root: true },
+    )
+    dispatch('centerMsgStore/getSafeProductDay', { entity_id }, { root: true })
+    dispatch('centerPopup/getRecentlyAccident', null, { root: true })
+    dispatch(
+      'manageMsgStore/getManageStateWaybill',
+      { entity_id },
+      { root: true },
+    )
+    dispatch(
+      'manageMsgStore/getMangeStateTurnover',
+      { entity_id },
+      { root: true },
+    )
+    dispatch(
+      'centerMsgStore/getCompanyCarInfo',
+      { entity_id },
+      { root: true },
+    )
+    dispatch('ExpireTipStore/getCompanyExpireTip', { entity_id }, { root: true })
+    dispatch('centerPopup/getWaybillProgressList', { entity_id }, { root: true })
+  },
+}
+export default {
+  namespaced: true,
+  state,
+  actions,
+  mutations,
+}

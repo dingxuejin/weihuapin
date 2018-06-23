@@ -1,0 +1,68 @@
+GET 127.0.0.1:8080/authors
+Accept: */*
+Cache-Control: no-cache
+
+###
+
+GET /localhost
+Accept: */*
+Cache-Control: no-cache
+
+###
+
+POST http://172.30.7.103:3033/authors
+Accept: */*
+Cache-Control: no-cache
+
+京AAF905
+
+<> 2018-06-15T102709.404.html
+
+###
+
+POST http://172.30.7.103:3033/tb_basic_cljcxx
+Accept: */*
+Cache-Control: no-cache
+
+京AAF905
+
+<> 2018-06-14T023706.404.html
+
+###
+
+POST http://172.30.7.103:3033/tb_basic_cljcxx
+Accept: */*
+Cache-Control: no-cache
+
+{   "plate_number": 京AAF905 }
+
+<> 2018-06-14T023640.404.html
+
+###
+
+POST http://172.30.7.103:3033/tb_basic_cljcxx?plate_number=京AAF905
+Accept: */*
+Cache-Control: no-cache
+
+<> 2018-06-14T023603.415.html
+
+###
+
+POST http://172.30.7.103:3033/tb_basic_cljcxx
+Accept: */*
+Cache-Control: no-cache
+plate_number: 48809656570574853
+
+<> 2018-06-14T023532.415.html
+
+###
+
+POST http://172.30.7.103:3033/tb_basic_cljcxx
+Accept: */*
+Cache-Control: no-cache
+plate_number: 京AAF905
+
+<> 2018-06-14T023246.415.html
+
+###
+

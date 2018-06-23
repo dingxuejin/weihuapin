@@ -1,0 +1,255 @@
+<template>
+  <div class="trend">
+    <div class="header">
+      <div :class="{hover:page===1}"
+           @click='page = 1'>
+        <span>违规行为区域分布</span>
+        <div @click='openDetailirregularityArea'></div>
+      </div>
+      <div :class="{hover:page===2}"
+           @click='page = 2'>
+        <span>违规行为时段分布</span>
+        <div @click='openDetailirregularityInterval'></div>
+      </div>
+    </div>
+    <!-- 违规行为区域分布 -->
+    <template v-if="page === 1">
+      <div class="change">
+        <div>统计周期</div>
+        <div>
+          <key-value-select width='116px'
+                            :data='yearOption'
+                            @select='selectAreaYear'></key-value-select>
+        </div>
+        <div>
+          <key-value-select width='111px'
+                            :data='monthOption'
+                            @select='selectAreaMonth'></key-value-select>
+        </div>
+        <div>区域选择</div>
+        <div>
+          <key-value-select width='236px'
+                            :data='regionOption'
+                            @select='selectRegion'></key-value-select>
+        </div>
+      </div>
+
+      <div class="irre_echart">
+        <loading :data='irregularityAreaDistribute'>
+          <bar v-if="irregularityAreaDistribute"
+               chartTheme="dark"
+               :data="irregularityAreaDistribute"
+               yaxisName="数量（次）"></bar>
+        </loading>
+      </div>
+    </template>
+    <!-- 违规行为时段分布 -->
+    <template v-if="page === 2">
+      <div class="change">
+        <div>统计周期</div>
+        <div>
+          <key-value-select width='116px'
+                            :data='yearOption'
+                            @select='selectIntervalYear'></key-value-select>
+        </div>
+        <div>
+          <key-value-select width='111px'
+                            :data='monthOption'
+                            @select='selectIntervalMonth'></key-value-select>
+        </div>
+      </div>
+      <div class="irre_echart">
+        <loading :data='irregularityIntervalDistribtue'>
+          <radar v-if="irregularityIntervalDistribtue"
+                 :data='irregularityIntervalDistribtue'
+                 chartTheme="dark"></radar>
+        </loading>
+      </div>
+    </template>
+
+  </div>
+</template>
+
+<script>
+/*eslint-disable */
+import { mapState, mapActions, mapMutations } from "vuex";
+import htitle from "../../../components/companysecure/title";
+import KeyValueSelect from "../../../components/KeyValueSelect";
+import Bar from "../../../components/charts/bar";
+import Radar from "../../../components/charts/Radar";
+import Dictionary from "../../../util/dictionary";
+
+const { date: { year, month }, regionCode } = Dictionary;
+export default {
+  components: {
+    htitle,
+    KeyValueSelect,
+    Bar,
+    Radar
+  },
+  computed: {
+    ...mapState("areaDistributionIrregularity", [
+      "irregularityAreaDistribute",
+      "irregularityIntervalDistribtue"
+    ]),
+    ...mapState("secureMain", ["entity_id"])
+  },
+  methods: {
+    ...mapActions("areaDistributionIrregularity", [
+      "getIrregularityAreaDistribute",
+      "getIrregularityIntervalDistribute"
+    ]),
+    ...mapMutations("popupSecContainer", ["getComDetails"]),
+    ...mapMutations("popupSecContainer", [
+      "setirregularityDistributeTrendArea_Show",
+      "setirregularityDistributeTrendInterval_show"
+    ]),
+    openDetailirregularityArea() {
+      this.setirregularityDistributeTrendArea_Show(true);
+    },
+    openDetailirregularityInterval() {
+      this.setirregularityDistributeTrendInterval_show(true);
+    },
+    openDetail(item) {
+      this.getComDetails(item);
+    },
+    selectAreaYear(item) {
+      this.area.year = item.value;
+      this.fetchAreaData();
+    },
+    selectAreaMonth(item) {
+      this.area.month = item.value;
+      this.fetchAreaData();
+    },
+    selectRegion(item) {
+      this.area.regionCode = item.value;
+      this.fetchAreaData();
+    },
+    selectIntervalYear(item) {
+      this.interval.year = item.value;
+      this.fetchIntervalData();
+    },
+    selectIntervalMonth(item) {
+      this.interval.month = item.value;
+      this.fetchIntervalData();
+    },
+    fetchAreaData() {
+      const { year, month, regionCode } = this.area;
+      this.getIrregularityAreaDistribute({
+        entity_id: this.entity_id,
+        year,
+        month,
+        region_code: regionCode
+      });
+    },
+    fetchIntervalData() {
+      const { year, month } = this.interval;
+      this.getIrregularityIntervalDistribute({
+        entity_id: this.entity_id,
+        year,
+        month
+      });
+    }
+  },
+  data: () => ({
+    page: 1,
+    yearOption: [{ label: "全部", value: null }, ...year],
+    monthOption: [{ label: "全部", value: null }, ...month],
+    regionOption: [{ label: "全部", value: null }, ...regionCode],
+    area: {
+      year: 2017,
+      month: 11,
+      regionCode: 440000
+    },
+    interval: {
+      year: 2017,
+      month: 11
+    }
+  })
+};
+</script>
+
+<style lang="scss" scoped>
+.trend {
+  width: 100%;
+  height: 240px;
+  .header {
+    height: 25px;
+    div:nth-child(1) {
+      //margin-right: 10px;
+    }
+    div {
+      width: 160px;
+      //text-indent: 20px;
+      height: 25px;
+      line-height: 25px;
+      float: left;
+      background: rgba(129, 217, 299, 0.1);
+      position: relative;
+      font-size: 16px;
+      color: #89dddf;
+      cursor: pointer;
+      &:nth-child(1) {
+        margin-right: 295px;
+      }
+      div {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        background: url("../../../assets/driver/drill_icon_off.png") no-repeat
+          center center;
+        top: 4px;
+        right: 5px;
+        cursor: pointer;
+      }
+      div:hover {
+        background: url("../../../assets/driver/drill_icon_on.png") no-repeat
+          center center;
+      }
+    }
+    .hover {
+      background: rgba(129, 217, 299, 0.3);
+    }
+  }
+  .change {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    height: 25.4px;
+    font-size: 14px;
+    // background: #89dddf;
+    div {
+      float: left;
+      height: 25px;
+      color: #b5b5b5;
+    }
+    div:nth-child(1) {
+      line-height: 25px;
+    }
+    div:nth-child(2) {
+      width: 116px;
+      margin-left: 15.6px;
+      margin-right: 9px;
+    }
+    div:nth-child(3) {
+      width: 111px;
+    }
+    div:nth-child(4) {
+      // clear: both;
+      line-height: 25px;
+      margin-left: 6px;
+      // margin-top: 5.4px;
+    }
+    div:nth-child(5) {
+      width: 236px;
+      // margin-top: 5.4px;
+      // margin-left: 15.6px;
+      margin-left: 13.6px;
+    }
+  }
+  .irre_echart {
+    // clear: both;
+    height: 170px;
+    // background: lightblue;
+  }
+}
+</style>

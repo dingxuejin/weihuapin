@@ -1,0 +1,204 @@
+<template>
+  <div class="company_secure_driver_accident_distribute_trend_interval_wrap"
+       v-if="accidentDistributeTrendInterval_show">
+    <!-- <popup-out-frame title="不同类型事故时间分布"> -->
+    <!-- 选择类型 -->
+    <div class="company_secure_driver_danger_outframe_wrap"
+         v-drag
+         @mousedown="move=true"
+         @mouseup="move=false"
+         :style="move?'cursor:move':''">
+      <pop-up-frame @close='closeDetails'>
+        <pop-up-widget title="不同类型事故时间分布"></pop-up-widget>
+        <div class="dateSelectedWrap clearfix">
+          <div class="dateSelecteContent">
+            <div class="title">统计周期</div>
+            <div class="yearWrap">
+              <key-value-select width="100px"
+                                :data="years"
+                                @select="selectYear"></key-value-select>
+            </div>
+            <div class="monthWrap">
+              <key-value-select width="100px"
+                                :data="months"
+                                @select="selectMonth"></key-value-select>
+            </div>
+            <div class="title">类型选择</div>
+            <div class="typeWrap">
+              <key-value-select width="110px"
+                                :data="accidentResCode"
+                                @select="selectType"></key-value-select>
+            </div>
+          </div>
+        </div>
+        <!-- 内容：chart -->
+        <div class="accident_distribute_trend_interval_chart">
+          <bar-stack chartTheme="dark"
+                     :data="accidentDistributeTrendInterval"
+                     :color="chartColor"
+                     yName="数量(次)"
+                     v-if="accidentDistributeTrendInterval&&accidentDistributeTrendInterval.length>0"></bar-stack>
+          <loading :data='accidentDistributeTrendInterval'></loading>
+        </div>
+        <!-- </popup-out-frame> -->
+      </pop-up-frame>
+    </div>
+  </div>
+</template>
+<script>
+/*eslint-disable */
+import KeyValueSelect from "@/components/KeyValueSelect";
+import lineChart from "@/components/charts/lineChart";
+import BarStack from "@/components/charts/BarStack";
+
+import PopupOutFrame from "./PopupOutFrame";
+import {
+  mapState,
+  // mapActions,
+  mapMutations
+} from "../../../../node_modules/_vuex@3.0.1@vuex";
+import Dictionary from "../../../util/dictionary";
+import PopUpFrame from "@/components/PopUpFrame";
+import PopUpWidget from "@/components/PopUpWidget";
+
+const { date: { year, month }, accidentResCode } = Dictionary;
+export default {
+  name: "",
+  components: {
+    KeyValueSelect,
+    lineChart,
+    PopupOutFrame,
+    BarStack,
+    PopUpWidget,
+    PopUpFrame
+  },
+  data() {
+    return {
+      // 公共数据
+      move: false,
+      years: [{ label: "全部", value: null }, ...year],
+      months: [{ label: "全部", value: null }, ...month],
+      accidentResCode,
+      chartColor: [
+        "#05d0eb",
+        "#81d9e5",
+        "#f6ffcb",
+        "#e75029",
+        "#038bfc",
+        "#006a55"
+      ],
+      yearValue: null,
+      monthValue: null,
+      typeValue: null
+    };
+  },
+  computed: {
+    ...mapState("popupSecContainer", [
+      // 弹框显示/隐藏：
+      "detailsShow",
+      "accidentDistributeTrendInterval_show",
+      "accidentDistributeTrendInterval",
+      // 2.高危驾驶行为时段分布变化趋势
+      "driver_danger_distribute_trend_interval"
+    ]),
+    ...mapState("secureMain", ["selectedEntity"]),
+    fetchData() {
+      return {
+        entity_id: this.selectedEntity.entity_id,
+        year: this.yearValue,
+        month: this.monthValue,
+        accident_level_code: this.typeValue
+      };
+    }
+  },
+  methods: {
+    // ...mapActions('popupSecContainer', [
+    //   'getAccidentDistributeTrendInterval',
+    // ]),
+    ...mapMutations("popupSecContainer", [
+      "setaccidentDistributeTrendInterval_show"
+    ]),
+    closeDetails() {
+      this.setaccidentDistributeTrendInterval_show(false);
+    },
+    selectYear(item) {
+      this.yearValue = item.value;
+      this.getAccidentDistributeTrendInterval(this.fetchData);
+    },
+    selectMonth(item) {
+      this.monthValue = item.value;
+      this.getAccidentDistributeTrendInterval(this.fetchData);
+    },
+    selectType(item) {
+      this.typeValue = item.value;
+      this.getAccidentDistributeTrendInterval(this.fetchData);
+    }
+  }
+};
+</script>
+
+<style lang="scss" scoped>
+@mixin size($width, $height) {
+  width: $width;
+  height: $height;
+}
+.clearfix {
+  &:before,
+  &:after {
+    content: "";
+    display: table;
+  }
+  &:after {
+    clear: both;
+    overflow: hidden;
+  }
+}
+.company_secure_driver_accident_distribute_trend_interval_wrap {
+  width: 750px;
+  position: absolute;
+  top: 110px;
+  left: 1239px;
+  z-index: 3;
+  .dateSelectedWrap {
+    width: 100%;
+    position: relative;
+    margin-top: 10px;
+    .dateSelecteContent {
+      @include size(552px, 25px);
+      float: right;
+      .title {
+        width: 100px;
+        text-align: center;
+        line-height: 25px;
+        float: left;
+        color: #b5b5b5;
+        font-size: 14px;
+        // margin-right: 10px;
+        margin-left: 10px;
+      }
+      .yearWrap {
+        width: 100px;
+        height: 25px;
+        float: left;
+        margin-right: 5px;
+      }
+      .monthWrap {
+        width: 100px;
+        height: 25px;
+        float: left;
+        margin-right: 5px;
+      }
+      .typeWrap {
+        width: 110px;
+        height: 25px;
+        float: left;
+      }
+    }
+  }
+  .accident_distribute_trend_interval_chart {
+    width: 100%;
+    height: 200px;
+    margin-top: 10px;
+  }
+}
+</style>

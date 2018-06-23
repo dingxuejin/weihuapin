@@ -1,0 +1,16 @@
+/*eslint-disable*/
+const state = {
+  carOverdueRemindingShow: false
+};
+const mutations = {
+  setcarOverdueRemindingShow(state, data) {
+    state.carOverdueRemindingShow = data;
+  }
+};
+const actions = {};
+export default {
+  namespaced: true,
+  state,
+  actions,
+  mutations
+};

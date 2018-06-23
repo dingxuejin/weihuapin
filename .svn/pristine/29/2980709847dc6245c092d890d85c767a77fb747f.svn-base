@@ -1,0 +1,260 @@
+<template>
+  <div class="company_secure_driver_accident_details_wrap"
+       v-if="accidentDetails_show">
+    <!-- <popup-out-frame title="事故详情"> -->
+    <!-- 内容： -->
+    <div class="company_secure_driver_danger_outframe_wrap"
+         v-drag
+         @mousedown="move=true"
+         @mouseup="move=false"
+         :style="move?'cursor:move':''">
+      <pop-up-frame @close='closeDetails'>
+        <pop-up-widget title="事故详情"></pop-up-widget>
+        <div class="accident_details">
+          <div class="detailsContent">
+            <div class="titleWrap">
+              <div class="accidentTitle">事故时间</div>
+              <div class="accidentTitle">事故地点</div>
+              <div class="accidentTitle">事故等级</div>
+              <div class="accidentTitle">事故责任</div>
+              <div class="accidentTitle">事故致因</div>
+              <div class="accidentTitle">事故损失</div>
+              <div class="accidentTitle">事故处理状态</div>
+            </div>
+            <div class="detailListWrap">
+              <ul v-if="gettb_business_yzsg_data">
+                <li v-for="(o,index) in gettb_business_yzsg_data"
+                    :key=index>
+                  <ul>
+                    <li :title="o.accidenttype_time">{{o.accidenttype_time}}</li>
+                    <li :title="o.accident_location">{{o.accident_location}}</li>
+                    <li>{{o.sgdj.accident_level}}</li>
+                    <li>{{o.sgzr.accident_responsibility}}</li>
+                    <li :title="o.accident_cause">{{o.accident_cause}}</li>
+                    <li :title="o.accident_loss">{{o.accident_loss}}</li>
+                    <li :title="o.accident_status">{{o.accident_status}}</li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="detailListWrap">
+            <ul v-if="accidentList">
+              <li v-for="(o,index) in accidentList"
+                  :key=index>
+                <ul>
+                  <li :title="o.accidentType_Time">{{o.accidentType_Time}}</li>
+                  <li :title="o.accident_Location">{{o.accident_Location}}</li>
+                  <li>{{o.sgdj.accident_level}}</li>
+                  <li>{{o.sgzr.accident_responsibility}}</li>
+                  <li :title="o.accident_Cause">{{o.accident_Cause}}</li>
+                  <li :title="o.accident_Loss">{{o.accident_Loss}}</li>
+                  <li :title="o.accident_Status">{{o.accident_Status}}</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <!-- </popup-out-frame> -->
+      </pop-up-frame>
+    </div>
+
+  </div>
+</template>
+<script>
+/*eslint-disable */
+import {
+  mapState,
+  mapActions,
+  mapMutations
+} from "../../../../node_modules/_vuex@3.0.1@vuex";
+import PopupOutFrame from "./PopupOutFrame";
+import KeyValueSelect from "../../../components/KeyValueSelect";
+import lineChart from "../../../components/charts/lineChart";
+import xxx from "../../../util/dictionary";
+import PopUpFrame from "../../../components/PopUpFrame";
+import PopUpWidget from "../../../components/PopUpWidget";
+
+export default {
+  name: "",
+  components: {
+    KeyValueSelect,
+    xxx,
+    lineChart,
+    PopupOutFrame,
+    PopUpWidget,
+    PopUpFrame
+  },
+  data() {
+    return {
+      move: false
+    };
+  },
+  computed: {
+    ...mapState("accidentView", ["accidentList"]),
+    ...mapState("popupSecContainer", [
+      // 弹框显示/隐藏：
+      "detailsShow",
+      "accidentDetails_show",
+      "tb_business_yzsg"
+    ]),
+
+    // 获取数据
+    gettb_business_yzsg_data() {
+      if (this.tb_business_yzsg) {
+        return this.tb_business_yzsg;
+      }
+      return null;
+    },
+    // 设置参数
+    getQueryParams() {
+      return {
+        driver_id: "201408000001",
+        year: "",
+        month: ""
+      };
+    },
+    // 获取数据
+    gettb_business_yzsg_data() {
+      if (this.tb_business_yzsg) {
+        return this.tb_business_yzsg;
+      }
+      return null;
+    },
+    // 设置参数
+    getQueryParams() {
+      return {
+        driver_id: "201408000001",
+        year: "",
+        month: ""
+      };
+    }
+  },
+  methods: {
+    ...mapActions("popupSecContainer", ["gettb_business_yzsg"]),
+    ...mapMutations("popupSecContainer", [
+      "setaccidentDetails_show"
+      // "setillegalDistributeTrendArea_show",
+      // "setillegalDistributeTrendInterval_show"
+    ]),
+    closeDetails() {
+      // this.setillegalDistributeTrendInterval_show(false);
+      this.setaccidentDetails_show(false);
+    }
+  }
+};
+</script>
+
+<style lang="scss" scoped>
+@mixin size($width, $height) {
+  width: $width;
+  height: $height;
+}
+.clearfix {
+  &:before,
+  &:after {
+    content: "";
+    display: table;
+  }
+  &:after {
+    clear: both;
+    overflow: hidden;
+  }
+}
+.company_secure_driver_accident_details_wrap {
+  width: 750px;
+  position: absolute;
+  top: 395px;
+  left: 1240px;
+  z-index: 3;
+  .accident_details {
+    width: 100%;
+    margin-top: 10px;
+    .detailsContent {
+      width: 100%;
+      height: 265px;
+      overflow: hidden;
+      border: 1px solid #81d9e5;
+      box-sizing: border-box;
+      .titleWrap {
+        @include size(100%, 25px);
+        margin-top: 10px;
+        margin-bottom: 5px;
+        background: rgba(5, 208, 235, 0.2);
+        .accidentTitle {
+          @include size(100px, 25px);
+          line-height: 25px;
+          text-align: center;
+          color: #89dddf;
+          font-size: 14px;
+          float: left;
+        }
+      }
+      .detailListWrap {
+        width: 100%;
+        ul {
+          width: 703px;
+          height: 220px;
+          list-style: none;
+          margin: 0;
+          padding: 0;
+          overflow: hidden;
+          overflow-y: scroll;
+          li {
+            width: 99.3%;
+            height: 20px;
+            overflow: hidden;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            margin-bottom: 5px;
+            background: rgba(129, 217, 229, 0.1);
+            ul {
+              width: 100%;
+              height: 20px;
+              overflow: hidden;
+              list-style: none;
+              margin: 0;
+              padding: 0;
+              li {
+                width: (100%/7);
+                height: 20px;
+                line-height: 20px;
+                text-align: center;
+                color: #b5b5b5;
+                font-size: 14px;
+                float: left;
+                list-style: none;
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+              }
+            }
+            ul:hover {
+              background: rgba(129, 217, 229, 0.5);
+            }
+            ul:hover {
+              li {
+                color: #fff;
+              }
+            }
+          }
+        }
+        ul::-webkit-scrollbar {
+          @include size(5px, 220px);
+          background: url(~assets/car/scroll.png) no-repeat center center;
+          position: relative;
+          right: 10px;
+          top: 5px;
+          background-size: 5px 220px;
+        }
+        ul::-webkit-scrollbar-thumb {
+          background: rgba(5, 208, 235, 1);
+        }
+      }
+    }
+  }
+}
+</style>

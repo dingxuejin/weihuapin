@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobiusVision.dao.TbSubject.TbSubjectQyCdwgnslTDJMapper" >
+
+    <resultMap id="BaseResultMap" type="com.mobiusVision.pojo.TbSubject.TbSubjectQyCdwgnsl" >
+        <id column="tb_subject_qy_cdwgnsl_id" property="tb_subject_qy_cdwgnsl_id" jdbcType="INTEGER" />
+        <result column="year" property="year" jdbcType="VARCHAR" />
+        <result column="entity_id" property="entity_id" jdbcType="VARCHAR" />
+        <result column="drive_event_type_code" property="drive_event_type_code" jdbcType="VARCHAR" />
+        <result column="total_irregularity_drive" property="total_irregularity_drive" jdbcType="VARCHAR" />
+    </resultMap>
+    <resultMap id="TbSubjectQyCdwgnslAndTDJ" type="TbSubjectQyCdwgnslTDJ" extends="BaseResultMap"   >
+        <association property="jssjlx" javaType="TbDictionaryJssjlx" >
+            <id column="tb_dictionary_jssjlx_id" property="tb_dictionary_jssjlx_id" jdbcType="INTEGER" />
+            <result column="drive_event_type_code" property="drive_event_type_code" jdbcType="VARCHAR" />
+            <result column="drive_event_type" property="drive_event_type" jdbcType="VARCHAR" />
+            <result column="remark" property="remark" jdbcType="VARCHAR" />
+        </association>
+    </resultMap>
+    <!--mapper缓存参数设定-->
+    <cache  eviction="LRU" flushInterval="60000"  size="512" readOnly="true"/>
+    <!--通过entity_id和year查询TB_SUBJECT_QY_CDWGNSL表和TB_DICTIONARY_JSSJLX表中所有数据-->
+    <select id="findAllByEntityIdAndYear" resultMap="TbSubjectQyCdwgnslAndTDJ">
+        select t1.*,t2.* from TB_SUBJECT_QY_CDWGNSL t1,TB_DICTIONARY_JSSJLX t2 where t1.entity_id=#{entity_id} and t1.year=#{year} and t1.drive_event_type_code=t2.drive_event_type_code;
+    </select>
+</mapper>

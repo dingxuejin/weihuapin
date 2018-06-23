@@ -1,0 +1,470 @@
+<template>
+  <div class="company_secure_driver_illegal_distribute_trend_area_wrap"
+       v-if="illegalDistributeTrendArea_show">
+    <popup-out-frame title="违法行为区域分布变化趋势">
+      <!-- 选择类型 -->
+      <div class="dateSelectedWrap clearfix">
+        <div class="dateSelecteContent">
+          <div class="title">统计周期</div>
+          <div class="yearWrap">
+            <key-value-select width="100px"
+                              :data="years"
+                              @up="selectYear"></key-value-select>
+          </div>
+          <div class="monthWrap">
+            <key-value-select width="100px"
+                              :data="months"
+                              @up="selectMonth"></key-value-select>
+          </div>
+          <div class="title">区域选择</div>
+          <div class="typeWrap">
+            <key-value-select width="100px"
+                              :data="areaTypeCode"
+                              @up="selectType"></key-value-select>
+          </div>
+        </div>
+      </div>
+      <!-- 内容：chart -->
+      <div class="illegal_distribute_trend_area_chart">
+        <loading :data="getChartData">
+          <lineChart chartTheme="dark"
+                     :data="getChartData"
+                     :color="chartColor"
+                     yaxisName="数量(次)"></lineChart>
+        </loading>
+      </div>
+    </popup-out-frame>
+
+  </div>
+</template>
+<script>
+import KeyValueSelect from '@/components/KeyValueSelect'
+import lineChart from '@/components/charts/lineChart'
+import xxx from '../../../util/dictionary'
+import PopupOutFrame from './PopupOutFrame'
+import {
+  mapState,
+  mapActions,
+} from '../../../../node_modules/_vuex@3.0.1@vuex'
+
+export default {
+  name: '',
+  components: {
+    KeyValueSelect,
+    xxx,
+    lineChart,
+    PopupOutFrame,
+  },
+  data() {
+    return {
+      // 公共数据
+      years: [{ label: '全部', value: null }, ...xxx.date.year],
+      months: [{ label: '全部', value: null }, ...xxx.date.month],
+      areaTypeCode: [{ label: '全部', value: null }, ...xxx.regionCode],
+      chartColor: [
+        '#05d0eb',
+        '#81d9e5',
+        '#f6ffcb',
+        '#e75029',
+        '#038bfc',
+        '#006a55',
+      ],
+      yearValue: null,
+      monthValue: null,
+      typeValue: null,
+      entity_id: 1310000010000000,
+
+      // 获取数据
+      lineChartData: [
+        {
+          name: '酒驾',
+          data: [
+            {
+              name: '1',
+              value: 2707,
+            },
+            {
+              name: '2',
+              value: 2365,
+            },
+            {
+              name: '3',
+              value: 2365,
+            },
+            {
+              name: '4',
+              value: 2465,
+            },
+            {
+              name: '5',
+              value: 2335,
+            },
+            {
+              name: '6',
+              value: 2265,
+            },
+            {
+              name: '7',
+              value: 2385,
+            },
+            {
+              name: '8',
+              value: 2395,
+            },
+            {
+              name: '9',
+              value: 2305,
+            },
+            {
+              name: '10',
+              value: 2335,
+            },
+            {
+              name: '11',
+              value: 2305,
+            },
+            {
+              name: '12',
+              value: 2345,
+            },
+          ],
+        },
+        {
+          name: '闯红灯',
+          data: [
+            {
+              name: '1',
+              value: 2707,
+            },
+            {
+              name: '2',
+              value: 2365,
+            },
+            {
+              name: '3',
+              value: 2365,
+            },
+            {
+              name: '4',
+              value: 2465,
+            },
+            {
+              name: '5',
+              value: 2335,
+            },
+            {
+              name: '6',
+              value: 2265,
+            },
+            {
+              name: '7',
+              value: 2385,
+            },
+            {
+              name: '8',
+              value: 2395,
+            },
+            {
+              name: '9',
+              value: 2305,
+            },
+            {
+              name: '10',
+              value: 2335,
+            },
+            {
+              name: '11',
+              value: 2305,
+            },
+            {
+              name: '12',
+              value: 2345,
+            },
+          ],
+        },
+        {
+          name: '疲劳驾驶',
+          data: [
+            {
+              name: '1',
+              value: 2707,
+            },
+            {
+              name: '2',
+              value: 2365,
+            },
+            {
+              name: '3',
+              value: 2365,
+            },
+            {
+              name: '4',
+              value: 2465,
+            },
+            {
+              name: '5',
+              value: 2335,
+            },
+            {
+              name: '6',
+              value: 2265,
+            },
+            {
+              name: '7',
+              value: 2385,
+            },
+            {
+              name: '8',
+              value: 2395,
+            },
+            {
+              name: '9',
+              value: 2305,
+            },
+            {
+              name: '10',
+              value: 2335,
+            },
+            {
+              name: '11',
+              value: 2305,
+            },
+            {
+              name: '12',
+              value: 2345,
+            },
+          ],
+        },
+        {
+          name: '超载超限',
+          data: [
+            {
+              name: '1',
+              value: 2707,
+            },
+            {
+              name: '2',
+              value: 2365,
+            },
+            {
+              name: '3',
+              value: 2365,
+            },
+            {
+              name: '4',
+              value: 2465,
+            },
+            {
+              name: '5',
+              value: 2335,
+            },
+            {
+              name: '6',
+              value: 2265,
+            },
+            {
+              name: '7',
+              value: 2385,
+            },
+            {
+              name: '8',
+              value: 2395,
+            },
+            {
+              name: '9',
+              value: 2305,
+            },
+            {
+              name: '10',
+              value: 2335,
+            },
+            {
+              name: '11',
+              value: 2305,
+            },
+            {
+              name: '12',
+              value: 2345,
+            },
+          ],
+        },
+        {
+          name: '超速',
+          data: [
+            {
+              name: '1',
+              value: 2707,
+            },
+            {
+              name: '2',
+              value: 2365,
+            },
+            {
+              name: '3',
+              value: 2365,
+            },
+            {
+              name: '4',
+              value: 2465,
+            },
+            {
+              name: '5',
+              value: 2335,
+            },
+            {
+              name: '6',
+              value: 2265,
+            },
+            {
+              name: '7',
+              value: 2385,
+            },
+            {
+              name: '8',
+              value: 2395,
+            },
+            {
+              name: '9',
+              value: 2305,
+            },
+            {
+              name: '10',
+              value: 2335,
+            },
+            {
+              name: '11',
+              value: 2305,
+            },
+            {
+              name: '12',
+              value: 2345,
+            },
+          ],
+        },
+      ],
+    }
+  },
+  computed: {
+    ...mapState('popupSecContainer', [
+      // 弹框显示/隐藏：
+      'detailsShow',
+      'illegalDistributeTrendArea_show',
+
+      'driver_illegal_distribute_trend_area',
+
+      // 数据：
+    ]),
+    getCalChartValue() {
+      return this.lineChartData.map(item => ({
+        name: item.name,
+        data: item.data.map(o => ({
+          name: o.name,
+          value: Math.floor(Math.random() * 10),
+        })),
+      }))
+    },
+    // 获取chart数据
+    getChartData() {
+      if (this.driver_illegal_distribute_trend_area) {
+        return this.driver_illegal_distribute_trend_area
+      }
+      return null
+    },
+    // 设置参数
+    getQueryParams() {
+      return {
+        entity_id: this.entity_id,
+        year: this.yearValue,
+        month: this.monthValue,
+        region_code: this.typeValue,
+      }
+    },
+  },
+  methods: {
+    ...mapActions('popupSecContainer', [
+      'getdriver_illegal_distribute_trend_area',
+    ]),
+    selectYear(item) {
+      this.yearValue = item
+      this.getdriver_illegal_distribute_trend_area(this.getQueryParams)
+    },
+    selectMonth(item) {
+      this.monthValue = item
+      this.getdriver_illegal_distribute_trend_area(this.getQueryParams)
+    },
+    selectType(item) {
+      this.typeValue = item
+      this.getdriver_illegal_distribute_trend_area(this.getQueryParams)
+    },
+  },
+  mounted() {
+    this.getdriver_illegal_distribute_trend_area(this.getQueryParams)
+  },
+}
+</script>
+
+<style lang="scss" scoped>
+@mixin size($width,$height) {
+  width: $width;
+  height: $height;
+}
+.clearfix {
+  &:before,
+  &:after {
+    content: "";
+    display: table;
+  }
+  &:after {
+    clear: both;
+    overflow: hidden;
+  }
+}
+.company_secure_driver_illegal_distribute_trend_area_wrap {
+  width: 750px;
+  position: absolute;
+  top: 300px;
+  left: 950px;
+  z-index: 3;
+  .dateSelectedWrap {
+    width: 100%;
+    position: relative;
+    margin-top: 10px;
+    .dateSelecteContent {
+      @include size(552px,25px);
+      float: right;
+      .title {
+        width: 100px;
+        text-align: center;
+        line-height: 25px;
+        float: left;
+        color: #b5b5b5;
+        font-size: 14px;
+        margin-right: 10px;
+        margin-left: 10px;
+      }
+      .yearWrap {
+        width: 100px;
+        height: 25px;
+        float: left;
+        margin-right: 5px;
+      }
+      .monthWrap {
+        width: 100px;
+        height: 25px;
+        float: left;
+        margin-right: 5px;
+      }
+      .typeWrap {
+        width: 100px;
+        height: 25px;
+        float: left;
+      }
+    }
+  }
+  .illegal_distribute_trend_area_chart {
+    width: 100%;
+    height: 200px;
+    margin-top: 10px;
+  }
+}
+</style>

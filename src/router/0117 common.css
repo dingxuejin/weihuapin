@@ -1,0 +1,97 @@
+body,html{
+	/* 声明项目公用基本样式字体大小 颜色等 */
+    font-family:Helvetica, Arial,"Microsoft YaHei", sans-serif;
+}
+*{margin:0px;padding:0px;list-style:none;}
+a{text-decoration:none;color:black;}
+
+/* 浮动 */
+.fl{float:left;}
+.fr{float:right;}
+.clearfix{zoom:1;}
+.clearfix:after{
+	content:'';
+	display:table;
+	clear:both;
+}
+
+/* 表单控件border outline */
+input,button{
+	border:none;
+	outline:none;
+}
+
+/* 省略号 */
+.lines{
+	overflow: hidden;
+	display: -webkit-box;
+	-webkit-box-orient:vertical;
+	text-overflow:ellipsis;
+	-webkit-line-clamp:n;
+}
+
+.line{
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow:ellipsis;
+}
+
+
+/* 自定义字体文件 */
+/*引入字体文件 IE11+*/
+@font-face{
+	font-family: myFontFamily;
+	src: url('./DS-DIGIT.TTF');
+}
+
+P{
+	font-family: myFontFamily;
+}
+
+
+/* 滚动条  --水平滚动条thumb width自适应 垂直滚动条 thumb height自适应 */
+.eleScrollBar::-webkit-scrollbar{
+	width: 6px;
+	height: 100%;
+	border: 1px solid grey;
+	background: url(../imgs/list_01.png) no-repeat;
+	background-size: 100% 100%;
+}
+
+.eleScrollBar::-webkit-scrollbar-thumb{
+	/*width: 6px;
+	height: 50%;*/
+	background: url(../imgs/list_02.png) no-repeat;
+	background-size: 100% 100%;
+}
+
+
+/* 子级自动居中 */
+/* 父级 包裹*/
+.div{
+	width:100%;
+	height:100%;
+	position: relative;
+}
+
+/* 第一种  绝对定位top:20%;left:50%;减去居中元素宽高各一半; */
+.subdiv{
+	width:200px;
+	height:200px;
+	position: absolute;
+	top:50%;
+	left:50%;
+	transform: translate(-50%,-50%);
+}
+
+/* 第二种:   margin:auto; 绝对定位,上下左右全为0*/
+.subdiv{
+	width:200px;
+	height:200px;
+	margin:auto;
+	position: absolute;
+	top:0;
+	right:0;
+	bottom:0;
+	left:0;
+}

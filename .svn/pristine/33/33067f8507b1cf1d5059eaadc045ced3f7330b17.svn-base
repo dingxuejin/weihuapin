@@ -1,0 +1,287 @@
+<template>
+  <div class="map"
+       ref="CarRealtime"
+       id="CarRealtimeMap">
+
+  </div>
+</template>
+<script>
+/* eslint-disable */
+import {mapState} from 'vuex'
+import "echarts/extension/bmap/bmap";
+import bmapStyle from "../../assets/mapStyle/mapStyle.json";
+export default {
+  computed:{
+    ...mapState('CarRealtimeMap',['CarLocationInfo'])
+  },
+  methods: {
+    drawchart() {
+      const myChart = this.$echarts.init(this.$refs.CarRealtime);
+      let data=this.CarLocationInfo
+      let point={},center=[],line={}
+      if(this.Mv.isEmpty(this.CarLocationInfo)){
+        center=data.clwz.position
+        point={
+          value:data.clwz.position,
+          address:data.clwz.address,
+          driver_name:data.clwz.driver_name,
+          diver_phone:data.clwz.diver_phone,
+          supercargo_name:data.clwz.supercargo_name,
+          vehicle_loading_status:data.clwz.vehicle_loading_status,
+          speed:data.clwz.speed,
+          symbolSize: 14,
+          itemStyle: { normal: { color: "#05d0eb" } }
+        }
+        line={
+          name:data.clgjxx.route_name,
+          source:data.clgjxx.source,
+          target: data.clgjxx.destination,
+          carCategory:data.clgjxx.waybill_id,
+          coords: [data.clgjxx.source_position,data.clgjxx.destination_position]
+        }
+      }
+      const option = {
+        tooltip: {
+          show: true,
+          showContent: true,
+          enterable: true,
+          // confine: true,
+          formatter(params) {
+            if (params.seriesIndex === 0) {
+              return (
+                `${'<div class="tooltipContainer"><div class="tooltipContent">' +
+                  '<div class="items"><div class="itemsTitleContent">'}${
+                    "车辆信息"
+                  }</div><div class="itemsBorder clearfix"><div></div><div></div><div></div></div></div>` +
+                `<div class="items"><div class="itemsContent"><div class="itemTitle">驾驶员</div><div class="itemIndex over">${
+                  params.data.driver_name
+                }</div></div><div class="itemsBorder clearfix"><div></div><div></div><div></div></div></div>` +
+                `<div class="items"><div class="itemsContent"><div class="itemTitle">驾驶员电话</div><div class="itemIndex over">${
+                  params.data.diver_phone
+                }</div></div><div class="itemsBorder clearfix"><div></div><div></div><div></div></div></div>` +
+                `<div class="items"><div class="itemsContent"><div class="itemTitle">押运员</div><div class="itemIndex over">${
+                  params.data.supercargo_name
+                  }</div></div><div class="itemsBorder clearfix"><div></div><div></div><div></div></div></div>` +
+                `<div class="items"><div class="itemsContent"><div class="itemTitle">车辆位置</div><div class="itemIndex over">${
+                  params.data.address
+                  }</div></div><div class="itemsBorder clearfix"><div></div><div></div><div></div></div></div>` +
+                `<div class="items"><div class="itemsContent"><div class="itemTitle">车辆状态</div><div class="itemIndex over">${
+                  params.data.vehicle_loading_status
+                  }</div></div><div class="itemsBorder clearfix"><div></div><div></div><div></div></div></div>` +
+                `<div class="items"><div class="itemsContent"><div class="itemTitle">车速</div><div class="itemIndex over">${
+                 params.data.speed+'km/h'
+                  }</div></div><div class="itemsBorder clearfix"><div></div><div></div><div></div></div></div>` +
+                "</div></div>"
+              );
+            } else {
+              return (
+                `${'<div class="tooltipContainer"><div class="tooltipContent">' +
+                  '<div class="items"><div class="itemsTitleContent">'}${
+                    "轨迹信息"
+                  }</div><div class="itemsBorder clearfix"><div></div><div></div><div></div></div></div>` +
+                `<div class="items"><div class="itemsContent"><div class="itemTitle">路线名称</div><div class="itemIndex">${
+                  params.data.name
+                  }</div></div><div class="itemsBorder clearfix"><div></div><div></div><div></div></div></div>` +
+                `<div class="items"><div class="itemsContent"><div class="itemTitle">货源地</div><div class="itemIndex">${
+                  params.data.source
+                }</div></div><div class="itemsBorder clearfix"><div></div><div></div><div></div></div></div>` +
+                `<div class="items"><div class="itemsContent"><div class="itemTitle">目的地</div><div class="itemIndex">${
+                  params.data.target
+                }</div></div><div class="itemsBorder clearfix"><div></div><div></div><div></div></div></div>` +
+                `<div class="items"><div class="itemsContent"><div class="itemTitle">运单编号</div><div class="itemIndex">${
+                  params.data.carCategory
+                }</div></div><div class="itemsBorder clearfix"><div></div><div></div><div></div></div></div>` +
+                "</div></div>"
+              );
+            }
+          }
+        },
+        bmap: {
+          center: center,
+          zoom: 5,
+          roam: true,
+          mapStyle: {
+            styleJson: bmapStyle
+          }
+        },
+        series: [
+          {
+            name: "地点",
+            type: "effectScatter",
+            coordinateSystem: "bmap",
+            zlevel: 2,
+            rippleEffect: {
+              brushType: "stroke"
+            },
+            label: {
+              emphasis: {
+                show: false,
+                position: "right",
+                formatter: "{b}"
+              }
+            },
+            symbolSize: 2,
+            showEffectOn: "render",
+            itemStyle: {
+              normal: {
+                color: "#46bee9"
+              }
+            },
+            data: [point]
+          },
+          {
+            name: "线路",
+            type: "lines",
+            coordinateSystem: "bmap",
+            zlevel: 2,
+            large: true,
+            polyline: true,
+            effect: {
+              show: true,
+              constantSpeed: 30,
+              symbol: "pin",
+              symbolSize: 3,
+              trailLength: 0
+            },
+            lineStyle: {
+              normal: {
+                width: 3,
+                curveness: 0.1,
+                color: {
+                  type: "linear",
+                  x: 0,
+                  y: 0,
+                  x2: 0,
+                  y2: 1,
+                  colorStops: [
+                    {
+                      offset: 0,
+                      color: "#05d0eb"
+                    },
+                    {
+                      offset: 1,
+                      color: "#e75029"
+                    }
+                  ],
+                  globalCoord: false
+                }
+              }
+            },
+            data: [line]
+          }
+        ]
+      };
+      myChart.setOption(option);
+    }
+  },
+  watch:{
+    CarLocationInfo(){
+      this.drawchart();
+    }
+  },
+  created() {
+    this.$nextTick(() => {
+      this.drawchart();
+    });
+  }
+};
+</script>
+<style lang="scss">
+.map {
+  width: 100%;
+  height: 100%;
+  border: 3px solid rgba(5, 208, 235, 0.8);
+}
+#CarRealtimeMap {
+  .tooltipContainer {
+    width: 350px;
+    overflow: hidden;
+    border: 2px solid #05d0eb;
+    background: rgba(9, 10, 11, 0.9);
+    // 内容部分
+    .tooltipContent {
+      width: calc(100% - 20px);
+      height: 100%;
+      overflow: hidden;
+      margin-left: 10px;
+      .items {
+        width: 100%;
+        height: 50px;
+        overflow: hidden;
+        .itemsTitleContent {
+          // height:48px;
+          height: calc(100% - 2px);
+          overflow: hidden;
+          font-size: 24px;
+          color: #fff;
+          line-height: 48px;
+        }
+        .itemsContent {
+          height: calc(100% - 2px);
+          overflow: hidden;
+          font-size: 16px;
+          color: #fff;
+          line-height: 48px;
+          position: relative;
+          .itemTitle {
+            float: left;
+          }
+          // index
+          .itemIndex {
+            position: absolute;
+            left: 85px;
+            top: 0;
+            width: 200px;
+            color: #05d0eb;
+            font-size: 18px;
+            font-weight: bold;
+          }
+          .itemOrderNum {
+            font-size: 20px;
+            font-weight: normal;
+          }
+          // unit
+          .trafficMileageUnit {
+            position: absolute;
+            right: 0px;
+            top: 15px;
+            color: #05d0eb;
+            font-size: 16px;
+            font-weight: bold;
+            line-height: 30px;
+            // background: red;
+          }
+          .orderNumUnit {
+            position: absolute;
+            left: 180px;
+            top: 10px;
+            color: #05d0eb;
+            font-size: 16px;
+            font-weight: bold;
+            line-height: 30px;
+            // background: red;
+          }
+        }
+        .itemsBorder {
+          height: 2px;
+          // background: orange;
+          div:nth-child(odd) {
+            width: 10px;
+            height: 100%;
+            overflow: hidden;
+            float: left;
+            background: #81d9e5;
+          }
+          div:nth-child(even) {
+            width: calc(100% - 20px);
+            height: 100%;
+            overflow: hidden;
+            float: left;
+            background: rgba(129, 217, 229, 0.5);
+          }
+        }
+      }
+    }
+  }
+}
+</style>

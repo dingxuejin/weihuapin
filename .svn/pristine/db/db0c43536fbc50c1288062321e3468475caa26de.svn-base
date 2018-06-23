@@ -1,0 +1,32 @@
+/*eslint-disable */
+import * as CarAPI from "@/api/car";
+
+const state = {
+  DataJgxxsl: "",
+  carAlertPopUpShow: false
+};
+const mutations = {
+  setDataJgxxsl(state, data) {
+    state.DataJgxxsl = data;
+  },
+  setcarAlertPopUpShow(state, data) {
+    state.carAlertPopUpShow = data;
+  }
+};
+const actions = {
+  getJgxxsl({ commit }) {
+    CarAPI.getJgxxsl()
+      .then(data => {
+        commit("setDataJgxxsl", data.data);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }
+};
+export default {
+  namespaced: true,
+  state,
+  actions,
+  mutations
+};

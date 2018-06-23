@@ -1,0 +1,327 @@
+<template>
+  <div class="content">
+    <div class="header">
+      <htitle data='安全驾驶排名'></htitle>
+    </div>
+    <div class="select">
+      <div>统计类型</div>
+      <div v-if="organcon">
+        <key-value-select :data='organcon'
+                          width='339px'
+                          @select="selectOrgan"></key-value-select>
+      </div>
+    </div>
+    <div class="change">
+      <div :class='{show:period=="y"}'
+           @click='showtoggle("y")'>本年</div>
+      <div :class='{show:period=="m"}'
+           @click='showtoggle("m")'>本月</div>
+    </div>
+    <div class="ranking">
+      <div>本机构排名</div>
+      <div>
+        <span>{{getRanking}}</span>
+        <nav></nav>
+      </div>
+      <div></div>
+    </div>
+    <div class="title">
+      <div>排名</div>
+      <div>机构</div>
+      <div>总安全得分</div>
+    </div>
+    <ul v-if="order">
+      <li v-for='(item,index) in order'
+          :key='index'>
+        <div>{{item.ranking}}</div>
+        <div class="over"
+             :title="item && item.qy_cdxx && item.qy_cdxx.entity_name && item.qy_cdxx.entity_name">{{item && item.qy_cdxx && item.qy_cdxx.entity_name && item.qy_cdxx.entity_name || ''}}</div>
+        <div>{{item.score}}</div>
+      </li>
+    </ul>
+  </div>
+</template>
+<script>
+/*eslint-disable */
+import { mapState, mapActions } from "vuex";
+import KeyValueSelect from "../../../components/KeyValueSelect";
+import htitle from "../../../components/companysecure/title";
+
+export default {
+  components: {
+    KeyValueSelect,
+    htitle
+  },
+  data() {
+    return {
+      period: "y",
+      entityIdValue: null,
+      monthValue: null,
+      yearValue: null
+      // organcon: null,
+    };
+  },
+  computed: {
+    ...mapState("securityRanking", ["secureDriverOrder"]),
+    order() {
+      return (
+        this.secureDriverOrder &&
+        this.secureDriverOrder[this.period] &&
+        this.secureDriverOrder[this.period]
+      );
+    },
+    getRanking() {
+      if (this.order && this.order !== undefined && this.order !== null) {
+        const len = this.order && this.order.length && this.order.length;
+        const e = this.order.filter(e => e.entity_id === this.entityIdValue);
+        if (e.length > 0) {
+          return `${e[0].ranking} / ${len}`;
+        }
+        return `${this.order[0].ranking} / ${len}`;
+      }
+      return "";
+    },
+    organcon() {
+      if (
+        this.secureDriverOrder &&
+        this.secureDriverOrder !== null &&
+        this.secureDriverOrder !== undefined &&
+        this.secureDriverOrder[this.period] &&
+        this.secureDriverOrder[this.period] !== null &&
+        this.secureDriverOrder[this.period] !== undefined
+      ) {
+        const organList = this.secureDriverOrder[this.period].map(o => {
+          return {
+            label: o.qy_cdxx && o.qy_cdxx.entity_name && o.qy_cdxx.entity_name,
+            value: o.qy_cdxx && o.qy_cdxx.entity_id && o.qy_cdxx.entity_id
+          };
+        });
+        return organList;
+      }
+      return "";
+    }
+    // organcon() {
+    //   if (
+    //     this.secureDriverOrder &&
+    //     this.secureDriverOrder !== null &&
+    //     this.secureDriverOrder !== undefined &&
+    //     this.secureDriverOrder[this.period] &&
+    //     this.secureDriverOrder[this.period] !== null &&
+    //     this.secureDriverOrder[this.period] !== undefined
+    //   ) {
+    //     console.log(
+    //       " this.secureDriverOrder[this.period]",
+    //       this.secureDriverOrder[this.period]
+    //     );
+    //     const organList = this.secureDriverOrder[this.period].map(
+    //       o => o.qy_cdxx && o.qy_cdxx.entity_name && o.qy_cdxx.entity_name
+    //     );
+    //  ({
+
+    // value:
+    //   o.qy_cdxx !== null
+    //     ? o.qy_cdxx.entity_id ? o.qy_cdxx.entity_id : "1310000010010000"
+    //     : "1310000010010000",
+    // label:
+    //   o.qy_cdxx !== null
+    //     ? o.qy_cdxx && o.qy_cdxx.entity_name && o.qy_cdxx.entity_name
+    //       ? o.qy_cdxx.entity_name
+    //       : "华南配送中心"
+    //     : "华南配送中心"
+    // }));
+    //     return organList;
+    //   }
+    //   return true;
+    // },
+    // getSelectParams() {
+    //   return {
+    //     vehicleId: this.entityIdValue,
+    //     year: this.yearValue,
+    //     month: this.monthValue
+    //   };
+    // },
+  },
+
+  methods: {
+    ...mapActions("securityRanking", ["getSecureDriverOrder"]),
+    showtoggle(period) {
+      this.period = period;
+    },
+    selectOrgan(item) {
+      this.entityIdValue = item.value;
+      this.monthValue = new Date().getMonth() + 1;
+      this.yearValue = new Date().getFullYear() - 1;
+      const arg = {
+        entity_id: item.value,
+        year: this.yearValue,
+        month: this.monthValue
+      };
+      this.getSecureDriverOrder(arg);
+    }
+  },
+  beforeUpdate() {
+    // console.log(this.order)
+  },
+  mounted() {
+    if (this.secureDriverOrder) {
+      console.log(this.secureDriverOrder);
+    }
+  }
+};
+</script>
+<style lang="scss" scoped>
+.content {
+  width: 413px;
+  height: 308px;
+  margin-top: 10px;
+  margin-left: 17px;
+  color: #b5b5b5;
+  .header {
+    float: left;
+    width: 413px;
+    height: 30px;
+    margin-bottom: 10px;
+  }
+  .change {
+    float: right;
+    margin-bottom: 10px;
+    div {
+      width: 206px;
+      height: 25px;
+      float: left;
+      //margin-left: 10px;
+      box-sizing: border-box;
+      color: #b5b5b5;
+      text-align: center;
+      line-height: 23px;
+      background: rgba(0, 191, 229, 0.2);
+      border: 1px solid rgba(0, 191, 229, 1);
+      cursor: pointer;
+    }
+    .show {
+      color: #ffffff;
+      background: rgba(0, 191, 229, 0.5);
+    }
+  }
+  .select {
+    clear: both;
+    //float: right;
+    div {
+      float: left;
+      margin-bottom: 10px;
+    }
+    div:nth-child(1) {
+      line-height: 25px;
+      margin-right: 10px;
+    }
+    div:nth-child(2) {
+      width: 160px;
+      height: 25px;
+    }
+  }
+  .ranking {
+    clear: both;
+    height: 40px;
+    margin-bottom: 10px;
+    div {
+      float: left;
+      line-height: 40px;
+    }
+    div:nth-child(1) {
+      font-size: 16px;
+      color: #89dddf;
+    }
+    div:nth-child(2) {
+      float: right;
+      width: 251px;
+      height: 40px;
+      text-align: center;
+      box-sizing: border-box;
+      border: 2px solid #81d9e5;
+      line-height: 36px;
+      font-size: 36px;
+      font-weight: bold;
+      color: #efca0f;
+      font-family: "digi";
+      position: relative;
+      nav {
+        width: 9px;
+        height: 28px;
+        position: absolute;
+        background: url("../../../assets/companysecure/up_green.png") no-repeat;
+        right: 50px;
+        top: 4px;
+      }
+    }
+    div:nth-child(3) {
+      float: right;
+      width: 33px;
+      height: 28px;
+      background: url("../../../assets/companysecure/rank_icon.png");
+      margin-top: 4px;
+      margin-right: 10px;
+    }
+  }
+  .title {
+    height: 30px;
+    margin-bottom: 10px;
+    div {
+      float: left;
+      width: 136px;
+      height: 30px;
+      margin-left: 12px;
+      box-sizing: border-box;
+      text-align: center;
+      line-height: 28px;
+      border: 1px solid #81d9e5;
+      color: #b5b5b5;
+      font-size: 16px;
+    }
+    div:nth-child(1) {
+      width: 117px;
+      margin-left: 0px;
+    }
+  }
+  ul::-webkit-scrollbar {
+    background: rgba(0, 191, 229, 0.5);
+    width: 6px;
+  }
+  ul::-webkit-scrollbar-thumb {
+    background: rgba(0, 191, 229, 1);
+  }
+  ul {
+    list-style: none;
+    height: 115px;
+    overflow-y: scroll;
+    li {
+      margin-bottom: 5px;
+      height: 25px;
+      cursor: pointer;
+      div {
+        float: left;
+        height: 25px;
+        box-sizing: border-box;
+        line-height: 23px;
+        text-align: center;
+        border: 1px solid rgba(0, 191, 229, 1);
+        background: rgba(0, 191, 229, 0.2);
+      }
+      div:nth-child(1) {
+        width: 117px;
+        margin-right: 12px;
+      }
+      div:nth-child(2) {
+        width: 136px;
+        margin-right: 12px;
+      }
+      div:nth-child(3) {
+        width: 128px;
+      }
+    }
+    li:hover div {
+      background: rgba(0, 191, 229, 0.5);
+      color: #ffffff;
+    }
+  }
+}
+</style>

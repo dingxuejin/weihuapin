@@ -1,0 +1,144 @@
+<template>
+  <div class="dropDownBox">
+    <i @click="showDropDownBox"></i>
+    <input type="text"
+           v-model='selectItemContent'
+           @focus='showDropDownBox'>
+    <div style="display:none;">{{firstItem}}</div>
+    <div class="optionContent"
+         v-if="showDropDownBoxList" @mouseleave='mouseLeaveHide'>
+      <ul>
+        <li v-for="item in items"
+            :key=item.id
+            @click="selectItem(item)">{{item}}</li>
+      </ul>
+    </div>
+  </div>
+</template>
+
+<script>
+
+export default {
+  props: ['items'],
+  data() {
+    return {
+      selectItemContent: '',
+      showDropDownBoxList: false,
+    }
+  },
+  computed: {
+    firstItem() {
+      if (this.items.length > 0) {
+        this.selectItemContent = this.items[0]
+      }
+      return null
+    },
+  },
+  methods: {
+    selectItem(item) {
+      this.selectItemContent = item
+      this.$emit('selected', this.selectItemContent)
+      this.showDropDownBoxList = false
+    },
+    showDropDownBox() {
+      this.showDropDownBoxList = !this.showDropDownBoxList
+    },
+    mouseLeaveHide() {
+      this.showDropDownBoxList = false
+    },
+  },
+}
+</script>
+
+<style lang="scss">
+@mixin size($width,$height) {
+  width: $width;
+  height: $height;
+}
+.dropDownBox {
+  @include size(100%,100%);
+  i {
+    @include size(15px,8px);
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    z-index: 15;
+    background: url(~assets/car/css_sprite_car-01.png) no-repeat -760px -40px;
+  }
+  i:hover {
+    background: url(~assets/car/css_sprite_car-01.png) no-repeat -820px -40px;
+  }
+  input {
+    @include size(100%,20px);
+    outline: none;
+    display: block;
+    line-height: 20px;
+    padding-left: 10px;
+    color: #b5b5b5;
+    font-size: 14px;
+    margin: 0 auto;
+    border: 0.5px solid rgba(0, 191, 229, 0.5);
+    background: none;
+    box-sizing: border-box;
+  }
+
+  .optionContent {
+    @include size(340px,185px);
+    position: relative;
+    top: 10px;
+    left: -5px;
+    border: 2px solid rgba(3, 139, 252, 0.8);
+    box-sizing: border-box;
+    z-index: 21;
+    background: rgba(10, 42, 66, 0.95);
+    overflow: hidden;
+    ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      background: rgba(10, 42, 66, 0.95);
+      @include size(332px,100%);
+      position: relative;
+      top: 0px;
+      left: 0;
+      overflow: hidden;
+      overflow-y: scroll;
+      box-sizing: border-box;
+      li {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        @include size(332px,25px);
+        line-height: 25px;
+        font-size: 14px;
+        color: #b5b5b5;
+        padding-left: 20px;
+        box-sizing: border-box;
+        cursor: pointer;
+      }
+      li:first-child {
+        margin-top: 5px;
+      }
+      li:last-child {
+        margin-bottom: 5px;
+      }
+      li:hover {
+        background: rgba(5, 208, 235, 0.5);
+        color: #fff;
+      }
+    }
+    ul::-webkit-scrollbar {
+      @include size(5px,175px);
+      background: url(~assets/car/scroll.png) no-repeat center center;
+      position: relative;
+      right: 10px;
+      top: 5px;
+      background-size: 5px 175px;
+      // background-position: 5px 5px;
+    }
+    ul::-webkit-scrollbar-thumb {
+      background: rgba(5, 208, 235, 1);
+    }
+  }
+}
+</style>

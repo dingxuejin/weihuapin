@@ -1,0 +1,78 @@
+<template>
+  <div id="container" :class="{'active':isActive}" :style="{width}">
+    <!-- 这是runreal标题组件 -->
+    <!-- isActive为选择状态
+         width为宽度
+        title为标题内容 -->
+    <div class="realtitle-inner flex-between" :style="{padding}">
+      <div>
+        <span>{{title}}</span>
+      </div>
+      <div class="flex-between real-dian-container" @click="openDetail">
+        <div class="real-dian"></div>
+        <div class="real-dian"></div>
+        <div class="real-dian"></div>
+      </div>
+    </div>
+  </div>
+</template>
+<script>
+/* eslint-disbale */
+export default {
+  name: 'RunRealTitle',
+  props: {
+    isActive: {
+      type: Boolean,
+      default: false,
+    },
+    width: {
+      type: String,
+      default: '390px',
+    },
+    padding: {
+      type: String,
+      default: '0 20px',
+    },
+
+    title: {
+      type: String,
+      default: '组件的标题',
+    },
+  },
+  methods: {
+    openDetail() {
+      this.$emit('openDetail')
+    },
+  },
+}
+</script>
+<style scoped>
+#container {
+  height: 30px;
+}
+.realtitle-inner {
+  font-family: Helvetica;
+  font-size: 16px;
+  height: 100%;
+  color: #8c8c8c;
+  background: rgba(129, 217, 229, 0.3);
+}
+.active .realtitle-inner {
+  color: #89dddf;
+  background: rgba(3, 139, 252, 0.3);
+}
+.real-dian-container {
+  width: 20px;
+}
+.real-dian {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #5193a4;
+}
+.real-dian-container:hover > .real-dian {
+  background: #81d9e5;
+}
+</style>
+
+

@@ -1,0 +1,303 @@
+<template>
+  <div class="protectionWarningConfiguration">
+    <div class="protectionWarningConfiguration-line"></div>
+    <div class="protectionWarningConfiguration-title">
+      防护及警告装备配置信息
+    </div>
+    <div class="protectionWarningConfiguration-content">
+      <div class="itemsInfo">
+        <div class="toggleBtn">
+          <div class="protection"
+               @click="protectionShow"
+               :class="{hightShow:protectionActive}">防护装备</div>
+          <div class="alarm"
+               @click="warningShow"
+               :class="{hightShow:warningActive}">警告装备</div>
+        </div>
+        <!-- 防护装备 -->
+        <div class="btnDetails"
+             v-if="protectionActive">
+          <div class="item"
+               v-for="(item,i) in protectItems"
+               :key="i"
+               :class="nowSelectItem===item.name?'btnHightLight '+item.className+'':item.className"
+               @click='detailsBtn(item.name)'>{{item.name}}</div>
+        </div>
+        <!-- 警告装备 -->
+        <div class="btnDetails"
+             v-if="warningActive">
+          <div class="item"
+               v-for="(list,index) in warningItems"
+               :key='index'
+               :class="nowSelectItem===list.name?'btnHightLight '+list.className+'':list.className"
+               @click='detailsBtn(list.name)'>{{list.name}}</div>
+        </div>
+      </div>
+      <!-- <div class="imgInfo">
+        <i v-if="protectionActive"
+           class="protectionImg"></i>
+        <i v-if="warningActive"
+           class="alarmImg"></i>
+      </div> -->
+    </div>
+    <!-- items详情弹出框 -->
+    <div class="protectionWarningPopupWrap clearfix"
+         v-drag
+         @mousedown="move=true"
+         @mouseup="move=false"
+         :style="move?'cursor:move':''">
+      <slot name="protectionWarningPopupFrame"></slot>
+    </div>
+        <!-- 增加Items Button -->
+    <div class="addItemBtn">
+      添加其他选项
+    </div>
+    <div class="bottomLine"></div>
+  </div>
+</template>
+
+<script>
+import PopUpFrame from '@/components/car/PopUpFrame'
+import PopUpWidget from '@/components/car/PopUpWidget'
+
+export default {
+  name: 'protection-warning-configuration',
+  components: {
+    PopUpFrame,
+    PopUpWidget,
+  },
+  data() {
+    return {
+      protectionActive: true,
+      warningActive: false,
+      hightShow: false,
+      popUpFrameToggle: true,
+      nowSelectItem: '',
+      protectItems: [
+        { name: '灭火器', className: 'item_1' },
+        { name: '应急救援箱', className: 'item_2' },
+        { name: '防护面具', className: 'item_3' },
+        { name: '防护服', className: 'item_4' },
+        { name: '导静电装置', className: 'item_5' },
+      ],
+      warningItems: [
+        { name: '标志灯', className: 'item_1' },
+        { name: '标志牌', className: 'item_2' },
+        { name: '安全告示牌', className: 'item_3' },
+        { name: '车身标字', className: 'item_4' },
+        { name: '反光条', className: 'item_5' },
+        { name: '色带', className: 'item_5' },
+        { name: '危险货物应急装置', className: 'item_6' },
+        { name: '其它', className: 'item_7' },
+      ],
+      move: false,
+    }
+  },
+  methods: {
+    // 按钮切换:防护装备/警告装备
+    protectionShow() {
+      this.protectionActive = true
+      this.warningActive = false
+    },
+    warningShow() {
+      this.warningActive = true
+      this.protectionActive = false
+    },
+    detailsBtn(name) {
+      this.nowSelectItem = name
+      this.$emit('detailsBtn', name)
+    },
+  },
+}
+</script>
+
+<style lang="scss" scope>
+.clearfix {
+  &:before,
+  &:after {
+    content: "";
+    display: table;
+  }
+  &:after {
+    clear: both;
+    overflow: hidden;
+  }
+}
+@mixin size($width,$height) {
+  width: $width;
+  height: $height;
+}
+.protectionWarningConfiguration {
+  @include size(100%,100%);
+  position: relative;
+  .protectionWarningConfiguration-title {
+    @include size(368px,30px);
+    position: relative;
+    color: #89dddf;
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 30px;
+    padding-left: 50px;
+    box-sizing: border-box;
+    background: url(~assets/car/left_header_strip_3.png) no-repeat;
+  }
+  .protectionWarningConfiguration-line {
+    width: 350px;
+    height: 2px;
+    margin-left: 19px;
+    margin-bottom: 8px;
+    background: rgba(226, 5, 27, 0.5);
+  }
+  .protectionWarningConfiguration-content {
+    @include size(338px,140px);
+    margin-left: 30px;
+    padding-top: 10px;
+    box-sizing: border-box;
+    // 左侧区域:防护装备 & 警告装备Items
+    .itemsInfo {
+      @include size(338px,130px);
+      line-height: 130px;
+      position: relative;
+      float: left;
+      .toggleBtn {
+        @include size(100%,30px);
+        .protection {
+          @include size(169px,30px);
+          line-height: 30px;
+          color: #b5b5b5;
+          font-size: 16px;
+          text-align: center;
+          // margin-right: 20px;
+          float: left;
+          border: 1px solid rgba(0, 191, 229, 1);
+          background: rgba(0, 191, 229, 0.2);
+          box-sizing: border-box;
+          cursor: pointer;
+        }
+        .protection:hover {
+          color: #fff;
+        }
+        .alarm {
+          @extend .protection;
+          margin-right: 0;
+          color: #b5b5b5;
+          background: rgba(0, 191, 229, 0.2);
+          cursor: pointer;
+        }
+        .alarm:hover {
+          color: #fff;
+        }
+        .hightShow {
+          color: #fff;
+          background: rgba(0, 191, 229, 0.5);
+          box-shadow: 0px 0px 1px #00bfe5;
+        }
+      }
+      .btnDetails {
+        @include size(338px,90px);
+        margin-top: 10px;
+        // overflow-x: hidden;
+        // overflow-y: scroll;
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: flex-start;
+        .item {
+          height: 25px;
+          line-height: 25px;
+          color: #b5b5b5;
+          font-size: 14px;
+          padding: 0 20px;
+          margin-bottom: 5px;
+          margin-left: 10px;
+          float: left;
+          background: rgba(0, 91, 127, 0.5);
+          cursor: pointer;
+        }
+        // .item_1 {
+        //   margin-left: 0px;
+        // }
+        // .item_2{
+        //   margin-left: 10px;
+        // }
+        // .item_3 {
+        //   margin-left: 0px;
+        // }
+        // .item_5 {
+        //   margin-left: 0px;
+        // }
+        .lastBox {
+          margin-left: 0px;
+        }
+        .item:hover {
+          color: #fff;
+        }
+        .btnHightLight {
+          background: rgba(0, 91, 127, 1);
+          color: #fff;
+        }
+      }
+      .btnDetails::-webkit-scrollbar {
+        display: none;
+      }
+    }
+    // 右侧区域: 图片
+    .imgInfo {
+      @include size(160px,130px);
+      float: left;
+      text-align: center;
+      line-height: 130px;
+      position: relative;
+      .protectionImg {
+        @include size(130px,130px);
+        position: absolute;
+        top: 0;
+        right: 0;
+        background: url(../../assets/car/css_sprite_car-01.png) no-repeat -280px -192px;
+      }
+      .alarmImg {
+        @include size(130px,130px);
+        position: absolute;
+        top: 0;
+        right: 0;
+        background: url(../../assets/car/css_sprite_car-01.png) no-repeat -460px -192px;
+      }
+    }
+  }
+  .protectionWarningPopupWrap {
+    width: 1190px;
+    position: absolute;
+    bottom: 25px;
+    left: 385px;
+  }
+  // 增加项目按钮
+  .addItemBtn {
+    width: 354px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    background: rgba(3, 139, 252, 0.2);
+    color: #fff;
+    font-size: 14px;
+    position: absolute;
+    bottom: 10px;
+    left: 19px;
+    cursor: pointer;
+    position: absolute;
+    bottom: 32px;
+    left: 10px;
+  }
+  .addItemBtn:hover {
+    color: #fff;
+    font-size: 14px;
+    background: rgba(3, 139, 252, 0.5);
+  }
+  .bottomLine{
+    width:356px;
+    height:2px;
+    background:#81D9E5;
+     position: absolute;
+    bottom: 15px;
+    left: 10px;
+  }
+}
+</style>

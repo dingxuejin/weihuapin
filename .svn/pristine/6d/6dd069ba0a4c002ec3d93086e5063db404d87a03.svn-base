@@ -1,0 +1,270 @@
+<template>
+  <div class="trend">
+    <div class="header">
+      <div :class="{hover:page===1}"
+           @click='page = 1'>
+        <span>违法行为区域分布</span>
+        <div @click='openDetailillegalArea'></div>
+      </div>
+      <div :class="{hover:page===2}"
+           @click='page = 2'>
+        <span>违法行为时段分布</span>
+        <div @click='openDetailillegalInterval'></div>
+      </div>
+    </div>
+    <!-- 违法行为区域分布 -->
+    <template v-if="page === 1">
+      <div class="change">
+        <div>统计周期</div>
+        <div>
+          <key-value-select width='116px'
+                            :data='yearOption'
+                            @select='selectAreaYear'></key-value-select>
+        </div>
+        <div>
+          <key-value-select width='111px'
+                            :data='monthOption'
+                            @select='selectAreaMonth'></key-value-select>
+        </div>
+        <div>区域选择</div>
+        <div>
+          <key-value-select width='236px'
+                            :data='regionOption'
+                            @select='selectRegion'></key-value-select>
+        </div>
+      </div>
+
+      <div class="ill_echart">
+        <loading :data='illegalAreaDistribute'>
+          <bar v-if="illegalAreaDistribute"
+               chartTheme="dark"
+               :data="illegalAreaDistribute"
+               yaxisName="数量（次）"></bar>
+        </loading>
+      </div>
+    </template>
+    <!-- 违法行为时段分布 -->
+    <template v-if="page === 2">
+      <div class="change">
+        <div>统计周期</div>
+        <div>
+          <key-value-select width='116px'
+                            :data='yearOption'
+                            @select='selectIntervalYear'></key-value-select>
+        </div>
+        <div>
+          <key-value-select width='111px'
+                            :data='monthOption'
+                            @select='selectIntervalMonth'></key-value-select>
+        </div>
+      </div>
+      <div class="ill_echart">
+        <loading :data='illegalIntervalDistribute'>
+          <radar v-if="illegalIntervalDistribute"
+                 :data='illegalIntervalDistribute'
+                 chartTheme="dark"></radar>
+        </loading>
+      </div>
+    </template>
+
+  </div>
+</template>
+
+<script>
+/*eslint-disable */
+import { mapState, mapActions, mapMutations } from "vuex";
+import htitle from "../../../components/companysecure/title";
+import KeyValueSelect from "../../../components/KeyValueSelect";
+import Bar from "../../../components/charts/bar";
+import Radar from "../../../components/charts/Radar";
+import Dictionary from "../../../util/dictionary";
+
+const { date: { year, month }, regionCode } = Dictionary;
+// const { year, month, regionCode } = this.area
+// const { year, month } = this.interval
+export default {
+  components: {
+    htitle,
+    KeyValueSelect,
+    Bar,
+    Radar
+  },
+  computed: {
+    ...mapState("areaDistributionIllegal", [
+      "illegalAreaDistribute",
+      "illegalIntervalDistribute"
+    ]),
+    ...mapState("secureMain", ["entity_id"]),
+    ...mapState("popupSecContainer", [
+      "illegalDistributeTrendArea_show",
+      "illegalDistributeTrendInterval_show"
+    ]),
+    fetchAreaData() {
+      return {
+        entity_id: this.entity_id,
+        year: this.area.year,
+        month: this.area.month,
+        region_code: this.area.regionCode
+      };
+      // this.getIllegalAreaDistribute()
+    },
+    fetchIntervalData() {
+      return {
+        entity_id: this.entity_id,
+        year: this.interval.year,
+        month: this.interval.month
+      };
+    }
+  },
+  methods: {
+    ...mapActions("areaDistributionIllegal", [
+      "getIllegalIntervalDistribute",
+      "getIllegalAreaDistribute"
+    ]),
+    ...mapMutations("popupSecContainer", ["getComDetails"]),
+    ...mapMutations("popupSecContainer", [
+      "setillegalDistributeTrendArea_show",
+      "setillegalDistributeTrendInterval_show"
+    ]),
+    /* 违法行为区域分布弹出框显示 */
+    openDetailillegalArea() {
+      // alert("lllllll");
+      this.setillegalDistributeTrendArea_show(true);
+    },
+    /* 违法行为时段分布弹出框显示  */
+    openDetailillegalInterval() {
+      // alert("rrrrrrr");
+      this.setillegalDistributeTrendInterval_show(true);
+    },
+    openDetail(item) {
+      this.getComDetails(item);
+    },
+    selectAreaYear(item) {
+      this.area.year = item.value;
+      this.getIllegalAreaDistribute(this.fetchAreaData);
+    },
+    selectAreaMonth(item) {
+      this.area.month = item.value;
+      this.getIllegalAreaDistribute(this.fetchAreaData);
+    },
+    selectRegion(item) {
+      this.area.regionCode = item.value;
+      this.getIllegalAreaDistribute(this.fetchAreaData);
+    },
+    selectIntervalYear(item) {
+      this.interval.year = item.value;
+      this.getIllegalIntervalDistribute(this.fetchIntervalData);
+    },
+    selectIntervalMonth(item) {
+      this.interval.month = item.value;
+      this.getIllegalIntervalDistribute(this.fetchIntervalData);
+    }
+  },
+  data: () => ({
+    page: 1,
+    yearOption: [{ label: "全部", value: null }, ...year],
+    monthOption: [{ label: "全部", value: null }, ...month],
+    regionOption: [{ label: "全部", value: null }, ...regionCode],
+    area: {
+      year: null,
+      month: null,
+      regionCode: null
+    },
+    interval: {
+      year: null,
+      month: null
+    }
+    // area: {
+    //   year: 2017,
+    //   month: 11,
+    //   regionCode: 440000,
+    // },
+    // interval: {
+    //   year: 2017,
+    //   month: 11,
+    // },
+  })
+};
+</script>
+
+<style lang="scss" scoped>
+.trend {
+  width: 100%;
+  height: 310px;
+  .header {
+    height: 25px;
+    div:nth-child(1) {
+      //margin-right: 10px;
+    }
+    div {
+      width: 160px;
+      //text-indent: 20px;
+      height: 25px;
+      line-height: 25px;
+      float: left;
+      background: rgba(129, 217, 299, 0.1);
+      position: relative;
+      font-size: 16px;
+      color: #89dddf;
+      cursor: pointer;
+      &:nth-child(1) {
+        margin-right: 295px;
+      }
+      div {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        background: url("../../../assets/driver/drill_icon_off.png") no-repeat
+          center center;
+        top: 4px;
+        right: 5px;
+        cursor: pointer;
+      }
+      div:hover {
+        background: url("../../../assets/driver/drill_icon_on.png") no-repeat
+          center center;
+      }
+    }
+    .hover {
+      background: rgba(129, 217, 299, 0.3);
+    }
+  }
+  .change {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    height: 25.4px;
+    font-size: 14px;
+    div {
+      float: left;
+      height: 25px;
+      color: #b5b5b5;
+    }
+    div:nth-child(1) {
+      line-height: 25px;
+    }
+    div:nth-child(2) {
+      width: 116px;
+      margin-left: 15.6px;
+      margin-right: 9px;
+    }
+    div:nth-child(3) {
+      width: 111px;
+    }
+    div:nth-child(4) {
+      line-height: 25px;
+      margin-left: 6px;
+      // margin-top: 5.4px;
+    }
+    div:nth-child(5) {
+      width: 236px;
+      // margin-top: 5.4px;
+      margin-left: 9.4px;
+    }
+  }
+  .ill_echart {
+    clear: both;
+    height: 180px;
+    // background: lightblue;
+  }
+}
+</style>

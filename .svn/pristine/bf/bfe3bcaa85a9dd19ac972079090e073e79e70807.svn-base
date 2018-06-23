@@ -1,0 +1,295 @@
+/*eslint-disable */
+import Vue from "vue";
+import Vuex from "vuex";
+import car from "./car";
+import driver from "./driver";
+import company from "./company";
+import companyManage from "./companyManage";
+import companysecure from "./companysecure";
+
+// api test
+// import apitest from './ApiTest'
+// driver store
+/* eslint-disable */
+import driverbase from "../containers/driver/driverbase/store";
+import driverreward from "../containers/driver/awardPunishment/store";
+import scoreAndRankingOfSafetyEvaluation from "../containers/driver/scoreAndRankingOfSafetyEvaluation/store";
+import accumulatedWorkloadStatistics from "../containers/driver/accumulatedWorkloadStatistics/store";
+import driverLine from "../containers/driver/driverLine/store";
+
+// import drivercertificate from '../containers/driver/drivercertificate/store'
+// import driverroute from '../containers/driver/driverroute/store'
+// import driverreward from '../containers/driver/driverreward/store'
+
+// driver pop
+import blameaccidentcountinfo from "../containers/driverPopup/blameaccidentcountinfo/store";
+import blameaccidentdetailsinfo from "../containers/driverPopup/blameaccidentdetailsinfo/store";
+import blameaccidentnumcountinfo from "../containers/driverPopup/blameaccidentnumcountinfo/store";
+import blameaccidentproportioninfo from "../containers/driverPopup/blameaccidentproportioninfo/store";
+import drivebehaviorcountinfo from "../containers/driverPopup/drivebehaviorcountinfo/store";
+import driverbehavioralarmcountinfo from "../containers/driverPopup/driverbehavioralarmcountinfo/store";
+import driverbehavioralarmdetailsinfo from "../containers/driverPopup/driverbehavioralarmdetailsinfo/store";
+import driverbehaviorspeedcountinfo from "../containers/driverPopup/driverbehaviorspeedcountinfo/store";
+import driverlinerealtimealarminfo from "../containers/driverPopup/driverlinerealtimealarminfo/store";
+import illegalbehavioralarmcount from "../containers/driverPopup/illegalbehavioralarmcount/store";
+import illegalbehaviorcountinfo from "../containers/driverPopup/illegalbehaviorcountinfo/store";
+import illegalbehaviordetailsinfo from "../containers/driverPopup/illegalbehaviordetailsinfo/store";
+import illegalbehaviorproportioncount from "../containers/driverPopup/illegalbehaviorproportioncount/store";
+import irregalaritybehaviorcountinfo from "../containers/driverPopup/irregalaritybehaviorcountinfo/store";
+import irregalaritybehaviordetailsinfo from "../containers/driverPopup/irregalaritybehaviordetailsinfo/store";
+import popupdriverhealthy from "../containers/driverPopup/popupdriverhealthy/store";
+import popupdriverinfo from "../containers/driverPopup/popupdriverinfo/store";
+import popupdriverlicense from "../containers/driverPopup/popupdriverlicense/store";
+import popupdriverqualification from "../containers/driverPopup/popupdriverqualification/store";
+import popuptraininfo from "../containers/driverPopup/popuptraininfo/store";
+import popupworkqualification from "../containers/driverPopup/popupworkqualification/store";
+import punishcountinfo from "../containers/driverPopup/punishcountinfo/store";
+import punishdetailsinfo from "../containers/driverPopup/punishdetailsinfo/store";
+import punishinfo from "../containers/driverPopup/punishinfo/store";
+import PopUpDriverTag from "../containers/driverPopup/popupdrivertag/store";
+import rewardcountinfo from "../containers/driverPopup/rewardcountinfo/store";
+import rewarddetailsinfo from "../containers/driverPopup/rewarddetailsinfo/store";
+import rewardinfo from "../containers/driverPopup/rewardinfo/store";
+import traincountinfo from "../containers/driverPopup/traincountinfo/store";
+import traindetailsinfo from "../containers/driverPopup/traindetailsinfo/store";
+import workinfo from "../containers/driverPopup/workinfo/store";
+import workmileagecountinfo from "../containers/driverPopup/workmileagecountinfo/store";
+import workmileagedetailsinfo from "../containers/driverPopup/workmileagedetailsinfo/store";
+import workordercountinfo from "../containers/driverPopup/workordercountinfo/store";
+import workorderdetailsinfo from "../containers/driverPopup/workorderdetailsinfo/store";
+import workstrengthcountinfo from "../containers/driverPopup/workstrengthcountinfo/store";
+import workstrengthdetailsinfo from "../containers/driverPopup/workstrengthdetailsinfo/store";
+
+// car store
+import caralertinfo from "../containers/car/carAlertInfoContainer/store";
+import tyreConfigurationContainer from "../containers/car/tyreConfigurationContainer/store";
+import carModelsSearchContainer from "../containers/car/carModelsSearchContainer/store";
+import totalMileageContainer from "../containers/car/totalMileageContainer/store";
+import carWeightContainer from "../containers/car/carWeightContainer/store";
+import carPerMileageContainer from "../containers/car/carPerMileageContainer/store";
+import carTotalCountContainer from "../containers/car/carTotalCountContainer/store";
+import carListCostsContainer from "../containers/car/carListCostsContainer/store";
+import carMaintenanceRepaireContainer from "../containers/car/carMaintenanceRepaireContainer/store";
+import terminalConfigurationContainer from "../containers/car/terminalConfigurationContainer/store";
+import protectionWarningConfigurationContainer from "../containers/car/protectionWarningConfigurationContainer/store";
+import carBaseInfoContainer from "../containers/car/carBaseInfoContainer/store";
+
+import costStatisticPopupContainer from "../containers/car/costStatisticPopupContainer/store";
+import heavyEmptyMileageContainer from "../containers/car/heavyEmptyMileageContainer/store";
+import warningCarouselpopupContainer from "../containers/car/warningCarouselpopupContainer/store";
+import mileagemiscinfoWrapContainer from "../containers/car/mileagemiscinfoWrapContainer/store";
+import CarRealtimeMap from "../components/car/CarRealtimeMap";
+import CarOverdueRemindingStore from "../containers/car/carOverdueRemindingContainer/store";
+
+// company
+import companyMsgStore from "../containers/company/companyMsg/store";
+import peopleMsgStore from "../containers/company/peopleMsg/store";
+import carMsgStore from "../containers/company/carMsg/store";
+import lineMsgStore from "../containers/company/lineMsg/store";
+import centerMsgStore from "../containers/company/centerMsg/store";
+import manageMsgStore from "../containers/company/manageMsg/store";
+import safeMsgStore from "../containers/company/safeMsg/store";
+import headerMsgStore from "../containers/company/headerMsg/store";
+import carPopup from "../containers/company/carPopup/store";
+import centerPopup from "../containers/company/centerPopup/store";
+
+// companypopup
+import linePopup from "../containers/company/linePopup/store";
+
+// companymanage
+import manageCostRatio from "../containers/companymanage/costRatio/store";
+import manageCostConstant from "../containers/companymanage/costConstant/store";
+import manageCostChange from "../containers/companymanage/costChange/store";
+import managegoodsbh from "../containers/companymanage/goodsBh/store";
+import manageGoodsFx from "../containers/companymanage/goodsFx/store";
+import manageGoodsTj from "../containers/companymanage/goodsTj/store";
+import manageLineRanking from "../containers/companymanage/lineRanking/store";
+import manageMileageDistribution from "../containers/companymanage/mileageDistribution/store";
+import manageRunReal from "../containers/companymanage/runReal/store";
+import manageRunTime from "../containers/companymanage/runTime/store";
+import maintitlemsg from "../containers/companymanage/maintitlemsg/store";
+import popupContainer from "../containers/companymanage/popupContainer/store";
+
+// companysecure
+import secureMain from "../containers/companysecure/mainTitleMsg/store";
+import securityOverview from "../containers/companysecure/securityOverview/store";
+import insitutionChange from "../containers/companysecure/insitutionChange/store";
+import securityRanking from "../containers/companysecure/securityRanking/store";
+import behaviorTitle from "../containers/companysecure/behaviorTitle/store";
+import driverTrend from "../containers/companysecure/driverTrend/store";
+import irregularityTrend from "../containers/companysecure/irregularityTrend/store";
+import illegalTrend from "../containers/companysecure/illegalTrend/store";
+import accidentTime from "../containers/companysecure/accidentTime/store";
+import popupSecContainer from "../containers/companysecure/popupSecContainer/store";
+import alarmEventRankBadSteering from "../containers/companysecure/alarmEventRankBadSteering/store";
+import alarmEventRankIrregularities from "../containers/companysecure/alarmEventRankIrregularities/store";
+import alarmEventRankIllegality from "../containers/companysecure/alarmEventRankIllegality/store";
+
+import quantityDriver from "../containers/companysecure/quantityDriver/store";
+import quantityIllegal from "../containers/companysecure/quantityIllegal/store";
+import quantityIrregularity from "../containers/companysecure/quantityIrregularity/store";
+import accidentArea from "../containers/companysecure/accidentArea/store";
+
+import areaDistributionDriver from "../containers/companysecure/areaDistributionDriver/store";
+import areaDistributionIrregularity from "../containers/companysecure/areaDistributionIrregularity/store";
+import areaDistributionIllegal from "../containers/companysecure/areaDistributionIllegal/store";
+import accidentView from "../containers/companysecure/accidentView/store";
+
+// companymanagepopup
+import yearCostTrend from "../containers/companymanagepopup/yearCostTrend/store";
+import cargoVolume from "../containers/companymanagepopup/cargoVolume/store";
+import waybillStatistics from "../containers/companymanagepopup/waybillStatistics/store";
+import waybillTrendRecently from "../containers/companymanagepopup/waybillTrendRecently/store";
+import waybillYearOnYearThisMonth from "../containers/companymanagepopup/waybillYearOnYearThisMonth/store";
+import cargoTurnover from "../containers/companymanagepopup/cargoTurnover/store";
+import routeInfo from "../containers/companymanagepopup/routeInfo/store";
+import volumeStatisticsDayNight from "../containers/companymanagepopup/volumeStatisticsDayNight/store";
+import volumeStatisticsEntity from "../containers/companymanagepopup/volumeStatisticsEntity/store";
+import volumeInterstateEntity from "../containers/companymanagepopup/volumeInterstateEntity/store";
+// 首页index
+import index from "../containers/index/store";
+
+Vue.use(Vuex);
+export default new Vuex.Store({
+  modules: {
+    // apitest
+    // apitest,
+
+    car,
+    driver,
+    company,
+    companyManage,
+    companysecure,
+    // driver
+    driverbase,
+    driverreward,
+    scoreAndRankingOfSafetyEvaluation,
+    accumulatedWorkloadStatistics,
+    driverLine,
+    // drivercertificate,
+    // driverroute,
+    // driverreward,
+
+    // driverpopup
+    blameaccidentcountinfo,
+    blameaccidentdetailsinfo,
+    blameaccidentnumcountinfo,
+    blameaccidentproportioninfo,
+    drivebehaviorcountinfo,
+    driverbehavioralarmcountinfo,
+    driverbehavioralarmdetailsinfo,
+    driverbehaviorspeedcountinfo,
+    driverlinerealtimealarminfo,
+    illegalbehavioralarmcount,
+    illegalbehaviorcountinfo,
+    illegalbehaviordetailsinfo,
+    illegalbehaviorproportioncount,
+    irregalaritybehaviorcountinfo,
+    irregalaritybehaviordetailsinfo,
+    popupdriverinfo,
+    popupdriverhealthy,
+    popupdriverlicense,
+    popupdriverqualification,
+    popuptraininfo,
+    popupworkqualification,
+    punishcountinfo,
+    punishdetailsinfo,
+    punishinfo,
+    PopUpDriverTag,
+    rewardcountinfo,
+    rewarddetailsinfo,
+    rewardinfo,
+    traincountinfo,
+    traindetailsinfo,
+    workinfo,
+    workmileagecountinfo,
+    workmileagedetailsinfo,
+    workordercountinfo,
+    workorderdetailsinfo,
+    workstrengthcountinfo,
+    workstrengthdetailsinfo,
+
+    // car Store
+    caralertinfo,
+    tyreConfigurationContainer,
+    carModelsSearchContainer,
+    totalMileageContainer,
+    carWeightContainer,
+    carPerMileageContainer,
+    carTotalCountContainer,
+    carListCostsContainer,
+    carMaintenanceRepaireContainer,
+    terminalConfigurationContainer,
+    protectionWarningConfigurationContainer,
+    carBaseInfoContainer,
+    costStatisticPopupContainer,
+    heavyEmptyMileageContainer,
+    warningCarouselpopupContainer,
+    mileagemiscinfoWrapContainer,
+    CarRealtimeMap,
+    CarOverdueRemindingStore,
+    // company store
+    companyMsgStore,
+    peopleMsgStore,
+    carMsgStore,
+    lineMsgStore,
+    centerMsgStore,
+    manageMsgStore,
+    safeMsgStore,
+    headerMsgStore,
+    centerPopup,
+    alarmEventRankBadSteering,
+    alarmEventRankIrregularities,
+    alarmEventRankIllegality,
+    // company popup
+    linePopup,
+    carPopup,
+
+    // companymanage
+    manageCostRatio,
+    manageCostConstant,
+    manageCostChange,
+    managegoodsbh,
+    manageGoodsFx,
+    manageGoodsTj,
+    manageLineRanking,
+    manageMileageDistribution,
+    manageRunReal,
+    manageRunTime,
+    maintitlemsg,
+    popupContainer,
+
+    // companymanagepopup
+    yearCostTrend,
+    cargoVolume,
+    waybillStatistics,
+    waybillTrendRecently,
+    waybillYearOnYearThisMonth,
+    cargoTurnover,
+    routeInfo,
+    volumeStatisticsDayNight,
+    volumeStatisticsEntity,
+    volumeInterstateEntity,
+    // companysecure
+    secureMain,
+    securityOverview,
+    insitutionChange,
+    securityRanking,
+    behaviorTitle,
+    driverTrend,
+    irregularityTrend,
+    illegalTrend,
+    accidentTime,
+    quantityDriver,
+    quantityIllegal,
+    quantityIrregularity,
+    accidentArea,
+    areaDistributionDriver,
+    areaDistributionIrregularity,
+    areaDistributionIllegal,
+    accidentView,
+    popupSecContainer,
+    // index
+    index
+  }
+});

@@ -1,0 +1,709 @@
+<template>
+  <div class="scoreAndRankingOfSafetyEvaluation">
+    <div class="topWrap">
+      <div class="titleWrap">
+        <div class="title">
+          安全评价<br/>总得分及排名
+        </div>
+        <div class="subTitle">
+          <div :class="{subTilteHighLight:period === '年'}"
+               @click='changePeriod("年")'>当年</div>
+          <div :class="{subTilteHighLight:period === '月'}"
+               @click='changePeriod("月")'>当月</div>
+        </div>
+      </div>
+      <div class="summaryInfoWrap">
+        <div class="selecteWrap">
+          <div class="selecteContent">
+            <select @change='changeRanking'>
+              <option value="fleet_ranking"
+                      selected="selected">车队</option>
+              <option value="company_ranking">总公司</option>
+            </select>
+          </div>
+          <div class="selecteTitle">统计类型</div>
+        </div>
+        <div class="contentWrap">
+          <div class="leftContentWrap">
+            <div class="img_1"></div>
+            <template v-if="currentData&&currentData.length>0">
+              <div class="contentNoWrap">
+                <div class="contentNoTitle">{{`当${period}`}}</div>
+                <div class="contentNoData">{{qf(getCurrScore('安全评价'))}}</div>
+              </div>
+              <div class="img_2"></div>
+              <div class="contentRatio">{{getCurrOrder('安全评价')}}</div>
+            </template>
+
+            <loading :data='currentData' />
+
+          </div>
+          <div class="centerLine"></div>
+          <div class="rightContentWrap">
+            <div class="img_1"></div>
+
+            <template v-if="currentData&&currentData.length>0">
+
+              <div class="contentNoWrap">
+                <div class="contentNoTitle">{{`上${period}`}}</div>
+                <div class="contentNoData">{{qf(getLastScore('安全评价'))}}</div>
+              </div>
+              <div class="img_2"></div>
+              <div class="contentRatio">{{getLastOrder('安全评价')}}</div>
+            </template>
+
+            <loading :data='currentData' />
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="centerSplitLine">
+      <div class="centerSplitLine_leftPoint fl"></div>
+      <div class="centerSplitLineBorder fl"></div>
+      <div class="centerSplitLine_rightPoint fr"></div>
+    </div>
+    <div class="bottomWrap">
+      <!-- 驾驶行为  -->
+      <div class="itemWrap">
+        <div class="itemTitleWrap">驾驶行为得分及排名</div>
+        <!-- <div class="itemSubTitleWrap"
+             :class="{'itemContentToggleStyle':itemContentToggleStyleFlag}"
+             @click="itemContentToggleStyle">驾驶行为统计信息</div> -->
+        <div class="itemSubTitleWrap"
+             @click="open('driverBehavior')">驾驶行为统计信息</div>
+        <div class="itemContentWrap">
+          <div class="scoreAndRankWrap driverImg">
+
+            <template v-if="currentData">
+              <div class="ranking">
+                <div>{{`当${period}排名`}}</div>
+                <div class="rankingNumber">{{getCurrOrder('驾驶行为')}}</div>
+              </div>
+              <div class="score">
+                <div>{{`当${period}得分`}}</div>
+                <div class="scoreNumber">{{qf(getCurrScore('驾驶行为'))}}</div>
+              </div>
+            </template>
+
+            <loading :data='currentData'></loading>
+
+          </div>
+          <div class="behaviorStatisticsWrap">
+            <div class="behaviorStatisticsTitle">高频不良驾驶行为</div>
+            <div class="behaviorStatisticsChart">
+
+              <barhor chartTheme="dark"
+                      v-if="badDriver"
+                      :data="getBadDriver"
+                      :color="barhorColor"></barhor>
+
+              <loading :data='badDriver'></loading>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 违规行为 -->
+      <div class="itemWrap">
+        <div class="itemTitleWrap">违规行为得分及排名</div>
+        <div class="itemSubTitleWrap"
+             @click="open('irregalarityBehavior')">违规行为统计信息</div>
+        <div class="itemContentWrap ">
+          <div class="scoreAndRankWrap outOfLine">
+
+            <template v-if="currentData">
+              <div class="ranking">
+                <div>{{`当${period}排名`}}</div>
+                <div class="rankingNumber">{{getCurrOrder('违规行为')}}</div>
+              </div>
+              <div class="score">
+                <div>{{`当${period}得分`}}</div>
+                <div class="scoreNumber">{{qf(getCurrScore('违规行为'))}}</div>
+              </div>
+            </template>
+
+            <loading :data="currentData"></loading>
+
+          </div>
+          <div class="behaviorStatisticsWrap">
+            <div class="behaviorStatisticsTitle">高频违规行为</div>
+            <div class="behaviorStatisticsChart">
+
+              <barhor chartTheme="dark"
+                      v-if="irregularity"
+                      :data="getIrregularityDriver"
+                      :color="barhorColor"></barhor>
+
+              <loading :data='irregularity'></loading>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 违法行为 -->
+      <div class="itemWrap">
+        <div class="itemTitleWrap">违法行为得分及排名</div>
+        <div class="itemSubTitleWrap"
+             @click="open('illegalBehavior')">违法行为统计信息</div>
+        <div class="itemContentWrap ">
+          <div class="scoreAndRankWrap breakLaw">
+
+            <template v-if="currentData">
+              <div class="ranking">
+                <div>{{`当${period}排名`}}</div>
+                <div class="rankingNumber">{{getCurrOrder('违法行为')}}</div>
+              </div>
+              <div class="score">
+                <div>{{`当${period}得分`}}</div>
+                <div class="scoreNumber">{{qf(getCurrScore('违法行为'))}}</div>
+              </div>
+            </template>
+
+            <loading :data='currentData'></loading>
+
+          </div>
+          <div class="behaviorStatisticsWrap">
+            <div class="behaviorStatisticsTitle">高频违法行为</div>
+            <div class="behaviorStatisticsChart">
+
+              <barhor chartTheme="dark"
+                      v-if="illegal"
+                      :data="getIllegalDriver"
+                      :color="barhorColor"></barhor>
+              <loading :data='illegal'></loading>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 有责事故 -->
+      <div class="itemWrap">
+        <div class="itemTitleWrap">有责事故得分及排名</div>
+        <div class="itemSubTitleWrap"
+             @click="open('blameAccident')">有责事故统计信息</div>
+        <div class="itemContentWrap ">
+          <div class="scoreAndRankWrap responsibleAccident">
+
+            <template v-if="currentData">
+              <div class="ranking">
+                <div>{{`当${period}排名`}}</div>
+                <div class="rankingNumber">{{getCurrOrder('有责事故')}}</div>
+              </div>
+              <div class="score">
+                <div>{{`当${period}得分`}}</div>
+                <div class="scoreNumber">{{qf(getCurrScore('有责事故'))}}</div>
+              </div>
+            </template>
+            <loading :data='currentData'></loading>
+
+          </div>
+          <div class="behaviorStatisticsWrap">
+            <div class="behaviorStatisticsTitle">累计事故次数</div>
+            <div class="behaviorStatisticsChart">
+
+              <barhor chartTheme="dark"
+                      v-if="accident"
+                      :data="getAccidentDriver"
+                      :color="barhorColor"></barhor>
+
+              <loading :data='accident'></loading>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+/* eslint-disable */
+import { mapState, mapActions, mapMutations } from "vuex"
+// import _ from 'lodash'
+import barhor from "../../../components/charts/barhor"
+import KeyValueSelect from "../../../components/KeyValueSelect"
+
+export default {
+  name: "score-and-ranking-of-safety-evaluation",
+  components: {
+    barhor,
+    KeyValueSelect
+  },
+  data() {
+    return {
+      ranking: "fleet_ranking",
+      period: "年",
+      itemContentToggleStyleFlag: false,
+      barhorData: [
+        {
+          data: [
+            {
+              name: "左顾右盼",
+              value: 12
+            },
+            {
+              name: "分身提醒",
+              value: 10
+            },
+            {
+              name: "变道频次",
+              value: 7
+            },
+            {
+              name: "急加速",
+              value: 5
+            },
+            {
+              name: "车距过近",
+              value: 3
+            }
+          ]
+        }
+      ],
+      barhorColor: ["#05d0eb", "#81d9e5", "#f6ffcb", "#e75029", "#038bfc"]
+    }
+  },
+  computed: {
+    ...mapState("scoreAndRankingOfSafetyEvaluation", [
+      "currentData",
+      "lastData",
+      "badDriver",
+      "irregularity",
+      "illegal",
+      "accident"
+    ]),
+    ...mapState("driverbase", ["ryjb"]),
+    ...mapState("drive", ["driverBehavior"]),
+
+    getCurrScore() {
+      return function(type) {
+        const e = this.currentData.filter(e => e.pflx.evaluation_item === type)
+        if (e.length > 0) {
+          return e[0].score
+        }
+        return 0
+        // return this.currentData.filter(e => e.pflx.evaluation_item === type)[0].score
+      }
+    },
+    getLastScore() {
+      return function(type) {
+        const e = this.lastData.filter(e => e.pflx.evaluation_item === type)
+        if (e.length > 0) {
+          return e[0].score
+        }
+        return 0
+        // return this.lastData.filter(e => e.pflx.evaluation_item === type)[0].score
+      }
+    },
+    getCurrOrder() {
+      return function(type) {
+        const e = this.currentData.filter(e => e.pflx.evaluation_item === type)
+        if (e.length > 0) {
+          return e[0][this.ranking]
+        }
+        return 0
+        // return this.currentData.filter(e => e.pflx.evaluation_item === type)[0][this.ranking]
+      }
+    },
+    getLastOrder() {
+      return function(type) {
+        const e = this.lastData.filter(e => e.pflx.evaluation_item === type)
+        if (e.length > 0) {
+          return e[0][this.ranking]
+        }
+        return 0
+        // return this.currentData.filter(e => e.pflx.evaluation_item === type)[0][this.ranking]
+      }
+    },
+    getBadDriver() {
+      return [
+        {
+          data: this.badDriver
+            .map(item => ({
+              name: item.jssjlx.drive_event_type,
+              value: item["sum(alarm_quantity)"]
+            }))
+            .sort((a, b) => b.value - a.value)
+        }
+      ]
+    },
+    getIrregularityDriver() {
+      return [
+        {
+          data: this.irregularity
+            .map(item => ({
+              name: item.jssjlx.drive_event_type,
+              value: item["sum(irregularity_quantity)"]
+            }))
+            .sort((a, b) => b.value - a.value)
+        }
+      ]
+    },
+    getIllegalDriver() {
+      return [
+        {
+          data: this.illegal
+            .map(item => ({
+              name: item.jssjlx.drive_event_type,
+              value: item.illegal_quantity
+            }))
+            .sort((a, b) => b.value - a.value)
+        }
+      ]
+    },
+    getAccidentDriver() {
+      return [
+        {
+          data: this.accident
+            .map(item => ({
+              name: `${item.sgdj.accident_level}${
+                item.sgzr.accident_responsibility
+              }${item.sfxl.if_hm_release}泄露`,
+              value: item.accident_quantity
+            }))
+            .sort((a, b) => b.value - a.value)
+        }
+      ]
+    }
+  },
+  methods: {
+    ...mapActions("scoreAndRankingOfSafetyEvaluation", [
+      "getMonthKh",
+      "getYearKh"
+    ]),
+    ...mapMutations("driver", ["open"]),
+    // 0308 lfl
+    // itemContentToggleStyle() {
+    //   this.itemContentToggleStyleFlag = !this.itemContentToggleStyleFlag
+    // },
+    changePeriod(period) {
+      this.period = period
+      if (period === "月") {
+        this.getMonthKh({
+          year: 2017,
+          month: 11,
+          driver_id: this.ryjb.driver_id
+        })
+      } else {
+        this.getYearKh({ year: 2017, driver_id: this.ryjb.driver_id })
+      }
+    },
+    changeRanking(e) {
+      this.ranking = e.target.value
+    }
+  },
+}
+</script>
+
+<style lang="scss" scoped>
+@mixin size($width, $height) {
+  width: $width;
+  height: $height;
+}
+.scoreAndRankingOfSafetyEvaluation {
+  @include size(100%, 100%);
+  padding-top: 10px;
+  box-sizing: border-box;
+  .topWrap {
+    @include size(100%, 100px);
+    .titleWrap {
+      @include size(200px, 100px);
+      float: left;
+      .title {
+        @include size(200px, 60px);
+        line-height: 20px;
+        text-align: center;
+        padding-top: 9px;
+        font-size: 18px;
+        font-weight: bold;
+        color: #89dddf;
+        background: #005b7f;
+        float: left;
+        box-sizing: border-box;
+      }
+      .subTitle {
+        @include size(100%, 30px);
+        float: left;
+        margin-top: 10px;
+        div {
+          @include size(95px, 30px);
+          line-height: 30px;
+          text-align: center;
+
+          color: #b5b5b5;
+          font-size: 14px;
+          background: rgba(0, 191, 229, 0.2);
+          float: left;
+          cursor: pointer;
+        }
+        div:last-child {
+          margin-left: 10px;
+        }
+        .subTilteHighLight {
+          color: #fff;
+          background: rgba(0, 191, 229, 0.5);
+        }
+      }
+    }
+    .summaryInfoWrap {
+      @include size(1170px, 100px);
+      float: left;
+      margin-left: 20px;
+      .selecteWrap {
+        @include size(1170px, 25px);
+        .selecteTitle {
+          @include size(60px, 25px);
+          line-height: 25px;
+          float: right;
+          color: #b5b5b5;
+          font-size: 14px;
+          margin-right: 10px;
+        }
+        .selecteContent {
+          @include size(200px, 25px);
+          line-height: 25px;
+          float: right;
+          margin-left: 10px;
+          background: #090a0b;
+          box-sizing: border-box;
+          select {
+            -webkit-appearance: none;
+            @include size(100%, 100%);
+            margin-top: -1px;
+            line-height: 20px;
+            color: #b5b5b5;
+            font-size: 14px;
+            padding-left: 10px;
+            border: 1px solid rgba(129, 217, 229, 0.6);
+            background: #000;
+            box-sizing: border-box;
+            background: url("../../../assets/driver/select_arrow.png") no-repeat
+              scroll 180px center;
+            option {
+              -webkit-appearance: none;
+              background: rgba(129, 217, 229, 0.3);
+            }
+            option:hover {
+              background: rgba(129, 217, 229, 0.3);
+            }
+          }
+        }
+      }
+      .contentWrap {
+        @include size(1170px, 70px);
+        .leftContentWrap {
+          @include size(560px, 70px);
+          float: left;
+          .img_1 {
+            @include size(65px, 70px);
+            float: left;
+            background: url(../../../assets/driver/safety_icon.png) no-repeat
+              left center;
+          }
+          .contentNoWrap {
+            @include size(280px, 70px);
+            float: left;
+            border: 1px solid #81d9e5;
+            box-sizing: border-box;
+            .contentNoTitle {
+              @include size(100%, 25px);
+              line-height: 25px;
+              text-align: center;
+              color: #89dddf;
+              font-size: 16px;
+              background: #004668;
+            }
+            .contentNoData {
+              @include size(100%, 43px);
+              line-height: 43px;
+              text-align: center;
+              font-family: "digi";
+              color: #89dddf;
+              font-size: 36px;
+              font-weight: bold;
+              background: #090a0b;
+            }
+          }
+          .img_2 {
+            @include size(65px, 70px);
+            float: left;
+            background: url(../../../assets/driver/rank_3.png) no-repeat right
+              center;
+          }
+          .contentRatio {
+            @include size(150px, 70px);
+            line-height: 70px;
+            float: left;
+            text-align: right;
+            font-family: "digi";
+            color: #efca0f;
+            font-size: 48px;
+            font-weight: bold;
+          }
+        }
+        .centerLine {
+          @include size(50px, 70px);
+          float: left;
+          background: url(../../../assets/driver/people_line_short.png)
+            no-repeat center center;
+        }
+        .rightContentWrap {
+          @extend .leftContentWrap;
+          .contentRatio {
+            color: #05d0eb;
+          }
+        }
+      }
+    }
+  }
+  .centerSplitLine {
+    width: 96%;
+    height: 5px;
+    // background:rgba(129, 217, 229,0.6);
+    margin: 10px auto 0;
+    // margin-top:10px;
+    .centerSplitLine_leftPoint {
+      width: 20px;
+      height: 5px;
+      background: #81d9e5;
+    }
+    .centerSplitLine_rightPoint {
+      width: 20px;
+      height: 5px;
+      background: #81d9e5;
+    }
+    .centerSplitLineBorder {
+      width: 1294px;
+      height: 2px;
+      margin-top: 2px;
+      background: #81d9e5;
+      float: left;
+    }
+  }
+  .bottomWrap {
+    @include size(100%, 255px);
+    margin-top: 10px;
+    .itemWrap {
+      @include size(320px, 255px);
+      float: left;
+      margin-left: 22px;
+      .itemTitleWrap {
+        @include size(150px, 25px);
+        float: left;
+        line-height: 25px;
+        text-align: center;
+        color: #89dddf;
+        font-size: 16px;
+        font-weight: bold;
+        background: rgba(129, 217, 229, 0.3);
+      }
+      .itemSubTitleWrap {
+        @include size(160px, 25px);
+        line-height: 25px;
+        float: right;
+        text-align: center;
+        font-size: 14px;
+        color: #b5b5b5;
+        background: rgba(0, 91, 127, 0.5);
+        cursor: pointer;
+      }
+      // lfl 0308
+      .itemSubTitleWrap:hover {
+        color: #fff;
+        background: rgba(0, 91, 127, 1);
+      }
+      // .itemContentToggleStyle {
+      //   color: #fff;
+      //   background: rgba(0, 91, 127, 1);
+      // }
+      .itemContentWrap {
+        @include size(320px, 215px);
+        margin-top: 10px;
+        float: left;
+        .scoreAndRankWrap {
+          @include size(100%, 60px);
+          float: left;
+          .score {
+            @include size(115px, 60px);
+            float: right;
+            div:first-child {
+              @include size(115px, 25px);
+              line-height: 25px;
+              color: #89dddf;
+              font-size: 16px;
+              text-align: center;
+              border: 1px solid #81d9e5;
+              box-sizing: border-box;
+            }
+            div:last-child {
+              @include size(115px, 30px);
+              margin-top: 5px;
+              line-height: 30px;
+              text-align: center;
+              color: #89dddf;
+              font-size: 24px;
+              font-family: "digi";
+              font-weight: bold;
+              border: 1px solid #81d9e5;
+              box-sizing: border-box;
+            }
+            .scoreNumber {
+              background: url(../../../assets/driver/up_icon.png) no-repeat
+                140px center;
+            }
+          }
+          .ranking {
+            @extend .score;
+            margin-left: 10px;
+            .rankingNumber {
+              background: url(../../../assets/driver/up_icon.png) no-repeat
+                140px center;
+            }
+          }
+        }
+        .driverImg {
+          background: url(../../../assets/driver/drive_icon.png) no-repeat left
+            center;
+        }
+        .outOfLine {
+          background: url(../../../assets/driver/irre_icon.png) no-repeat left
+            center;
+        }
+        .breakLaw {
+          background: url(../../../assets/driver/law_icon.png) no-repeat left
+            center;
+        }
+        .responsibleAccident {
+          background: url(../../../assets/driver/incident_icon.png) no-repeat
+            left center;
+        }
+        .behaviorStatisticsWrap {
+          @include size(100%, 185px);
+          float: left;
+          margin-top: 15px;
+          .behaviorStatisticsTitle {
+            @include size(200px, 25px);
+            line-height: 25px;
+            background: rgba(231, 80, 41, 0.3);
+            color: #e75029;
+            font-size: 16px;
+            font-weight: bold;
+            padding-left: 20px;
+            box-sizing: border-box;
+          }
+          .behaviorStatisticsChart {
+            @include size(100%, 185px);
+            float: left;
+          }
+        }
+      }
+    }
+    .itemWrap:first-child {
+      margin-left: 10px;
+    }
+  }
+}
+</style>

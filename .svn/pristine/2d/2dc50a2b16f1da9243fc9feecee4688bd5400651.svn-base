@@ -1,0 +1,66 @@
+<template>
+    <div id="container" :style="{background:bgColor}">
+        <!-- 这是runreal标题组件 -->
+        <!-- bgColor属性为容器背景色
+        color为字体颜色
+        title为标题内容 -->
+        <div class="realtitle-inner flex-between" :style="{color:color}">
+            <div>
+                <span>{{title}}</span>
+            </div>
+            <div class="flex-between real-dian-container" @click="openDetail">
+                <div class="real-dian" ></div>
+                <div class="real-dian" ></div>
+                <div class="real-dian" ></div>
+            </div>
+        </div>
+    </div>
+</template>
+<script>
+/* eslint-disbale */
+export default {
+  name: 'RunRealTitle',
+  props: {
+    bgColor: {
+      type: String,
+      default: 'rgba(3, 139, 252, 0.3)',
+    },
+    title: {
+      type: String,
+      default: '组件的标题',
+    },
+    color: {
+      type: String,
+      default: '#89dddf',
+    },
+  },
+  methods: {
+    openDetail() {
+      this.$emit('openDetail')
+    },
+  },
+}
+</script>
+<style scoped>
+#container {
+  width: 390px;
+  height: 30px;
+}
+.realtitle-inner {
+  font-family: Helvetica;
+  font-size: 16px;
+  padding: 0 28px;
+  height: 100%;
+}
+.real-dian-container {
+  width: 20px;
+}
+.real-dian {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #89dddf;
+}
+</style>
+
+

@@ -1,0 +1,569 @@
+<template>
+  <tyre-configuration :ltsyxxData='ltsyxxData'
+                      :ltghxxData='ltghxxData'
+                      @configDetailsBtn='getConfigDetails'>
+    <!-- 详情信息 -->
+    <div class="tireDetailsWrap"
+         v-if="configDetailsShow"
+         v-drag
+         @mousedown="move=true"
+         @mouseup="move=false"
+         :style="move?'cursor:move':''">
+      <pop-up-frame @close="closeConfigDetails">
+        <pop-up-widget title="轮胎配置详细信息"
+                       :detailsBtnShow='false'>
+        </pop-up-widget>
+        <!-- 详细内容 -->
+        <loading :data="selectedTireInfo">
+          <div class="detailsContent">
+            <div class="items">
+              <div class="itemWrap">
+                <div class="subTitle">轮胎位置</div>
+                <div class="content"
+                     v-if="selectedTireInfo">{{selectedTireInfo.ltwz.tire_position}}
+                  <div class="rotateBox"></div>
+                </div>
+              </div>
+              <div class="itemWrap clearMarginRight">
+                <div class="subTitle">安装时间</div>
+                <div class="content"
+                     v-if="selectedTireInfo">{{formatDate(selectedTireInfo.install_date||'')}}
+                  <div class="rotateBox"></div>
+                </div>
+              </div>
+              <div class="itemWrap">
+                <div class="subTitle">轮胎品牌</div>
+                <div class="content"
+                     v-if="selectedTireInfo">{{selectedTireInfo.ltpp.tire_brand}}
+                  <div class="rotateBox"></div>
+                </div>
+              </div>
+              <div class="itemWrap clearMarginRight">
+                <div class="subTitle">轮胎型号</div>
+                <div class="content"
+                     v-if="selectedTireInfo">{{selectedTireInfo.tyre_modle}}
+                  <div class="rotateBox"></div>
+                </div>
+              </div>
+              <div class="itemWrap">
+                <div class="subTitle">购置时间</div>
+                <div class="content"
+                     v-if="selectedTireInfo">{{selectedTireInfo.purchase_date}}
+                  <div class="rotateBox"></div>
+                </div>
+              </div>
+              <div class="itemWrap clearMarginRight">
+                <div class="subTitle">额定承重</div>
+                <div class="content"
+                     v-if="selectedTireInfo">{{selectedTireInfo.rated_load}}
+                  <div class="rotateBox"></div>
+                </div>
+              </div>
+              <div class="itemWrap">
+                <div class="subTitle">额定行驶里程</div>
+                <div class="content"
+                     v-if="selectedTireInfo">{{selectedTireInfo.rated_km}}
+                  <div class="rotateBox"></div>
+                </div>
+              </div>
+              <div class="itemWrap clearMarginRight">
+                <div class="subTitle">采购渠道</div>
+                <div class="content"
+                     v-if="selectedTireInfo">{{selectedTireInfo.fhzzcgqd.protective_equipment_supply_channel}}
+                  <div class="rotateBox"></div>
+                </div>
+              </div>
+              <div class="itemWrap">
+                <div class="subTitle">轮胎价格</div>
+                <div class="content"
+                     v-if="selectedTireInfo">{{selectedTireInfo.price}}元
+                  <div class="rotateBox"></div>
+                </div>
+              </div>
+            </div>
+            <div class="bottomBtnWrap">
+              <div class="repaire"
+                   :class="{btnHightLight:false}"
+                   @click='repaireDetailsBtn'>轮胎维修记录</div>
+              <div class="takeTurns"
+                   :class="{btnHightLight:false}"
+                   @click='turnsDetailsBtn'>轮胎轮换记录</div>
+            </div>
+          </div>
+        </loading>
+      </pop-up-frame>
+    </div>
+    <!-- 详情信息: 弹出框1：轮胎轮换记录 -->
+    <div class="tireTakeTurnsRecordWrap"
+         v-if="turnsDetailsShow"
+         v-drag
+         @mousedown="move=true"
+         @mouseup="move=false"
+         :style="move?'cursor:move':''">
+      <pop-up-frame @close="closeTurnsDetails">
+        <pop-up-widget title="轮胎轮换记录"
+                       :detailsBtnShow='false'>
+        </pop-up-widget>
+        <!-- 详细内容 -->
+        <loading :data="ltghjlData">
+          <div class="detailsContent">
+            <div class="titleWrap">
+              <div class="title">轮胎位置</div>
+              <div class="title">安装时间</div>
+              <div class="title">更换前位置</div>
+              <div class="title">更换时间</div>
+              <div class="title">更换后位置</div>
+              <div class="title">更换前里程</div>
+            </div>
+            <div class="detailListWrap">
+              <ul v-if="ltghjlData">
+                <li v-for="(item,index) in ltghjlData"
+                    :key=index>
+                  <ul>
+                    <li>{{item.ltwz_position.tire_position}}</li>
+                    <li>{{item.install_date}}</li>
+                    <li>{{item.ltwz_before_position.tire_position}}</li>
+                    <li>{{item.shift_date}}</li>
+                    <li>{{item.ltwz_after_position.tire_position}}</li>
+                    <li>{{item.current_km}}km</li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </loading>
+      </pop-up-frame>
+    </div>
+    <!-- 详情信息: 弹出框2：轮胎维修记录 -->
+    <div class="tiresRepaireRecordWrap"
+         v-if="repaireDetailsShow"
+         v-drag
+         @mousedown="move=true"
+         @mouseup="move=false"
+         :style="move?'cursor:move':''">
+      <pop-up-frame @close="closeRepaireDetails">
+        <pop-up-widget title="轮胎维修记录"
+                       :detailsBtnShow='false'>
+        </pop-up-widget>
+        <!-- 详细内容 -->
+        <loading :data="ltwxjlData">
+          <div class="detailsContent">
+            <div class="titleWrap">
+              <div class="title">轮胎位置</div>
+              <div class="title">安装时间</div>
+              <div class="title">维修时间</div>
+              <div class="title">补胎次数</div>
+              <div class="title">补胎位置</div>
+              <div class="title">维修金额</div>
+              <div class="title">维修厂商</div>
+            </div>
+            <div class="detailListWrap">
+              <ul v-if="ltwxjlData">
+                <li v-for="(o,index) in ltwxjlData"
+                    :key=index>
+                  <ul>
+                    <li>{{o.ltwz.tire_position}}</li>
+                    <!-- <li>hehhee</li> -->
+                    <li>{{o.install_date}}</li>
+                    <li>{{o.repair_date}}</li>
+                    <li>{{o.repair_times}}</li>
+                    <li>{{o.repair_position_code}}</li>
+                    <li>{{o.repair_amount}}</li>
+                    <li>{{o.btjg.tire_repair_organization}}</li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </loading>
+      </pop-up-frame>
+    </div>
+    <!-- <div v-show="false">{{tirePosiData}}</div> -->
+    <div v-show="false">{{selectedTireInfo}}</div>
+    <!-- <div v-show="false">{{alarmChange}}</div> -->
+  </tyre-configuration>
+</template>
+<script>
+/*eslint-disable */
+import { mapState } from "vuex";
+import PopUpFrame from "@/components/PopUpFrame";
+import TyreConfiguration from "@/components/car/TyreConfiguration";
+import DropDownBox from "../../../components/car/DropDownBox";
+import PopUpWidget from "../../../components/car/PopUpWidget";
+
+export default {
+  components: {
+    TyreConfiguration,
+    PopUpFrame,
+    DropDownBox,
+    PopUpWidget
+  },
+  data() {
+    return {
+      hcar: "货车",
+      qcar: "牵引车",
+      bcar: "半挂车",
+      tireSelected: "",
+      alarmColor: false,
+      configDetailsShow: false,
+      turnsDetailsShow: false,
+      repaireDetailsShow: false,
+      vehicleType: null,
+      move: false
+    };
+  },
+  computed: {
+    ...mapState("tyreConfigurationContainer", ["ltsyxxData", "ltghxxData"]),
+    // 轮胎信息一级弹窗信息
+    selectedTireInfo() {
+      if (this.ltsyxxData) {
+        // console.log('this.tireSelected', this.tireSelected)
+        const data =
+          this.ltsyxxData &&
+          this.ltsyxxData.cllt_jbxx.filter(
+            lt => lt.ltwz.tire_position === this.tireSelected
+          );
+        const dataWrap = data && data[0];
+        // console.log('dataWrap', dataWrap)
+        return dataWrap;
+      }
+      return "";
+    },
+    //  轮胎轮换记录
+    ltghjlData() {
+      if (
+        this.ltsyxxData &&
+        this.ltsyxxData !== undefined &&
+        this.ltsyxxData !== null
+      ) {
+        const data =
+          this.ltsyxxData &&
+          this.ltsyxxData.cllt_ltgh &&
+          this.ltsyxxData.cllt_ltgh;
+        return data;
+      }
+      return "";
+    },
+    //  轮胎维修记录
+    ltwxjlData() {
+      if (
+        this.ltsyxxData &&
+        this.ltsyxxData !== undefined &&
+        this.ltsyxxData !== null
+      ) {
+        const data =
+          this.ltsyxxData &&
+          this.ltsyxxData.cllt_wxxx &&
+          this.ltsyxxData.cllt_wxxx;
+        return data;
+      }
+      return "";
+    }
+  },
+  methods: {
+    // getItem(data) {
+    //   this.tireSelected = data
+    // },
+    getConfigDetails(data) {
+      this.configDetailsShow = !this.configDetailsShow;
+      this.tireSelected = data;
+      // console.log('heheheheheh:', data)
+    },
+    closeConfigDetails() {
+      this.configDetailsShow = false;
+      this.turnsDetailsShow = false;
+      this.repaireDetailsShow = false;
+    },
+    turnsDetailsBtn() {
+      this.repaireDetailsShow = false;
+      this.turnsDetailsShow = !this.turnsDetailsShow;
+    },
+    closeTurnsDetails() {
+      this.turnsDetailsShow = false;
+    },
+    repaireDetailsBtn() {
+      this.turnsDetailsShow = false;
+      this.repaireDetailsShow = !this.repaireDetailsShow;
+    },
+    closeRepaireDetails() {
+      this.repaireDetailsShow = false;
+    }
+  }
+};
+</script>
+<style lang="scss" scoped>
+.clearfix {
+  &:before,
+  &:after {
+    content: "";
+    display: table;
+  }
+  &:after {
+    clear: both;
+    overflow: hidden;
+  }
+}
+@mixin size($width, $height) {
+  width: $width;
+  height: $height;
+}
+// 轮胎配置详细信息弹出框
+.tireDetailsWrap {
+  width: 750px;
+  position: absolute;
+  top: 330px;
+  left: 650px;
+  z-index: 31;
+  .detailsContent {
+    width: 100%;
+    overflow: hidden;
+    .items {
+      width: 100%;
+      overflow: hidden;
+      .itemWrap {
+        @include size(350px, 30px);
+        line-height: 30px;
+        margin-bottom: 10px;
+        margin-right: 10px;
+        float: left;
+        .subTitle {
+          @include size(110px, 30px);
+          line-height: 30px;
+          text-align: left;
+          color: #89dddf;
+          font-size: 14px;
+          float: left;
+        }
+        .content {
+          @include size(240px, 30px);
+          line-height: 30px;
+          padding-left: 30px;
+          color: #fff;
+          font-size: 14px;
+          font-weight: bold;
+          border: 1px solid #89dddf;
+          float: left;
+          position: relative;
+          box-sizing: border-box;
+          .rotateBox {
+            @include size(7px, 7px);
+            position: absolute;
+            top: 11px;
+            left: 10px;
+            transform: rotate(45deg);
+            background: #05d0eb;
+          }
+        }
+      }
+      .clearMarginRight {
+        margin-right: 0;
+      }
+    }
+    .bottomBtnWrap {
+      width: 100%;
+      overflow: hidden;
+      margin-top: 10px;
+      float: left;
+      .takeTurns {
+        @include size(200px, 30px);
+        line-height: 30px;
+        float: right;
+        margin-left: 10px;
+        color: #b5b5b5;
+        text-align: center;
+        font-size: 16px;
+        background: rgba(0, 91, 127, 0.5);
+      }
+      .repaire {
+        @extend .takeTurns;
+        background: rgba(0, 91, 127, 0.5);
+      }
+      .takeTurns:hover,
+      .repaire:hover {
+        color: #fff;
+        cursor: pointer;
+      }
+    }
+  }
+}
+// 详情信息: 弹出框1：轮胎轮换记录
+.tireTakeTurnsRecordWrap {
+  width: 750px;
+  position: absolute;
+  top: 655px;
+  left: 675px;
+  z-index: 32;
+  .detailsContent {
+    width: 100%;
+    height: 265px;
+    overflow: hidden;
+    border: 1px solid #81d9e5;
+    box-sizing: border-box;
+    .titleWrap {
+      @include size(100%, 25px);
+      margin-top: 10px;
+      margin-bottom: 5px;
+      background: rgba(5, 208, 235, 0.2);
+      .title {
+        @include size(115.52px, 25px);
+        line-height: 25px;
+        text-align: center;
+        color: #89dddf;
+        font-size: 14px;
+        float: left;
+      }
+    }
+    .detailListWrap {
+      width: 100%;
+      ul {
+        width: 703px;
+        height: 220px;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        overflow-y: scroll;
+        li {
+          width: 99.3%;
+          height: 20px;
+          overflow: hidden;
+          list-style: none;
+          margin: 0;
+          padding: 0;
+          margin-bottom: 5px;
+          background: rgba(129, 217, 229, 0.1);
+          ul {
+            width: 100%;
+            height: 20px;
+            overflow: hidden;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            li {
+              width: (100%/6);
+              height: 20px;
+              line-height: 20px;
+              text-align: center;
+              color: #b5b5b5;
+              font-size: 14px;
+              float: left;
+              list-style: none;
+              margin: 0;
+              padding: 0;
+            }
+          }
+          ul:hover {
+            background: rgba(129, 217, 229, 0.5);
+          }
+          ul:hover {
+            li {
+              color: #fff;
+            }
+          }
+        }
+      }
+      ul::-webkit-scrollbar {
+        @include size(5px, 220px);
+        background: url(~assets/car/scroll.png) no-repeat center center;
+        position: relative;
+        right: 10px;
+        top: 5px;
+        background-size: 5px 220px;
+      }
+      ul::-webkit-scrollbar-thumb {
+        background: rgba(5, 208, 235, 1);
+      }
+    }
+  }
+}
+// 详情信息: 弹出框2：轮胎维修记录
+.tiresRepaireRecordWrap {
+  width: 750px;
+  position: absolute;
+  top: 655px;
+  left: 675px;
+  z-index: 32;
+  .detailsContent {
+    width: 100%;
+    height: 265px;
+    overflow: hidden;
+    border: 1px solid #81d9e5;
+    box-sizing: border-box;
+    .titleWrap {
+      @include size(100%, 25px);
+      margin-top: 10px;
+      margin-bottom: 5px;
+      background: rgba(5, 208, 235, 0.2);
+      .title {
+        @include size(99px, 25px);
+        line-height: 25px;
+        text-align: center;
+        color: #89dddf;
+        font-size: 14px;
+        float: left;
+      }
+    }
+    .detailListWrap {
+      width: 100%;
+      ul {
+        width: 703px;
+        height: 220px;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        overflow-y: scroll;
+        li {
+          width: 99.3%;
+          height: 20px;
+          overflow: hidden;
+          list-style: none;
+          margin: 0;
+          padding: 0;
+          margin-bottom: 5px;
+          background: rgba(129, 217, 229, 0.1);
+          ul {
+            width: 100%;
+            height: 20px;
+            overflow: hidden;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            li {
+              width: (100%/7);
+              height: 20px;
+              line-height: 20px;
+              text-align: center;
+              color: #b5b5b5;
+              font-size: 14px;
+              float: left;
+              list-style: none;
+              margin: 0;
+              padding: 0;
+            }
+          }
+          ul:hover {
+            background: rgba(129, 217, 229, 0.5);
+          }
+          ul:hover {
+            li {
+              color: #fff;
+            }
+          }
+        }
+      }
+      ul::-webkit-scrollbar {
+        @include size(5px, 220px);
+        background: url(~assets/car/scroll.png) no-repeat center center;
+        position: relative;
+        right: 10px;
+        top: 5px;
+        background-size: 5px 220px;
+      }
+      ul::-webkit-scrollbar-thumb {
+        background: rgba(5, 208, 235, 1);
+      }
+    }
+  }
+}
+</style>

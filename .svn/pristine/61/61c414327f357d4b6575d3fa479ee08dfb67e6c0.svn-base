@@ -1,0 +1,40 @@
+<template>
+  <div>
+    <amessage>
+      <aheader slot='header' name='企业安全情况' @click='$router.push("/secure")'></aheader>
+      <asafe slot='content' :branchCom="branchCom" :driver="driver" :motorcade="motorcade"></asafe>
+    </amessage>
+  </div>
+</template>
+
+<script>
+  import {
+    mapActions,
+    mapState,
+  } from 'vuex'
+  import amessage from '../../../components/company/amessage'
+  import aheader from '../../../components/company/aheader'
+  import asafe from '../../../components/company/asafe'
+
+  export default {
+    components: {
+      amessage,
+      aheader,
+      asafe,
+    },
+    computed: {
+      ...mapState('safeMsgStore', ['branchCom', 'driver', 'motorcade']),
+    },
+    methods: {
+      ...mapActions('safeMsgStore', ['getYearOrMonthMsg']),
+    },
+    mounted() {
+      const arg = {
+        year: 2018,
+      }
+      this.getYearOrMonthMsg(arg)
+    },
+
+  }
+
+</script>

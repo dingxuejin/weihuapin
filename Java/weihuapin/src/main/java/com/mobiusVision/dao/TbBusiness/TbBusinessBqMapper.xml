@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobiusVision.dao.TbBusiness.TbBusinessBqMapper" >
+    <resultMap id="BaseResultMap" type="com.mobiusVision.pojo.TbBusiness.TbBusinessBq" >
+        <id column="tb_business_bq_id" property="tb_business_bq_id" jdbcType="INTEGER" />
+        <result column="Driver_ID" property="driver_ID" jdbcType="VARCHAR" />
+        <result column="Date" property="date" jdbcType="VARCHAR" />
+        <result column="Year" property="year" jdbcType="VARCHAR" />
+        <result column="Month" property="month" jdbcType="VARCHAR" />
+        <result column="Day" property="day" jdbcType="VARCHAR" />
+        <result column="Label_content" property="label_content" jdbcType="VARCHAR" />
+        <result column="Label_source" property="label_source" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <resultMap id="TbBusinessBqAndTBR" type="TbBusinessBqTBR" extends="BaseResultMap"   >
+        <association property="ryjb" javaType="TbBasicRyjb" >
+            <id column="tb_basic_ryjb_id" property="tb_basic_ryjb_id" jdbcType="INTEGER" />
+            <result column="Driver_ID" property="driver_ID" jdbcType="VARCHAR" />
+            <result column="Name" property="name" jdbcType="VARCHAR" />
+            <result column="phone" property="phone" jdbcType="VARCHAR" />
+            <result column="Photo" property="photo" jdbcType="VARCHAR" />
+            <result column="IDCertificate_Number" property="IDCertificate_Number" jdbcType="VARCHAR" />
+            <result column="Gender_Code" property="gender_Code" jdbcType="VARCHAR" />
+            <result column="Birth_Date" property="birth_Date" jdbcType="VARCHAR" />
+            <result column="Marital_Status_Code" property="marital_Status_Code" jdbcType="VARCHAR" />
+            <result column="Education_Code" property="education_Code" jdbcType="VARCHAR" />
+            <result column="Employees_Type_Code" property="employees_Type_Code" jdbcType="VARCHAR" />
+            <result column="Drive_Age" property="drive_Age" jdbcType="VARCHAR" />
+            <result column="Employment_Years" property="employment_Years" jdbcType="VARCHAR" />
+            <result column="Corporate_Service" property="corporate_Service" jdbcType="VARCHAR" />
+            <result column="Entity_Id" property="entity_Id" jdbcType="VARCHAR" />
+            <result column="Credit_Level_Code" property="credit_Level_Code" jdbcType="VARCHAR" />
+            <result column="Assessment_Date" property="assessment_Date" jdbcType="VARCHAR" />
+            <result column="Nationality" property="nationality" jdbcType="VARCHAR" />
+            <result column="Address" property="address" jdbcType="VARCHAR" />
+        </association>
+    </resultMap>
+    <!--mapper缓存参数设定-->
+    <cache  eviction="LRU" flushInterval="60000"  size="512" readOnly="true"/>
+    <!--通过driver_id和label_source查询tb_business_bq表中所有数据-->
+    <select id="findAllByDriverIdAndLabelSource" resultType="TbBusinessBq">
+        select *,concat(Year,'-',Month,'-',Day) as Date from tb_business_bq where Driver_ID=#{driver_id} and Label_source=#{label_source} order by Year desc,Month desc,Day desc
+    </select>
+
+    <!--通过driver_id和label_source=system和查询tb_business_bq表和tb_basic_ryjb表中最新数据（去重条件Label_source）-->
+    <select id="findAllByDriverIdAndNotSystemAndTBR" resultMap="TbBusinessBqAndTBR">
+       select t1.*,concat(t1.Year,'-',t1.Month,'-',t1.Day) as Date,t2.* from tb_business_bq t1,tb_basic_ryjb t2
+       where t1.Label_source=t2.Driver_ID and t1.Driver_ID=#{driver_id} and t1.Label_source !='system'  and DATE(concat(Year,'-',Month,'-',Day)) in (select MAX(DATE(concat(Year,'-',Month,'-',Day)))
+       from tb_business_bq where Label_source=t1.Label_source) order by t1.Year desc,t1.Month desc,t1.Day desc
+    </select>
+
+</mapper>
