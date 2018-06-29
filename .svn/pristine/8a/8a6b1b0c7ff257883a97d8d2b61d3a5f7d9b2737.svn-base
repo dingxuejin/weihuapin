@@ -1,0 +1,337 @@
+<template>
+  <div class="workOrderDetailsInfoCon">
+    <pop-up-widget title="运单详细信息"></pop-up-widget>
+    <div class="workOrderDetailsinfo">
+      <!-- 筛选框 -->
+      <div class="filterCon clearfix">
+        <div class="itemCon fl clearfix">
+          <div>统计周期</div>
+          <div>
+            <key-value-select :data="cycleYeardata"
+                              width="100px"
+                              @select='select("year",$event)'
+                              :defaultValue="nowYear"></key-value-select>
+          </div>
+          <div>
+            <key-value-select :data="cycleMonthdata"
+                              width="100px"
+                              @select='select("month",$event)'></key-value-select>
+          </div>
+          <div>
+            <key-value-select :data="cycleDatedata"
+                              width="100px"
+                              @select='select("day",$event)'></key-value-select>
+          </div>
+        </div>
+        <div class="itemCon fr clearfix" v-if="AlarmTypeData&&AlarmTypeData.length>0">
+          <div>线路名称</div>
+          <div>
+            <key-value-select :data="getAlarmTypeDataStant"
+                              width="240px"
+                              @select='select("routeId",$event)'></key-value-select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 内容部分 -->
+      <div class="rewardListCon eleScrollBar">
+         <div class="onlineRateDetails_content">
+            <div class="listTitle">
+              <div>序号</div>
+              <div v-for="(item,index) in listTitle1" :key="index">{{item}}</div>
+            </div>
+            <ul>
+              <li v-for='(item,index) in workOrderDetailsInfo'
+                  :key='index'>
+                  <div>{{index+1}}</div>
+                <div>{{item.waybill_id}}</div>
+                <div>{{item.xlxx.route_name}}</div>
+                <div>{{item.driver_name}}</div>
+                <div>{{item.supercargo_name}}</div>
+                <!-- 车牌 -->
+                <div>{{item.plate_number}}</div>
+                <!-- 接单时间 -->
+                <div>{{item.create_time}}</div>
+                <!-- 货物名称 -->
+                <div>货物名称</div>
+                <!-- 货物数量 -->
+                <div>{{item.volume}}</div>
+                <!-- 货源地 -->
+                <!-- <div>{{item.xlxx.source_db_id}}</div> -->
+                <div>货源地</div>
+                <!-- 目的地 -->
+                <!-- <div>{{item.xlxx.destination_db_id}}</div> -->
+                <div>目的地</div>
+                <!-- 预计用时 -->
+                <div>{{formatDate(item.xlxx.plan_time)}}</div>
+                <!-- 出发时间 -->
+                <div>{{formatDate(item.start_time)}}</div>
+                <!-- 出发里程 -->
+                <div>{{item.start_km}}</div>
+              </li>
+            </ul>
+          </div>
+          <div class="onlineRateDetails_content">
+            <div class="listTitle">
+              <div>序号</div>
+              <div v-for="(item,index) in listTitle2" :key="index">{{item}}</div>
+            </div>
+            <ul>
+              <li v-for='(item,index) in workOrderDetailsInfo'
+                  :key='index'>
+                  <div>{{index+1}}</div>
+                <div>{{formatDate(item.arrive_time)}}</div>
+                <div>{{item.arrive_km}}</div>
+                <div>{{formatDate(item.driving_time)}}</div>
+                <!-- 客户名称 -->
+                <div>客户名称</div>
+                <div>{{item.phone_number}}</div>
+                <div>{{item.money}}</div>
+                <!-- 标准路桥费 -->
+                <div>{{item.xlxx.standard_toll_cost}}</div>
+                <div>{{item.actual_toll_cost}}</div>
+                <!-- 标准耗油量 -->
+                <div>{{item.xlxx.standard_fuel_cost}}</div>
+                <div>{{item.actual_fuel_cost}}</div>
+                <div>{{item.actual_fuel_price}}</div>
+                <div>{{item.apply_reserve_amount}}</div>
+                <div>{{item.remain_reserve_amount}}</div>
+              </li>
+            </ul>
+          </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script type="text/javascript">
+/*eslint-disable */
+import { mapState, mapActions } from "vuex";
+import PopUpWidget from "../../../components/PopUpWidget";
+import KeyValueSelect from "../../../components/KeyValueSelect";
+import Dictionary from "../../../util/dictionary";
+// 列表组件
+import ListComponent from "../../../components/ListComponent";
+
+const { date: { year, month, day } } = Dictionary;
+
+export default {
+  name: "",
+  components: {
+    PopUpWidget,
+    KeyValueSelect,
+    ListComponent,
+    Dictionary
+  },
+  computed: {
+    ...mapState("workorderdetailsinfo", ["workOrderDetailsInfo"]),
+    ...mapState('driverbehavioralarmcountinfo', ['AlarmTypeData']),
+    ...mapState("driverbase", ["ryjb"]),
+    ...mapState("driverbase", ["ryjb"]),
+    contentWidth() {
+      return (
+        this.titlesData.reduce((total, curr) => total + curr.width, 0) + 10
+      );
+    },
+    fetchData() {
+      return {
+        driver_id: this.ryjb.driver_id,
+        year: this.year,
+        month: this.month,
+        day: this.day,
+        route_id:this.routeId
+      };
+    },
+    getAlarmTypeDataStant() {
+      const AlarmData = this.AlarmTypeData.map(o => ({
+        label: o.route_name,
+        value: o.route_id,
+      }))
+      return AlarmData
+    },
+    // getWorkOrder(){
+    //   this.AlarmTypeData.map(o=>{
+    //     o.route_name
+    //   })
+    // }
+  },
+  methods: {
+    ...mapActions("workorderdetailsinfo", ["getWorkOrderDetailsInfo"]),
+    select(name, item) {
+      this[name] = item.value
+      this.getWorkOrderDetailsInfo(this.fetchData);
+    }
+  },
+  data() {
+    return {
+      nowYear: `${new Date().getFullYear()}年`,
+      nowMonth: `${new Date().getMonth() + 1}月`,
+      cycleYeardata: year,
+      cycleMonthdata: [{ label: "全年", value: null }, ...month],
+      cycleDatedata: [{ label: "全月", value: null }, ...day],
+      year: `${new Date().getFullYear()}`,
+      month: null,
+      day: null,
+      routeId:'445200445100201401',
+      listTitle1: ["运单编号", "线路名称", "驾驶员姓名", "押运员姓名","车牌号码", "接单时间 ", "货物名称", "货物数量", "货源地", "目的地", "预计用时 ", "出发时间", "出发里程"],
+      listTitle2: ["到达时间", "到达里程", "驾驶时长 ", "客户名称","客户电话", "运单金额", "标准路桥费(元)", "实际路桥费(元)", "标准耗油量(L)", "实际 耗油量(L)", "实际油价(元) ", "已申请备用金", "剩余备用金"],
+    };
+  }
+};
+</script>
+
+<style lang="scss" scoped>
+// 公用样式
+@mixin size($w, $h) {
+  width: $w;
+  height: $h;
+}
+
+// 自定义滚动条
+.eleScrollBar::-webkit-scrollbar {
+  @include size(5px, 5px);
+  background: url("../../../assets/driver/scroll.png") no-repeat center center;
+  // position: relative;
+  // right: 10px;
+  // top: 5px;
+  background-size: 100% 100%;
+}
+.eleScrollBar::-webkit-scrollbar-thumb {
+  background: rgba(5, 208, 235, 1);
+}
+
+// 三级菜单内容
+.workOrderDetailsinfo {
+  // @include size(100%,);
+  width: 100%;
+  min-height: 200px;
+  // background:green;
+
+  // 筛选框
+  .filterCon {
+    @include size(100%, 25px);
+    // background: pink;
+    // 筛选条件
+    .itemCon {
+      min-width: 100px;
+      height: 100%;
+      line-height: 25px;
+      color: #b5b5b5;
+      font-size: 14px;
+      // background: #000;
+
+      div {
+        float: left;
+        // background: cyan;
+      }
+      div:nth-child(2) {
+        margin-left: 10px;
+      }
+      div:nth-child(n + 3) {
+        margin-left: 5px;
+      }
+    }
+    .itemCon:nth-child(n + 2) {
+      margin-right: 10px;
+    }
+  }
+
+  // 内容部分
+  .rewardListCon {
+    width: 100%;
+    height: 280px;
+    box-sizing: border-box;
+    border: 1px solid #81d9e5;
+    position: relative;
+    padding-top: 9.2px;
+    padding-bottom: 5px;
+    margin-top: 10px;
+    // overflow: hidden;
+    .onlineRateDetails_content {
+      @include size(100%, 135px);
+      // overflow: hidden;
+      overflow-x: scroll;
+      // background: #05d0eb;
+      // background:red;
+      .listTitle {
+        @include size(1500px, 25px);
+        margin-bottom: 5px;
+        float: left;
+        // background: #05d0eb;
+        div {
+          @include size(100px, 100%);
+          float: left;
+          text-align: center;
+          line-height: 25px;
+          color:#89DDDF;
+          font-size: 14px;
+          background: rgba(5,208,235,0.20);
+          &:nth-child(1){
+            @include size(40px, 100%);
+            background: rgba(5,208,235,0.4);
+            margin-left:2.8px;
+          }
+          &:nth-child(2){
+            @include size(200px, 100%);
+          }
+          &:nth-child(3){
+            @include size(150px, 100%);
+          }
+        }
+      }
+      ul {
+        @include size(1500px, 95px);
+        list-style: none;
+        overflow-y: scroll;
+        color: #b5b5b5;
+        float: left;
+        li {
+          margin-bottom: 5px;
+          height: 20px;
+          cursor: pointer;
+          div {
+            @include size(100px, 20px);
+            float: left;
+            box-sizing: border-box;
+            line-height: 23px;
+            text-align: center;
+            background: rgba(129,217,229, 0.1);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+          div:nth-child(1) {
+            @include size(40px, 100%);
+            background: rgba(129,217,229, 0.3);
+            margin-left:2.8px;
+          }
+          div:nth-child(2){
+            @include size(200px, 100%);
+          }
+          div:nth-child(3){
+            @include size(150px, 100%);
+          }
+          &:hover div {
+            background: rgba(0, 191, 229, 0.5);
+            color: #ffffff;
+          }
+        }
+      }
+      ul::-webkit-scrollbar {
+        background: #69a3b1;
+        width: 6px;
+      }
+      ul::-webkit-scrollbar-thumb {
+        background: #05d0eb;
+      }
+    }
+    .onlineRateDetails_content::-webkit-scrollbar {
+      background: #69a3b1;
+      height: 6px;
+    }
+    .onlineRateDetails_content::-webkit-scrollbar-thumb {
+      background: #05d0eb;
+    }
+  }
+}
+</style>

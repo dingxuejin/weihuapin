@@ -1,0 +1,318 @@
+<template>
+  <div class="company_manage_layout clearfix">
+    <div class="header_split_bg"></div>
+    <!-- left -->
+    <div class="left fl">
+      <div class="position">
+        <main-title-msg></main-title-msg>
+      </div>
+      <div class="title">运输成本状况</div>
+      <!-- 成本比例 -->
+      <div class="costRatio">
+        <cost-ratio></cost-ratio>
+      </div>
+      <!-- 成本变动 -->
+      <div class="costChange">
+        <cost-change></cost-change>
+      </div>
+      <!-- 固定成本 -->
+      <div class="costConstant">
+        <cost-constant></cost-constant>
+      </div>
+    </div>
+    <!-- right -->
+    <div class="right fl">
+      <div class="title">
+        企业运行状况
+      </div>
+      <div class="content clearfix">
+        <!-- 企业运行状况  左侧布局 -->
+        <div class="content_left fl">
+          <div class="realtimeStatus_con">
+            <runReal></runReal>
+          </div>
+          <div class="content_left_bottom clearfix">
+            <div class="car_spread fl">
+              <runTime></runTime>
+            </div>
+            <div class="line_rank fl">
+              <lineRanking></lineRanking>
+            </div>
+          </div>
+        </div>
+
+        <div class="content_right fl">
+          <!-- 货物流量流向统计及变化趋势 -->
+          <div class="content_right_top clearfix">
+            <div class="goods_count fl">
+              <goodsTj></goodsTj>
+            </div>
+          </div>
+          <div class="content_right_top clearfix">
+            <div class="goods_change fl">
+              <goodsBh></goodsBh>
+            </div>
+          </div>
+          <!-- 货物流量流向分析 -->
+          <div class="goods_analysis">
+            <goodsFx></goodsFx>
+          </div>
+
+          <!-- 里程分布 -->
+          <div class="mileage_spread">
+            <mileageDistribution></mileageDistribution>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 详情弹出框 -->
+    <div class="company_manage_Details_layout">
+      <popup-container></popup-container>
+    </div>
+  </div>
+</template>
+<script>
+/*eslint-disable*/
+import MainTitleMsg from "../containers/companymanage/maintitlemsg/MainTitleMsg";
+// 成本比例变化趋势
+import CostRatio from "../containers/companymanage/costRatio/CostRatio";
+// 成本变动
+import CostChange from "../containers/companymanage/costChange/CostChange";
+// 固定成本
+import CostConstant from "../containers/companymanage/costConstant/CostConstant";
+
+import runReal from "../containers/companymanage/runReal/runReal";
+import runTime from "../containers/companymanage/runTime/runTime";
+import lineRanking from "../containers/companymanage/lineRanking/lineRanking";
+import goodsTj from "../containers/companymanage/goodsTj/goodsTj";
+import goodsBh from "../containers/companymanage/goodsBh/goodsBh";
+import goodsFx from "../containers/companymanage/goodsFx/goodsFx";
+import mileageDistribution from "../containers/companymanage/mileageDistribution/mileageDistribution";
+import PopupContainer from "../containers/companymanage/popupContainer/PopupContainer";
+
+export default {
+ 
+  components: {
+    MainTitleMsg,
+    CostRatio,
+    CostChange,
+    CostConstant,
+    runReal,
+    runTime,
+    lineRanking,
+    goodsTj,
+    goodsBh,
+    goodsFx,
+    mileageDistribution,
+    PopupContainer
+  }
+};
+</script>
+<style lang="scss" scoped>
+// 公用上间距
+$mt10: 10px;
+$ml30: 30px;
+@mixin font_level_2 {
+  color: #89dddf;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.company_manage_layout {
+  width: 1890px;
+  height: 965px;
+  overflow: hidden;
+  margin: 15.5px 15px 15px 15px;
+  box-sizing: border-box;
+  border-left: 3px solid #004668;
+  border-right: 3px solid #004668;
+  border-bottom: 5px solid #004668;
+  // background:pink;
+
+  // 头部间隔线
+  .header_split_bg {
+    width: 100%;
+    height: 5px;
+    overflow: hidden;
+    background: url("../assets/company/content_header_bg.png") 0 0 no-repeat;
+  }
+
+  // 左侧布局
+  .left {
+    width: 440px;
+    height: 950px;
+    overflow: hidden;
+    margin-left: 10px;
+    margin-top: 10px;
+    // background: pink;
+    // 配送地点
+    .position {
+      width: 100%;
+      height: 100px;
+      overflow: hidden;
+      // background: green;
+      // background:url('../assets/company/company_bg.png');
+      background-size: 100% 100%;
+    }
+
+    // 标题部分
+    .title {
+      width: 440px;
+      height: 50px;
+      overflow: hidden;
+      background: green;
+      margin-top: $mt10;
+      // margin-left: $ml30;
+      background: url("../assets/companymanage/bg_font.png") no-repeat;
+      background-size: 100% 100%;
+      text-indent: 20px;
+      line-height: 50px;
+      @include font_level_2;
+    }
+
+    // 成本比例变化
+    .costRatio {
+      width: 440px;
+      height: 210px;
+      // overflow: hidden;
+      margin-top: $mt10;
+      // margin-left: $ml30;
+      // background: green;
+    }
+
+    // 成本变动 固定成本
+    .costChange,
+    .costConstant {
+      width: 440px;
+      height: 270px;
+      overflow: hidden;
+      margin-top: $mt10;
+      // margin-left: $ml30;
+      // background: pink;
+    }
+  }
+
+  // 右侧布局
+  .right {
+    width: 1414px;
+    height: 945px;
+    overflow: hidden;
+    margin-left: 10px;
+    margin-top: 10px;
+    // background: pink;
+
+    //标题
+    .title {
+      width: 100%;
+      height: 50px;
+      overflow: hidden;
+      background: url("../assets/companymanage/bg_font_right.png") no-repeat;
+      line-height: 50px;
+      text-indent: 20px;
+      @include font_level_2;
+    }
+
+    // 内容部分
+    .content {
+      width: 100%;
+      height: 890px;
+      margin-top: $mt10;
+      // background: red;
+    }
+
+    //左侧部分
+    .content_left {
+      width: 825px;
+      height: 100%;
+      // overflow: hidden;
+      // background:orange;
+
+      // 实时状态
+      .realtimeStatus_con {
+        width: 100%;
+        height: 600px;
+        overflow: hidden;
+      }
+
+      // 企业运行状况--底部布局
+      .content_left_bottom {
+        width: 100%;
+        height: 265px;
+        // overflow: hidden;
+        margin-top: $mt10;
+        // background:green;
+
+        // 车辆分布
+        .car_spread {
+          width: 403px;
+          height: 100%;
+          // overflow: hidden;
+        }
+
+        // 线路排名
+        .line_rank {
+          width: 402px;
+          height: 100%;
+          overflow: hidden;
+          margin-left: 20px;
+        }
+      }
+    }
+
+    // 右侧部分
+    .content_right {
+      width: 568px;
+      height: 890px;
+      overflow: hidden;
+      margin-left: 10px;
+
+      // 车辆状态-右侧-顶部布局
+      .content_right_top {
+        width: 568px;
+        height: 210px;
+        overflow: hidden;
+        // background: pink;
+
+        // 货物统计
+        .goods_count {
+          width: 568px;
+          height: 100%;
+          // margin-bottom:10px;
+          overflow: hidden;
+        }
+
+        // 货物变化趋势
+        .goods_change {
+          width: 568px;
+          height: 100%;
+          overflow: hidden;
+          margin-left: 10px;
+          // margin-top:10px;
+        }
+      }
+
+      // 货物流向分析
+      .goods_analysis {
+        width: 568px;
+        height: 210px;
+        overflow: hidden;
+        // margin-top: 10px;
+      }
+
+      // 里程分布
+      .mileage_spread {
+        width: 100%;
+        height: 260px;
+        overflow: hidden;
+        // margin-top: 10px;
+      }
+    }
+  }
+  // 详情弹出框
+  .company_manage_Details_layout {
+    width: 100%;
+    height: 100%;
+  }
+}
+</style>

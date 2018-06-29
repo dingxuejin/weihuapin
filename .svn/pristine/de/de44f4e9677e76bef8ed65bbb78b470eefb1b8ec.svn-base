@@ -1,0 +1,204 @@
+<template>
+  <div class="IllegalBehaviorProportionCountInfoCon">
+    <pop-up-widget title="违法行为占比统计"></pop-up-widget>
+
+    <!-- 内容部分 -->
+    <div class="mileageCon">
+      <!-- 标题 -->
+      <div class="selectCon clearfix">
+        <div class="itemCon fr clearfix">
+          <div class="fl">统计周期</div>
+          <div class="fl">
+            <key-value-select width="90px"
+                              :data="selectYearData"
+                              :defaultValue="yearValue"
+                              @select='select("year",$event)'></key-value-select>
+          </div>
+          <div class="fl">
+            <key-value-select width="90px"
+                              :data="selectMonthData"
+                              @select='select("month",$event)'></key-value-select>
+          </div>
+
+          <div class="fl">
+            <key-value-select width="90px"
+                              :data="selectDayData"
+                              @select='select("day",$event)'></key-value-select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 图表 -->
+      <div class="chartsCon">
+        <ringAndLegend chartTheme="dark"
+                       :data="illegalBehaviorProportionCount"
+                       :color="chartColor"
+                       v-if="illegalBehaviorProportionCount"
+                       marginLeft="0px"></ringAndLegend>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script type="text/javascript">
+/*eslint-disable */
+import { mapState, mapActions } from "vuex";
+import PopUpFrame from "../../../components/PopUpFrame";
+import PopUpWidget from "../../../components/PopUpWidget";
+import KeyValueSelect from "../../../components/KeyValueSelect";
+import Dictionary from "../../../util/dictionary";
+import ringAndLegend from "../../../components/charts/ringAndLegend";
+
+const {
+  driveEventType: { illegal },
+  date: { year, month, day },
+  countType,
+  timeSlot
+} = Dictionary;
+
+export default {
+  name: "illegalBehaviorAlarmCount",
+  components: {
+    PopUpFrame,
+    PopUpWidget,
+    KeyValueSelect,
+    Dictionary,
+    ringAndLegend
+  },
+  computed: {
+    ...mapState("illegalbehaviorproportioncount", [
+      "illegalBehaviorProportionCount"
+    ]),
+    ...mapState("driverbase", ["ryjb"]),
+    fetchData() {
+      return {
+        driver_id: this.ryjb.driver_id,
+        year: this.year,
+        month: this.month,
+        day: this.day
+      };
+    }
+  },
+  data() {
+    return {
+      selectYearData: year,
+      selectMonthData: [{ label: "全年", value: null }, ...month],
+      selectDayData: [{ label: "全月", value: null }, ...day],
+      selectAlarmType: illegal,
+      selectCountType: countType,
+      selectTimeSlot: timeSlot,
+      currentDataTypeIndex: 0,
+      yearValue: `${new Date().getFullYear()}年`,
+      chartData: [
+        { name: "醉驾", value: 33 },
+        { name: "毒驾", value: 31 },
+        { name: "酒驾", value: 23 },
+        { name: "疲劳驾驶", value: 18 },
+        { name: "超速行驶(20%以上)", value: 16 },
+        { name: "超速行驶(20%-50%)", value: 36 },
+        { name: "超速行驶(50%以上)", value: 26 },
+        { name: "超载超限", value: 46 },
+        { name: "违规停车", value: 16 }
+      ],
+      chartColor: [
+        "#05d0eb",
+        "#81d9e5",
+        "#f6ffcb",
+        "#e75029",
+        "#038bfc",
+        "#006a55"
+      ],
+      driver_id: 201408000001,
+      year: new Date().getFullYear(),
+      month: null,
+      day: null
+    };
+  },
+  methods: {
+    ...mapActions("illegalbehaviorproportioncount", [
+      "getIllegalBehaviorProportionCount"
+    ]),
+
+    select(name, item) {
+      this[name] = item.value;
+      this.getIllegalBehaviorProportionCount(this.fetchData);
+    }
+    // dataTypeActive(index) {
+    //   this.currentDataTypeIndex = index
+    // },
+  }
+};
+</script>
+
+<style lang="scss" scoped>
+// 公用样式
+@mixin size($w, $h) {
+  width: $w;
+  height: $h;
+}
+
+// 组件包裹
+.IllegalBehaviorProportionCountInfoCon {
+  position: relative;
+  // 内容包裹
+  .mileageCon {
+    position: relative;
+    // 下拉框包裹
+    .selectCon {
+      @include size(100%, 25px);
+      color: #b5b5b5;
+      font-size: 14px;
+      line-height: 25px;
+      .itemCon {
+        div:nth-child(n + 2) {
+          margin-left: 5px;
+        }
+      }
+      //   .itemCon:nth-child(1) {
+      //     margin-left: 132px;
+      //   }
+      .itemCon:nth-child(n + 2) {
+        margin-right: 10px;
+      }
+    }
+    .selectCon:nth-child(2) {
+      margin-top: 10px;
+    }
+
+    // 切换数据
+    .dataTypeCon {
+      @include size(100%, 25px);
+      margin-top: 10px;
+      // background: green;
+      div {
+        @include size(160px, 25px);
+        box-sizing: border-box;
+        text-align: center;
+        line-height: 23px;
+        color: #b5b5b5;
+        float: right;
+        background: rgba(0, 191, 229, 0.2);
+        cursor: pointer;
+      }
+      .dataTypeActive {
+        color: #fff;
+        background: rgba(0, 191, 229, 0.5);
+      }
+      div:nth-child(2) {
+        margin-right: 10px;
+      }
+      div:nth-child(n + 2) {
+        margin-left: 10px;
+      }
+    }
+
+    // 图表包裹
+    .chartsCon {
+      @include size(100%, 200px);
+      overflow: hidden;
+      margin-top: 10px;
+      //   background:red;
+    }
+  }
+}
+</style>

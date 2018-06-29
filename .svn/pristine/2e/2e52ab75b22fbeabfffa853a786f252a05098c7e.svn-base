@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobiusVision.dao.TbSubject.TbSubjectKhMapper" >
+
+    <!--mapper缓存参数设定-->
+    <cache  eviction="LRU" flushInterval="60000"  size="512" readOnly="true"/>
+
+    <!--#查询人员当年运单数的客户统计-->
+    <!--select kh.This_Year_Waybill_Quantity,hzsxx.name as kh_name from TB_SUBJECT_KH kh,TB_BASIC_QY_HZSXX hzsxx-->
+    <!--where kh.driver_id=201408000001 and kh.id=hzsxx.id order by abs(This_Year_Waybill_Quantity) desc;-->
+    <!--TB_SUBJECT_KH档案人员记录中，TB_BASIC_QY_HZSXX运营企业6-13，通过driver_id查询人员当年运单数的客户统计-->
+    <select id="findKuHzsYearByDId" resultType="TbSubjectKhExtends">
+        select kh.This_Year_Waybill_Quantity,hzsxx.name as kh_name from TB_SUBJECT_KH kh,TB_BASIC_QY_HZSXX hzsxx
+        where kh.driver_id=#{driver_id} and kh.id=hzsxx.id order by abs(This_Year_Waybill_Quantity) desc
+    </select>
+
+    <!--#查询人员当月运单数的客户统计-->
+    <!--select kh.This_Month_Waybill_Quantity,hzsxx.name as kh_name from TB_SUBJECT_KH kh,TB_BASIC_QY_HZSXX hzsxx-->
+    <!--where kh.driver_id=201408000001 and kh.id=hzsxx.id order by abs(This_Month_Waybill_Quantity) desc;-->
+    <!--TB_SUBJECT_KH档案人员记录中，TB_BASIC_QY_HZSXX运营企业6-13，通过driver_id查询人员当月运单数的客户统计-->
+    <select id="findKuHzsMonthByDId" resultType="TbSubjectKhExtends">
+        select kh.This_Month_Waybill_Quantity,hzsxx.name as kh_name from TB_SUBJECT_KH kh,TB_BASIC_QY_HZSXX hzsxx
+        where kh.driver_id=#{driver_id} and kh.id=hzsxx.id order by abs(This_Month_Waybill_Quantity) desc
+    </select>
+</mapper>

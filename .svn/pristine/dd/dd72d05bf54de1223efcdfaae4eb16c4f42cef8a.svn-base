@@ -1,0 +1,88 @@
+<template>
+  <Echarts :options="newoption" class="barTransverse_echarts"
+            :style="{height:newheight+'px'}"></Echarts>
+</template>
+
+<script type="text/javascript">
+/* eslint-disable */
+import Echarts from 'vue-echarts'
+
+export default {
+  components: {
+    Echarts,
+  },
+  props: ['data','gridWidth','height'],
+  computed: {
+    newoption() {
+      const newoption = this.option
+      newoption.series[0].data = this.data.map(item => item.value)
+      newoption.yAxis.data = this.data.map(item => item.label)
+      newoption.grid.width=this.gridWidth
+      return newoption
+    },
+    newheight() {
+        console.log('value:',(this.data.length - 4) * 27 + this.height)
+      return (this.data.length - 4) * 27 + parseInt(this.height)
+    },
+  },
+  methods: {
+
+  },
+  data() {
+    return {
+      option: {
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'shadow',
+          },
+        },
+        grid: {
+          top: '0%',
+          left: '2%',
+          width: '',
+          height: '100%',
+          containLabel: true,
+        },
+        xAxis: {
+          type: 'value',
+          show: false,
+        },
+        yAxis: {
+          type: 'category',
+          axisLine: { show: false },
+          axisTick: { show: false },
+          axisLabel: {
+            color: '#89DDDF ',
+            fontSize: 14,
+          },
+          data: [],
+        },
+        series: [
+          {
+            name: '2011年',
+            type: 'bar',
+            itemStyle: {
+              color: '#89DDDF',
+            },
+            barWidth: 12,
+            label: {
+              show: true,
+              position: 'right',
+              color: '#89DDDF',
+              fontSize: 14,
+            },
+            data: [],
+          },
+        ],
+      },
+    }
+  },
+}
+</script>
+
+<style lang="scss" scoped>
+.barTransverse_echarts{
+    width: 100%;
+}
+</style>

@@ -1,0 +1,253 @@
+/* eslint-disable */
+import * as CompanyAPI from "@/api/company";
+
+const state = {
+  entities: null,
+  selectedEntity: null,
+  entity_id: null
+};
+const mutations = {
+  setEntity(state, data) {
+    state.entities = data;
+  },
+  setSelectedEntity(state, data) {
+    state.selectedEntity = data;
+    state.entity_id = data;
+  }
+};
+const actions = {
+  async getEntity({ commit, dispatch }) {
+    commit('setEntity', null)
+    const entity = await CompanyAPI.getHeaderMsg();
+    commit("setEntity", entity.data);
+    if (entity.data["0"]) {
+      dispatch("selectEntity", { entity_id: entity.data["0"].entity_id });
+    }
+  },
+  // const CurrYear = `${new Date().getFullYear()}`
+    // const CurrMonth = `${new Date().getMonth() + 1}` < 10 ? `${`0${new Date().getMonth()}${1}`}` : `${new Date().getMonth() + 1}`
+  async selectEntity({ commit, dispatch }, { entity_id }) {
+    // save selected entity
+    commit("setSelectedEntity", entity_id);
+    dispatch("fetchOtherBlock", { entity_id });
+  },
+  async fetchOtherBlock({ commit, dispatch }, { entity_id }) {
+    // 报警事件排名（风险因素排名）(高频不良驾驶行为)
+    dispatch(
+      'alarmEventRankBadSteering/getBadSteering',
+      { month: 11, year: 2017, entity_id: state.selectedEntity },
+      // { month: null, year: null, entity_id: state.selectedEntity },
+      { root: true },
+    )
+    // 报警事件排名（风险因素排名）(高频违规行为)
+    dispatch(
+      'alarmEventRankIrregularities/getIrregularities',
+      { month: 11, year: 2017, entity_id: state.selectedEntity },
+      { root: true },
+    )
+
+    // 报警事件排名（风险因素排名）(高频违法行为)
+    dispatch(
+      'alarmEventRankIllegality/getIllegality',
+      { month: 11, year: 2017,entity_id: state.selectedEntity },
+      { root: true },
+    )
+    // 高危驾驶行为/违规行为/违法行为/事故记录得分(四个标题)
+    dispatch(
+      "behaviorTitle/gettb_subject_qy_qyaqfz",
+      { entity_id: state.selectedEntity }, // { entity_id },
+      { root: true }
+    );
+    // 安全情况总览
+    dispatch(
+      "securityOverview/getSecureStatusOverview",
+      { entity_id: state.selectedEntity, year: 2017, month: 11 },
+      { root: true }
+    );
+
+    // 机构得分变化趋势
+    dispatch(
+      "securityRanking/getSecureDriverOrder",
+      { entity_id: state.selectedEntity, month: 11, year: 2017 },
+      { root: true }
+    );
+
+    // 高危 违规 违法 事故
+    dispatch(
+      "behaviorTitle/getBehaviorScore",
+      { entity_id: state.selectedEntity, month: 11, year: 2017 },
+      { root: true }
+    );
+
+    // 高危驾驶行为数量变化趋势
+    dispatch(
+      "driverTrend/getDriverDangerTrend",
+      {
+        entity_id: state.selectedEntity,
+        year: null,
+        month:null,
+        drive_event_type_code: 10110
+      },
+      { root: true }
+    );
+
+    // 违规行为数量变化趋势
+    dispatch(
+      "irregularityTrend/getDriverIrregularityTrend",
+      { entity_id: state.selectedEntity, month:null, year:null,drive_event_type_code: 20100 },
+      { root: true }
+    );
+
+    // 违法行为数量变化趋势
+    dispatch(
+      "illegalTrend/getDriverIllegalTrend",
+      {
+        entity_id: state.selectedEntity,
+        year: null,
+        month: null,
+        drive_event_type_code:30100
+      },
+      { root: true }
+    );
+
+    // 事故时段分布
+    dispatch(
+      "accidentTime/getDriverAccidentTrend",
+      {
+        entity_id: state.selectedEntity,
+        year: null,
+        month: null,
+        accident_level_code: null,
+        type: "时段占比"
+      },
+      { root: true }
+    );
+    // 不同周期高危驾驶行为数量
+    dispatch(
+      'popupSecContainer/getDriverDangerCount',
+      { entity_id: state.selectedEntity, year:null , month: null },
+      { root: true }
+    );
+    // 不同周期违规行为数量
+    dispatch(
+      "popupSecContainer/getDriverIrregualarityCount",
+      { entity_id: state.selectedEntity, year: null, month: null },
+      { root: true }
+    );
+    // 不同周期违法行为数量
+    dispatch(
+      "popupSecContainer/getDriverIllegalCount",
+      { entity_id: state.selectedEntity, year: null, month: null },
+      { root: true }
+    );
+    // 事故区域分布
+    dispatch(
+      "accidentArea/getDriverAccidentAreaCount",
+      // { entity_id: state.selectedEntity, year: null,mounth:null, region_code: 440000 },
+      { entity_id: state.selectedEntity, year: null, mounth:null,region_code: 411381 },
+      { root: true }
+    ); // month: 11,
+    // 不同类型事故区域分布
+    dispatch(
+      "popupSecContainer/getAccidentDistributeTrendArea",
+      // { entity_id: state.selectedEntity, year: 2017, region_code: 440000 },
+      { entity_id: state.selectedEntity, year: null,month:null, region_code: 411381 },
+      { root: true }
+    ); // month: 11,
+
+    // 高驾行为区域分布
+    dispatch(
+      "areaDistributionDriver/getDriverAreaDistribute",
+      // { entity_id: state.selectedEntity, year: null,month: null, region_code: 430000 },
+      { entity_id: state.selectedEntity, year: null,month: null, region_code: 411381 },
+      { root: true }
+    ); // month: 11,
+    // 高危驾驶行为区域分布变化趋势（高驾行为区域分布弹窗）
+    dispatch(
+      "popupSecContainer/getdriver_danger_distribute_trend_area",
+      { entity_id: state.selectedEntity, year: null, month:null,region_code: 411381 },
+      { root: true }
+    );
+    // 高驾行为时段分布
+    dispatch(
+      "areaDistributionDriver/getDriverIntervalDistribute",
+      { entity_id: state.selectedEntity, year: null,month:null, },
+      { root: true }
+    ); // month: 11,
+    // 高危驾驶行为时段分布变化趋势（高驾行为时段分布弹窗）
+    dispatch(
+      "popupSecContainer/getdriver_danger_distribute_trend_interval",
+      { entity_id: state.selectedEntity, year: null, month:null,drive_event_type_code: 10110 },
+      { root: true }
+    );
+    // 违规行为区域分布
+    dispatch(
+      "areaDistributionIrregularity/getIrregularityAreaDistribute",
+      { entity_id: state.selectedEntity, year: null, month:null,region_code: 411381 },
+      { root: true }
+    ); // month: 11,
+    // 违规行为区域分布变化趋势（违规行为区域分布弹窗）
+    dispatch(
+      "popupSecContainer/getdriver_irregularity_distribute_trend_area",
+      { entity_id: state.selectedEntity, year: null, month:null,region_code: null },
+      { root: true }
+    );
+    // 违规行为时段分布  
+    dispatch(
+      "areaDistributionIrregularity/getIrregularityIntervalDistribute",
+      { entity_id: state.selectedEntity, year: null,month:null },
+      { root: true }
+    ); // month: 11,
+    // 违规行为时段分布变化趋势（违规行为时段分布弹窗）
+    dispatch(
+      "popupSecContainer/getdriver_irregularity_distribute_trend_interval",
+      { entity_id: state.selectedEntity, year: null, month:null,drive_event_type_code: 20100 },
+      { root: true }
+    );
+    // 违法行为区域分布
+    dispatch(
+      "areaDistributionIllegal/getIllegalAreaDistribute",
+      { entity_id: state.selectedEntity, year: null, month:null,region_code: 411381 },
+      { root: true }
+    ); // month: 11,
+    // 违法行为区域分布变化趋势（违法行为区域分布弹窗）
+    dispatch(
+      "popupSecContainer/getdriver_illegal_distribute_trend_area",
+      { entity_id: state.selectedEntity, year: null, month:null,region_code: 411381 },
+      { root: true }
+    ); // month: 11,
+    // 违法行为时段分布
+    dispatch(
+      "areaDistributionIllegal/getIllegalIntervalDistribute",
+      { entity_id: state.selectedEntity, year: null,month:null, },
+      { root: true }
+    ); // month: 11,
+    // 违法行为时段分布变化趋势（违法行为时段分布弹窗）
+    dispatch(
+      "popupSecContainer/getdriver_illegal_distribute_trend_interval",
+      { entity_id: state.selectedEntity, year: null, month:null,drive_event_type_code: 30100 },
+      { root: true }
+    );
+    // 事故总览
+    dispatch("accidentView/getAccidentList",state.selectedEntity, 
+    { root: true });
+// dispatch(
+    //不同类型事故时间分布
+    dispatch(
+      "popupSecContainer/getAccidentDistributeTrendInterval",
+      {
+        entity_id: state.selectedEntity,
+        year: null,
+        month: null,
+        accident_level_code: 1
+      },
+      { root: true }
+    );
+  }
+};
+export default {
+  namespaced: true,
+  state,
+  mutations,
+  actions
+};

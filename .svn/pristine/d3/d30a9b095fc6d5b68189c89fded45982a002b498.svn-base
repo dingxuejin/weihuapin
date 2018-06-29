@@ -1,0 +1,32 @@
+<template>
+  <div class="expenseCondition_contend">
+      expenseCondition_contend
+  </div>
+</template>
+
+<script type="text/javascript">
+
+
+export default {
+  name: '',
+  components: {
+  },
+  computed: {},
+  methods: {
+
+  },
+  data() {
+    return {
+
+    }
+  },
+}
+</script>
+
+<style lang="scss" scoped>
+.expenseCondition_contend{
+    width: 100%;
+    height:100%;
+    background: pink;
+}
+</style>

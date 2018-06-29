@@ -1,0 +1,690 @@
+<template>
+  <div class="warning">
+    <!-- <TitleView title="预警统计"></TitleView> -->
+    <div class="title">
+      <div class="col1"></div>
+      <div class="col2"></div>
+      <div class="col3"></div>
+      <div class="col4"></div>
+      <div class="text1">预警统计</div>
+      <div class="anniu"
+           @click="isShow=!isShow">报警事件统计</div>
+      <div class="text2">各月报警数量变化</div>
+      <div class="text3">预警项排名</div>
+    </div>
+    <div class="warningStatistics">
+      <!-- <div class="warningStatistics_title" >
+        <div class="warningNumTotle">
+          <div >报警事件统计</div>
+        </div> 
+      </div> -->
+      <div class="warningStatistics_content">
+        <div v-if="isShow">
+          <div class="itemCon flex-end">
+            <div>统计周期</div>
+            <div>
+              <key-value-select width="100px"
+                                :data="yearOption"
+                                @select='selectYear'></key-value-select>
+            </div>
+            <div>
+              <key-value-select width="82px"
+                                :data="monthOption"
+                                @select="selectMonth"></key-value-select>
+            </div>
+            <div>
+              <key-value-select width="82px"
+                                :data="dayOption"
+                                @select="selectDay"></key-value-select>
+            </div>
+          </div>
+          <div class="itemCon flex-end">
+            <div>统计维度</div>
+            <div>
+              <key-value-select width="100px"
+                                :data="yearOption"
+                                @select='selectYear'></key-value-select>
+            </div>
+            <div>
+              <key-value-select width="82px"
+                                :data="monthOption"
+                                @select="selectMonth"></key-value-select>
+            </div>
+            <div>
+              <key-value-select width="82px"
+                                :data="dayOption"
+                                @select="selectDay"></key-value-select>
+            </div>
+          </div>
+          <div class="bar1 flex-between">
+            <div class="warningCarNum">
+              <div>报警车辆数</div>
+              <div>900</div>
+              <div>
+                <div></div>
+                <span>报警车辆数</span>
+              </div>
+              <div>
+                <div></div>已处理报警测含量数</div>
+            </div>
+            <div class="warningchartCon">
+              <barhor-two chartTheme="dark"
+                          :data="barhorData"></barhor-two>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="!isShow">
+          <div class="flex-between warnReduce">
+            <div class="warnReduce1"
+                 :class="{warnReduce2:warnReduce==1}"
+                 @click="warnReduce=1">ADAS</div>
+            <div class="warnReduce1"
+                 :class="{warnReduce2:warnReduce==2}"
+                 @click="warnReduce=2">DMS</div>
+            <div class="warnReduce1"
+                 :class="{warnReduce2:warnReduce==3}"
+                 @click="warnReduce=3">GPS+BD</div>
+          </div>
+          <div style="height:170px;">
+            <barhor-warn-event-reduce chartTheme="dark"
+                                      :data="barhorData"></barhor-warn-event-reduce>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="warningNumChange">
+      <!-- <div class="warningNumChange_title">
+        各月报警数量变化
+      </div> -->
+      <div class="warningNumChange_content">
+        <div class="itemCon fr clearfix">
+          <div class="fl">统计周期</div>
+          <div class="fl">
+            <key-value-select width="100px"
+                              :data="yearOption"
+                              @select='selectYear'></key-value-select>
+          </div>
+        </div>
+        <div class="chartCon">
+          <changesinthenumberofalarmineachmonth chartTheme="dark"
+                                                :data="warningNumChangeData"
+                                                :color="workStrengthChartColor"
+                                                :areaOpacity=0
+                                                v-if="warningNumChangeData"
+                                                :dataZoom=false
+                                                yaxisName="报警数量"></changesinthenumberofalarmineachmonth>
+          <div class="month">月</div>
+        </div>
+      </div>
+    </div>
+    <div class="warningNumRank">
+      <!-- <div class="warningNumRank_title">
+        预警项排名
+      </div> -->
+
+      <div class="flex-between rangeDate">
+        <div>统计周期</div>
+        <el-date-picker v-model="valueDate"
+                        type="daterange"
+                        range-separator="—"
+                        start-placeholder="开始日期"
+                        end-placeholder="结束日期">
+        </el-date-picker>
+      </div>
+      <!-- listTitle: [ "类别", "预警项", "数量","排名"], -->
+      <div class="warningNumRank_content">
+        <div class="listTitle">
+          <div>
+            <dxj-select :data='leibieOption'></dxj-select>
+          </div>
+          <div>预警项</div>
+          <div>数量</div>
+          <div>排名</div>
+        </div>
+        <ul>
+          <li v-for='(item,index) in listdata'
+              :key='index'>
+            <div>{{item.name}}</div>
+            <div>{{item.value}}</div>
+            <div>{{item.value1}}</div>
+            <div>{{item.value2}}</div>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="warning_bottom"></div>
+  </div>
+</template>
+<script>
+/* eslint-disable */
+
+import TitleView from "./TitleView.vue";
+import KeyValueSelect from "../../components/KeyValueSelect";
+import DxjSelect from "../../components/kanban/DxjSelect.vue";
+import barhorTwo from "../../components/charts/barhorTwo.vue";
+import barhorWarnEventReduce from "../../components/charts/barhorWarnEventReduce.vue";
+import changesinthenumberofalarmineachmonth from "../../components/charts/changesinthenumberofalarmineachmonth.vue";
+import Dictionary from "../../util/dictionary";
+const { date: { year, month, day } } = Dictionary;
+export default {
+  components: {
+    TitleView,
+    KeyValueSelect,
+    Dictionary,
+    DxjSelect,
+    barhorWarnEventReduce,
+    barhorTwo,
+    changesinthenumberofalarmineachmonth
+  },
+  watch: {
+    valueDate() {
+      console.log(this.valueDate);
+    }
+  },
+  data: () => ({
+    warnReduce: 1,
+    isShow: false,
+    valueDate: "",
+    leibieOption: [
+      { label: "类别", value: null },
+      { label: "类别1", value: 1 },
+      { label: "类别2", value: 2 }
+    ],
+    listdata: [
+      { name: "CCCCCCCC", value: 99, value1: 22, value2: 33 },
+      { name: "CCCCCCCC", value: 99, value1: 22, value2: 33 },
+      { name: "CCCCCCCC", value: 99, value1: 22, value2: 33 },
+      { name: "CCCCCCCC", value: 99, value1: 22, value2: 33 },
+      { name: "CCCCCCCC", value: 99, value1: 22, value2: 33 },
+      { name: "CCCCCCCC", value: 99, value1: 22, value2: 33 }
+    ],
+    yearOption: year,
+    monthOption: [{ label: "全年", value: null }, ...month],
+    dayOption: [{ label: "全月", value: null }, ...day],
+    year: 2017,
+    month: "01",
+    day: "01",
+    workStrengthChartColor: ["#05D0EB ", "#C88637", "#BC570C"],
+    warningNumChangeData: [
+      {
+        data: [
+          { name: "1", value: Math.floor(Math.random() * 120) },
+          { name: "2", value: Math.floor(Math.random() * 120) },
+          { name: "3", value: Math.floor(Math.random() * 120) },
+          { name: "4", value: Math.floor(Math.random() * 120) },
+          { name: "5", value: Math.floor(Math.random() * 120) },
+          { name: "6", value: Math.floor(Math.random() * 120) },
+          { name: "7", value: Math.floor(Math.random() * 120) },
+          { name: "8", value: Math.floor(Math.random() * 120) },
+          { name: "9", value: Math.floor(Math.random() * 120) },
+          { name: "10", value: Math.floor(Math.random() * 120) },
+          { name: "11", value: Math.floor(Math.random() * 120) },
+          { name: "12", value: Math.floor(Math.random() * 120) }
+        ]
+      }
+    ],
+    barhorEventData:{
+      data:[],
+      color: ["#05d0eb", "#81d9e5", "#f6ffcb", "#e75029", "#038bfc"]
+    },
+    barhorData: [
+      {
+        data: [
+          {
+            name: "报警车辆数",
+            data: [
+              {
+                name: "ADAS",
+                value: 52
+              },
+              {
+                name: "DMS",
+                value: 32
+              },
+              {
+                name: "GPS+BD",
+                value: 2
+              }
+            ]
+          },
+          {
+            name: "已处理报警测含量数",
+            // data:[42,22,20]
+            data: [
+              {
+                name: "ADAS",
+                value: 42
+              },
+              {
+                name: "DMS",
+                value: 22
+              },
+              {
+                name: "GPS+BD",
+                value: 20
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    barhorColor: ["#05d0eb", "#81d9e5", "#f6ffcb", "#e75029", "#038bfc"]
+  }),
+  methods: {
+    selectYear(item) {
+      this.year = item.value;
+    },
+    selectMonth(item) {
+      this.month = item.value;
+    },
+    selectDay(item) {
+      this.day = item.value;
+    }
+  }
+};
+</script>
+<style lang="scss" scoped>
+@mixin size($width, $height) {
+  width: $width;
+  height: $height;
+}
+.warning {
+  width: 1140px;
+  height: 240px;
+  // padding: 5px;
+  box-sizing: border-box;
+  position: relative;
+  .title {
+    width: 1127px;
+    margin-left: 10px;
+    // margin-top: 7px;
+    height: 30px;
+    background: rgba(3, 139, 252, 0.4);
+    line-height: 30px;
+    box-sizing: border-box;
+    font-size: 18px;
+    color: #89dddf;
+    position: relative;
+    overflow: hidden;
+    .col1 {
+      width: 4px;
+      height: 30px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      background: rgba(129, 217, 229, 0.3);
+    }
+    .col2 {
+      width: 10px;
+      height: 30px;
+      position: absolute;
+      top: 0;
+      left: 16px;
+      background: rgba(129, 217, 229, 0.5);
+    }
+    .col3 {
+      width: 2px;
+      height: 30px;
+      position: absolute;
+      top: 0;
+      left: 388px;
+      background: #89dddf;
+    }
+    .col4 {
+      width: 2px;
+      height: 30px;
+      position: absolute;
+      top: 0;
+      left: 778px;
+      background: #89dddf;
+    }
+    .text1 {
+      float: left;
+      width: 258px;
+      height: 30px;
+      padding-left: 50px;
+      box-sizing: border-box;
+      line-height: 30px;
+      color: #89dddf;
+      font-size: 18px;
+    }
+    .anniu {
+      float: left;
+      width: 112px;
+      margin-right: 18px;
+      cursor: pointer;
+      // margin-right: 8px;
+      // margin-top: 3px;
+      height: 20px;
+      margin-top: 5px;
+      // padding-left: 50px;
+      box-sizing: border-box;
+      line-height: 20px;
+      color: #89dddf;
+      background: rgba(3, 139, 252, 0.4);
+      font-size: 14px;
+      text-align: center;
+    }
+    .text2 {
+      float: left;
+      width: 380px;
+      height: 30px;
+      padding-left: 50px;
+      box-sizing: border-box;
+      line-height: 30px;
+      color: #89dddf;
+      font-size: 18px;
+    }
+    .text3 {
+      float: left;
+      width: 347px;
+      height: 30px;
+      padding-left: 40px;
+      box-sizing: border-box;
+      line-height: 30px;
+      color: #89dddf;
+      font-size: 18px;
+    }
+  }
+  .warningStatistics {
+    @include size(390px, 200px);
+    float: left;
+    // margin-top: -30px;
+    margin-left: 10px;
+    // background:pink;
+    &_title {
+      @include size(100%, 26px);
+      box-sizing: border-box;
+      margin-top: 2px;
+      // border-right: 2px solid #81d9e5;
+      .warningNumTotle {
+        @include size(112px, 20px);
+        float: right;
+        margin-right: 8px;
+        margin-top: 3px;
+        background: rgba(3, 139, 252, 0.4);
+        font-size: 14px;
+        color: #89dddf;
+        text-align: center;
+        line-height: 20px;
+      }
+    }
+    &_content {
+      @include size(100%, 195px);
+      box-sizing: border-box;
+      margin-top: 10px;
+      border-right: 2px solid rgba(129, 217, 229, 0.4);
+      .itemCon {
+        @include size(100%, 37px);
+        color: #b5b5b5;
+        font-size: 14px;
+        line-height: 25px;
+        box-sizing: border-box;
+        padding: 10px;
+        div {
+          &:nth-child(1) {
+            margin-left: 10px;
+          }
+        }
+      }
+      .bar1 {
+        padding: 0 10px;
+        .warningCarNum {
+          color: #89dddf;
+          font-size: 14px;
+          text-align: center;
+          line-height: 30px;
+          div {
+            &:nth-child(1) {
+              @include size(100%, 30px);
+            }
+            &:nth-child(2) {
+              @include size(100%, 20px);
+              line-height: 20px;
+              background: rgba(3, 139, 252, 0.4);
+            }
+            &:nth-child(3) {
+              @include size(100%, 20px);
+              line-height: 20px;
+              text-align: left;
+              // background: rgba(3,139,252,0.7);
+              margin-top: 20px;
+              font-size: 12px;
+              div {
+                @include size(15px, 8px);
+                background: #bc570c;
+                float: left;
+                margin-top: 4px;
+                margin-right: 4px;
+              }
+            }
+            &:nth-child(4) {
+              @include size(150%, 20px);
+              line-height: 20px;
+              text-align: left;
+              font-size: 12px;
+              // background: rgba(3,139,252,0.7);
+              div {
+                @include size(15px, 8px);
+                background: #05d0eb;
+                float: left;
+                margin-top: 4px;
+                margin-right: 4px;
+              }
+            }
+          }
+        }
+      }
+
+      .warningchartCon {
+        @include size(242px, 122px);
+      }
+    }
+  }
+  .warningNumChange {
+    @include size(390px, 200px);
+    // margin-top: -30px;
+    float: left;
+    &_title {
+      @include size(100%, 26px);
+      box-sizing: border-box;
+      margin-top: 2px;
+      // border-right: 2px solid #81d9e5;
+      font-size: 18px;
+      color: #89dddf;
+      line-height: 30px;
+      box-sizing: border-box;
+      padding-left: 50px;
+    }
+    &_content {
+      @include size(100%, 186px);
+      box-sizing: border-box;
+      margin-top: 10px;
+      border-right: 2px solid rgba(129, 217, 229, 0.4);
+      position: relative;
+      .itemCon {
+        @include size(180px, 25px);
+        color: #b5b5b5;
+        font-size: 14px;
+        line-height: 25px;
+        box-sizing: border-box;
+        // margin-left: 173px;
+        margin-right: 10px;
+        // position: absolute;
+        // left: 173px;
+        // top: 0;
+        // margin-left: 173px;
+        // padding-top: 7px;
+        div:nth-child(1) {
+          //   margin-left: 173px;
+        }
+        div:nth-child(2) {
+          margin-left: 10px;
+        }
+      }
+      .chartCon {
+        @include size(100%, 155px);
+        padding-left: 10px;
+        padding-right: 10px;
+        box-sizing: border-box;
+        position: absolute;
+        bottom: 0px;
+        left: 0px;
+        // position: relative;
+        // padding-top: 37px;
+        .month {
+          position: absolute;
+          bottom: 0px;
+          right: 3px;
+          font-size: 14px;
+          color: #b5b5b5;
+        }
+      }
+    }
+  }
+  .warningNumRank {
+    @include size(349px, 200px);
+    margin-left: 792px;
+    // margin-top: -30px;
+    &_title {
+      @include size(100%, 26px);
+      box-sizing: border-box;
+      margin-top: 2px;
+      font-size: 18px;
+      color: #89dddf;
+      line-height: 30px;
+      box-sizing: border-box;
+      padding-left: 50px;
+    }
+    &_content {
+      @include size(100%, 186px);
+      box-sizing: border-box;
+      margin-top: 10px;
+      // margin-left: 11px;
+      .listTitle {
+        @include size(100%, 30px);
+        // clear: both;
+        margin-bottom: 10px;
+        float: left;
+        div {
+          @include size(100%, 30px);
+          float: left;
+          margin-left: 9px;
+          box-sizing: border-box;
+          text-align: center;
+          line-height: 28px;
+          color: #b5b5b5;
+          font-size: 16px;
+        }
+        div:nth-child(1) {
+          @include size(100px, 100%);
+          margin-left: 0px;
+          box-sizing: border-box;
+        }
+        div:nth-child(2) {
+          @include size(80px, 100%);
+          border: 1px solid #81d9e5;
+        }
+        div:nth-child(3) {
+          @include size(70px, 100%);
+          border: 1px solid #81d9e5;
+        }
+        div:nth-child(4) {
+          @include size(60px, 100%);
+          border: 1px solid #81d9e5;
+        }
+      }
+      ul {
+        @include size(98%, 120px);
+        list-style: none;
+        overflow-y: scroll;
+        color: #b5b5b5;
+        float: left;
+        li {
+          margin-bottom: 5px;
+          height: 25px;
+          cursor: pointer;
+          div {
+            float: left;
+            height: 25px;
+            box-sizing: border-box;
+            line-height: 23px;
+            text-align: center;
+            border: 1px solid rgba(0, 191, 229, 1);
+            background: rgba(0, 191, 229, 0.2);
+            width: 100px;
+            margin-left: 9px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+          div:nth-child(1) {
+            @include size(100px, 100%);
+            margin-left: 0px;
+          }
+          div:nth-child(2) {
+            @include size(80px, 100%);
+          }
+          div:nth-child(3) {
+            @include size(70px, 100%);
+          }
+          div:nth-child(4) {
+            @include size(50px, 100%);
+          }
+          &:hover div {
+            background: rgba(0, 191, 229, 0.5);
+            color: #ffffff;
+          }
+        }
+      }
+      ul::-webkit-scrollbar {
+        background: #69a3b1;
+        width: 6px;
+      }
+      ul::-webkit-scrollbar-thumb {
+        background: #05d0eb;
+      }
+    }
+  }
+  &_bottom {
+    width: calc(100% - 26px);
+    height: 2px;
+    position: absolute;
+    bottom: -2px;
+    left: 21px;
+    background: rgba(129, 217, 229, 0.5);
+  }
+  .rangeDate {
+    color: #b5b5b5;
+    font-size: 14px;
+    margin: 10px;
+    padding-left: 10px;
+    background: #1a3b5e;
+  }
+  .warnReduce {
+    padding: 0 10px;
+  }
+  .warnReduce1 {
+    box-sizing: border-box;
+    padding: 3px;
+    font-size: 14px;
+    color: #fff;
+    background: #113f51;
+    width: 28%;
+    text-align: center;
+    cursor: pointer;
+    transition: 100ms;
+  }
+  .warnReduce2 {
+    padding: 5px;
+    font-size: 14px;
+    color: #7cd1d6;
+    width: 42%;
+    background: #005b7f;
+    text-align: center;
+  }
+}
+</style>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobiusVision.dao.TbBusiness.TbBusinessAqxwjfjjMapper" >
+
+    <resultMap id="BaseResultMap" type="TbBusinessAqxwjfjj" >
+        <id column="tb_business_aqxwjfjj_id" property="tb_business_aqxwjfjj_id" jdbcType="INTEGER" />
+        <result column="Driver_ID" property="driver_ID" jdbcType="VARCHAR" />
+        <result column="Date" property="date" jdbcType="VARCHAR" />
+        <result column="Year" property="year" jdbcType="VARCHAR" />
+        <result column="Month" property="month" jdbcType="VARCHAR" />
+        <result column="Day" property="day" jdbcType="VARCHAR" />
+        <result column="Three_violations_content_code" property="three_violations_content_code" jdbcType="VARCHAR" />
+        <result column="Deduction_score" property="deduction_score" jdbcType="VARCHAR" />
+        <result column="Deduction_amount" property="deduction_amount" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <resultMap id="TbBusinessAqxwjfjjANDSw" type="TbBusinessAqxwjfjjAndSw" extends="BaseResultMap">
+        <result column="total_deduction_score" property="total_deduction_score" jdbcType="VARCHAR" />
+        <result column="total_deduction_amount" property="total_deduction_amount" jdbcType="VARCHAR" />
+        <result column="total_year_score" property="total_year_score" jdbcType="VARCHAR" />
+        <result column="total_year_amount" property="total_year_amount" jdbcType="VARCHAR" />
+        <association property="sw" javaType="TbDictionarySw">
+            <id column="tb_dictionary_sw_id" property="tb_dictionary_sw_id" jdbcType="INTEGER" />
+            <result column="three_violations_content_code" property="three_violations_content_code" jdbcType="VARCHAR" />
+            <result column="three_violations_content" property="three_violations_content" jdbcType="VARCHAR" />
+            <result column="remark" property="remark" jdbcType="VARCHAR" />
+        </association>
+    </resultMap>
+    <!--mapper缓存参数设定-->
+    <cache  eviction="LRU" flushInterval="60000"  size="512" readOnly="true"/>
+    <!--通过driver_id查询TB_BUSINESS_AQXWJFJJ aqxwjfjj,TB_DICTIONARY_SW sw表中所有违章数据-->
+    <select id="findAllJfJjSwByDriverId" resultMap="TbBusinessAqxwjfjjANDSw">
+        select aqxwjfjj.*,sw.*,concat(Year,'-',Month,'-',Day) as Date,'30' as total_year_score,'12000' as total_year_amount,
+        (select SUM(deduction_score) from TB_BUSINESS_AQXWJFJJ where Driver_ID=#{driver_id} and year="2017") as total_deduction_score,
+        (select SUM(deduction_amount) from TB_BUSINESS_AQXWJFJJ where Driver_ID=#{driver_id} and year="2017") as total_deduction_amount
+        from TB_BUSINESS_AQXWJFJJ aqxwjfjj,TB_DICTIONARY_SW sw
+        where Driver_ID=#{driver_id} order by Year desc,Month desc,Day desc
+    </select>
+
+
+</mapper>

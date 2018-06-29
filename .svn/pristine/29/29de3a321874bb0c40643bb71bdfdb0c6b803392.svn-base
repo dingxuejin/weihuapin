@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobiusVision.dao.TbSubject.TbSubjectQyJyzkpmMapper">
+    <resultMap id="BaseResult" type="TbSubjectQyJyzkpm">
+        <id column="tb_subject_qy_jyzkpm_id" property="tb_subject_qy_jyzkpm_id" jdbcType="INTEGER"/>
+        <result column="year" property="year" jdbcType="VARCHAR"/>
+        <result column="month" property="month" jdbcType="VARCHAR"/>
+        <result column="entity_id" property="entity_id" jdbcType="VARCHAR"/>
+        <result column="ranking" property="ranking" jdbcType="VARCHAR"/>
+        <result column="ranking_change_code" property="ranking_change_code" jdbcType="VARCHAR"/>
+        <result column="income" property="income" jdbcType="VARCHAR"/>
+        <result column="year_ranking" property="year_ranking" jdbcType="VARCHAR"/>
+        <result column="year_income" property="year_income" jdbcType="VARCHAR"/>
+        <result column="ranking_change_code" property="ranking_change_code" jdbcType="VARCHAR"/>
+    </resultMap>
+    <cache eviction="LRU" flushInterval="60000" size="512" readOnly="true"/>
+    <select id="queryRankingByYearAndEntityId" resultType="TbSubjectQyJyzkpm">
+ select year_ranking
+from
+(
+ select (@rowNO := @rowNo+1) AS year_ranking,a.* from (select avg(ranking) ,entity_id
+from  tb_subject_qy_jyzkpm
+where year=#{year}
+group by entity_id
+order by avg (ranking)
+) a,(select @rowNO :=0) b
+)d
+where entity_id=#{entity_id}
+  </select>
+   <select id="queryAllByEntityId" resultType="TbSubjectQyJyzkpm">
+select (@rowNO := @rowNo+1) AS year_ranking,a.*
+ from (select year,sum(income) as year_income from
+tb_subject_qy_jyzkpm where entity_id=#{entity_id}
+GROUP BY year ORDER BY year_income desc)a,(select @rowNO :=0) b
+</select>
+    <select id="queryAllByEntityIdAndYear" resultType="TbSubjectQyJyzkpm">
+select ranking,month,income,ranking_change_code from tb_subject_qy_jyzkpm where entity_id=#{entity_id} and year=#{year} order by ranking
+   </select>
+</mapper>

@@ -1,0 +1,178 @@
+<template>
+  <div class="WaybillFeature_contend">
+    <!-- 切换部分 -->
+    <table></table>
+    <div class="switchCase">
+      <!-- 切换 不同人 不同年份 -->
+      <div class="switch_people_time">
+        <!-- 切换 不同人  -->
+        <div class="switch_people">
+          <div class="driverOrClient">{{peopleType==='client'?'驾驶员':'客户'}}</div>
+          <div class="dOcDropdown">
+            <KeyValueSelect :data="peopleType==='client'?drivers:clients"
+                            width="91px"
+                            height="24px"></KeyValueSelect>
+          </div>
+        </div>
+        <!-- 切换 不同年份  -->
+        <div class="switch_time">
+          <div class="statisticTime">统计时间</div>
+          <div class="timeDropdown">
+            <KeyValueSelect :data="years"
+                            width="97px"
+                            height="24px"></KeyValueSelect>
+          </div>
+        </div>
+      </div>
+      <!-- 切换人员类型 -->
+      <div class="switch_peopleType">
+        <div class="driver"
+             :class='{active:peopleType==="driver"}'
+             @click='peopleType="driver"'>驾驶员</div>
+        <div class="client"
+             :class='{active:peopleType==="client"}'
+             @click='peopleType="client"'>客户</div>
+      </div>
+    </div>
+    <!-- echart图部分 -->
+    <div class="echart_part"></div>
+  </div>
+</template>
+
+<script type="text/javascript">
+import KeyValueSelect from './../../../../components/KeyValueSelect'
+
+export default {
+  name: '',
+  components: {
+    KeyValueSelect,
+  },
+  computed: {},
+  methods: {},
+  data() {
+    return {
+      peopleType: 'client',
+      drivers: [
+        { label: '张三', value: '张三' },
+        { label: '李四', value: '李四' },
+        { label: '王二', value: '王二' },
+        { label: '麻子', value: '麻子' },
+      ],
+      clients: [
+        { label: '王朝', value: '王朝' },
+        { label: '马汉', value: '马汉' },
+        { label: '张龙', value: '张龙' },
+        { label: '赵虎', value: '赵虎' },
+      ],
+      years: [
+        { label: '2017年', value: '2017年' },
+        { label: '2016年', value: '2016年' },
+        { label: '2015年', value: '2015年' },
+        { label: '2014年', value: '2014年' },
+      ],
+    }
+  },
+}
+</script>
+
+<style lang="scss" scoped>
+.WaybillFeature_contend {
+  width: 100%;
+  height: 100%;
+  // background: pink;
+  .switchCase {
+    width: 100%;
+    height: 30px;
+    margin-top: 15px;
+    // background: cyan;
+    display: flex;
+    .switch_people_time {
+      height: 100%;
+      flex: 1;
+      display: flex;
+      padding: 0 14px;
+      box-sizing: border-box;
+      div {
+        height: 100%;
+        flex: 1;
+      }
+      .switch_people {
+        margin-right: 2px;
+        width: 160px;
+        div {
+          float: left;
+        }
+        .driverOrClient {
+          width: 48px;
+          height: 100%;
+          text-align: center;
+          line-height: 30px;
+          font-size: 14px;
+          color: #b5b5b5;
+        }
+        .dOcDropdown {
+          height: 100%;
+          padding: 3px 0 3px 10px;
+          box-sizing: border-box;
+        }
+      }
+      .switch_time {
+        width: 160px;
+        div {
+          float: left;
+        }
+        .statisticTime {
+          width: 58px;
+          height: 100%;
+          text-align: center;
+          line-height: 30px;
+          font-size: 14px;
+          color: #b5b5b5;
+          margin-right: 5px;
+          position: relative;
+          right: 5px;
+        }
+        .timeDropdown {
+          height: 100%;
+          padding: 3px 0;
+          box-sizing: border-box;
+        }
+      }
+    }
+    .switch_peopleType {
+      width: 225px;
+      height: 100%;
+      display: flex;
+      padding: 0 10px;
+      box-sizing: border-box;
+      div {
+        height: 100%;
+        flex: 1;
+        background-color: rgba(5, 208, 235, 0.6);
+        text-align: center;
+        line-height: 30px;
+        color: #fff;
+        font-size: 14px;
+        border: 1px solid #05d0eb;
+        box-sizing: border-box;
+        cursor: pointer;
+      }
+      .driver {
+        margin-right: 2px;
+      }
+      .active {
+        background-color: rgba(5, 208, 235, 0.2);
+        border: 1px solid #05d0eb;
+        box-sizing: border-box;
+        color: #b5b5b5;
+      }
+    }
+  }
+  .echart_part {
+    clear: both;
+    width: 100%;
+    height: 144px;
+    background: red;
+  }
+}
+</style>

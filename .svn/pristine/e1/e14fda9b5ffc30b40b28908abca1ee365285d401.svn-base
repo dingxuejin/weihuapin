@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobiusVision.dao.TbSubject.TbSubjectLsxlydMapper" >
+
+    <!--mapper缓存参数设定-->
+    <cache  eviction="LRU" flushInterval="60000"  size="512" readOnly="true"/>
+    <!--TB_SUBJECT_LSXLYD档案人员记录中，通过driver_id查询历史经验-->
+    <select id="findAllLsxlydByDid" resultType="TbSubjectLsxlyd">
+        select lsxlyd.*,xlxx.route_name
+        from TB_SUBJECT_LSXLYD lsxlyd,TB_BASIC_QY_XLXX xlxx
+        where driver_id=#{driver_id} order by abs(Waybill_Quantity) desc;
+    </select>
+</mapper>

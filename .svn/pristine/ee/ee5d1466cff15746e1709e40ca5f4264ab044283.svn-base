@@ -1,0 +1,196 @@
+<template>
+  <protection-warning-configuration @detailsBtn='detailsBtn'>
+    <div class="popupDetailsWrap clearfix"
+         slot="protectionWarningPopupFrame"
+         v-if="popupDetailsShow">
+      <pop-up-frame @close='close'>
+        <pop-up-widget :title="title+'信息'"
+                       :detailsBtnShow='false'></pop-up-widget>
+        <!-- 弹出信息内容 -->
+        <loading :data="czzbxxData">
+          <div class="popupDetailsContent clearfix">
+            <ul class="itemWrap">
+              <li class="itemTitle">存放位置</li>
+              <li class="ItemData"
+                  v-if="czzbxxData">
+                {{czzbxxItem.equipment_position}}
+              </li>
+            </ul>
+            <ul class="itemWrap">
+              <li class="itemTitle">装备品牌</li>
+              <li class="ItemData"
+                  v-if="czzbxxData">
+                {{czzbxxItem.equipment_brand}}
+              </li>
+            </ul>
+            <ul class="itemWrap">
+              <li class="itemTitle">型号</li>
+              <li class="ItemData"
+                  v-if="czzbxxData">
+                {{czzbxxItem.equipment_model}}
+              </li>
+            </ul>
+            <ul class="itemWrap MFGDate">
+              <li class="itemTitle">生产日期</li>
+              <li class="ItemData"
+                  v-if="czzbxxData">
+                {{czzbxxItem.purchase_date}}
+              </li>
+            </ul>
+            <ul class="itemWrap">
+              <li class="itemTitle">有效期</li>
+              <li class="ItemData"
+                  v-if="czzbxxData">
+                {{czzbxxItem.valid_period}} 年
+              </li>
+            </ul>
+            <ul class="itemWrap">
+              <li class="itemTitle">采购渠道</li>
+              <li class="ItemData"
+                  v-if="czzbxxData">
+                {{czzbxxItem.purchase_channel}}
+              </li>
+            </ul>
+            <ul class="itemWrap price"
+                style="margin-right:0px">
+              <li class="itemTitle">采购价格</li>
+              <li class="ItemData"
+                  v-if="czzbxxData">
+                {{czzbxxItem.price}} 元
+              </li>
+            </ul>
+          </div>
+        </loading>
+      </pop-up-frame>
+    </div>
+  </protection-warning-configuration>
+</template>
+<script>
+import { mapState } from 'vuex'
+import ProtectionWarningConfiguration from '@/components/car/ProtectionWarningConfiguration'
+import PopUpFrame from '@/components/PopUpFrame'
+import PopUpWidget from '@/components/PopUpWidget'
+
+export default {
+  components: {
+    ProtectionWarningConfiguration,
+    PopUpWidget,
+    PopUpFrame,
+  },
+  data() {
+    return {
+      title: '灭火器',
+      popupDetailsShow: false,
+      czzbxxItem: null,
+    }
+  },
+  computed: {
+    ...mapState('protectionWarningConfigurationContainer', ['czzbxxData']),
+  },
+  methods: {
+    detailsBtn(name) {
+      this.title = name
+      if (this.czzbxxData) {
+        let czzbxxItems = this.czzbxxData.filter(
+          item => item.fhzzlx.protective_equipment_type === name,
+        )
+        czzbxxItems = czzbxxItems && czzbxxItems[0]
+
+        if (czzbxxItems !== undefined && czzbxxItems !== null && czzbxxItems) {
+          const czzbxxItem = {
+            equipment_position: czzbxxItems.equipment_position
+              ? czzbxxItems.equipment_position
+              : '',
+            equipment_brand: czzbxxItems.equipment_brand
+              ? czzbxxItems.equipment_brand
+              : '',
+            equipment_model: czzbxxItems.equipment_model
+              ? czzbxxItems.equipment_model
+              : '',
+            purchase_date: czzbxxItems.purchase_date
+              ? czzbxxItems.purchase_date
+              : '',
+            valid_period: czzbxxItems.valid_period
+              ? czzbxxItems.valid_period
+              : '',
+            purchase_channel: czzbxxItems.fhzzcgqd
+              .protective_equipment_supply_channel
+              ? czzbxxItems.fhzzcgqd.protective_equipment_supply_channel
+              : '',
+            price: czzbxxItems.price ? czzbxxItems.price : '',
+          }
+          this.czzbxxItem = czzbxxItem
+          // console.log('czzbxxItem', czzbxxItem)
+        } else {
+          this.czzbxxItem = {
+            equipment_position: '无',
+            equipment_brand: '无',
+            equipment_model: '无',
+            purchase_date: '无',
+            valid_period: '无',
+            purchase_channel: '无',
+            price: '无',
+          }
+        }
+      }
+      this.popupDetailsShow = true
+    },
+    close() {
+      this.popupDetailsShow = false
+    },
+  },
+}
+</script>
+<style lang="scss" scoped>
+.clearfix {
+  &:before,
+  &:after {
+    content: "";
+    display: table;
+  }
+  &:after {
+    clear: both;
+    overflow: hidden;
+  }
+}
+@mixin size($width, $height) {
+  width: $width;
+  height: $height;
+}
+.popupDetailsWrap {
+  width: 100%;
+  .popupDetailsContent {
+    width: 100%;
+    .itemWrap {
+      width: 120px;
+      float: left;
+      margin: 0;
+      padding: 0;
+      margin-right: 10px;
+      .itemTitle {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        font-size: 16px;
+        color: #89dddf;
+        text-align: center;
+        padding-bottom: 10px;
+      }
+      .ItemData {
+        height: 40px;
+        line-height: 40px;
+        font-size: 22px;
+        color: #fff;
+        text-align: center;
+        background: rgba(3, 139, 252, 0.4);
+      }
+    }
+    .MFGDate {
+      width: 200px;
+    }
+    .price {
+      width: 140px;
+    }
+  }
+}
+</style>

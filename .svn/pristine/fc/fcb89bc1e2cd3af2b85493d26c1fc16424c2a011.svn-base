@@ -1,0 +1,519 @@
+/*eslint-disable */
+import * as DriverAPI from "@/api/driver";
+
+const state = {
+  ryjb: null
+};
+
+const mutations = {
+  setRyjb(state, data) {
+    state.ryjb = data;
+  }
+};
+/* eslint-disable */
+
+const actions = {
+  async getRyjb({
+    commit,
+    dispatch
+  }, search) {
+    const ryjb = await DriverAPI.getRyjb(search);
+    commit("setRyjb", ryjb.data[0]);
+
+    const driverId = ryjb.data[0].driver_id;
+    const CurrYear = `${new Date().getFullYear()}`;
+    const CurrMonth =
+      new Date().getMonth() + 1 < 10 ?
+      "0" + (new Date().getMonth() + 1) :
+      new Date().getMonth() + 1;
+    const CurrentDay = new Date().getDate();
+    // console.log("CurrentDay", CurrentDay)
+    //  驾驶员自身标签
+    dispatch("PopUpDriverTag/getDriverMyselfTag", driverId, {
+      root: true
+    });
+    //  驾驶员同事印象
+    dispatch("PopUpDriverTag/getDriverTheirTag", driverId, {
+      root: true
+    });
+    // 获取健康信息
+    dispatch("popupdriverhealthy/getDriverHealthy", driverId, {
+      root: true
+    });
+    dispatch("popuptraininfo/getSubject", driverId, {
+      root: true
+    });
+    // 获取奖惩资料
+    dispatch(
+      "driverreward/getJc", {
+        year: CurrYear,
+        driver_id: driverId
+      }, {
+        root: true
+      }
+    );
+    // 获取安全积分
+    dispatch("driverreward/getSafetyIntegral", driverId, {
+      root: true
+    });
+    // 获取当年累计工作量统计资料
+    dispatch(
+      "accumulatedWorkloadStatistics/getPm", {
+        year: CurrYear,
+        driver_id: driverId
+      }, {
+        root: true
+      }
+    );
+    // 安全评价
+    // 总得分及排名
+
+    // 获取考核项目月得分及排名
+    dispatch(
+      "scoreAndRankingOfSafetyEvaluation/getMonthKh", {
+        year: CurrYear,
+        month: CurrMonth,
+        driver_id: driverId
+      }, {
+        root: true
+      }
+    );
+
+    // 获取考核项目年得分及排名
+    dispatch(
+      "scoreAndRankingOfSafetyEvaluation/getYearKh", {
+        year: CurrYear,
+        driver_id: driverId
+      }, {
+        root: true
+      }
+    );
+
+    // 安全评价总得分及排名(高频不良驾驶行为)
+    dispatch(
+      "scoreAndRankingOfSafetyEvaluation/getBadDrive", {
+        year: CurrYear,
+        month: CurrMonth,
+        driver_id: driverId
+      }, {
+        root: true
+      }
+    );
+
+    // 安全评价总得分及排名(高频违规行为)
+    dispatch(
+      "scoreAndRankingOfSafetyEvaluation/getIrregularity", {
+        year: CurrYear,
+        month: CurrMonth,
+        driver_id: driverId
+      }, {
+        root: true
+      }
+    );
+
+    // 安全评价总得分及排名(高频违法行为)
+    dispatch(
+      "scoreAndRankingOfSafetyEvaluation/getIllegal", {
+        month: CurrMonth,
+        driver_id: driverId
+      }, {
+        root: true
+      }
+    );
+
+    // 安全评价总得分及排名(累计事故次数)
+    dispatch(
+      "scoreAndRankingOfSafetyEvaluation/getAccident", {
+        month: CurrMonth,
+        driver_id: driverId
+      }, {
+        root: true
+      }
+    );
+
+    // 驾驶员承运线路(jy)
+    dispatch("driverLine/getDriverJy", {
+      driver_id: driverId
+    }, {
+      root: true
+    });
+
+    // 驾驶员承运线路(驾驶行为)0
+    dispatch(
+      "driverLine/getTodayDriver", {
+        driver_id: driverId,
+        year: CurrYear,
+        month: CurrMonth,
+        day: CurrentDay
+      }, {
+        root: true
+      }
+    );
+    // 驾驶员承运线路(违规行为)1
+    dispatch(
+      "driverLine/getToadyIrregularity", {
+        driver_id: driverId,
+        year: CurrYear,
+        month: CurrMonth,
+        day: CurrentDay
+      }, {
+        root: true
+      }
+    );
+    // 驾驶员承运线路(违法行为)2
+    dispatch(
+      "driverLine/getTodayIllegal", {
+        driver_id: driverId,
+        year: CurrYear,
+        month: CurrMonth,
+        day: CurrentDay
+      }, {
+        root: true
+      }
+    );
+    // 驾驶员承运线路(有责事故)3
+    dispatch(
+      "driverLine/getTodayAccident", {
+        driver_id: driverId,
+        year: CurrYear,
+        month: CurrMonth,
+        day: CurrentDay
+      }, {
+        root: true
+      }
+    );
+    //地图中的历史工作量统计
+
+    dispatch(
+      "driverLine/getTbSubjectJyALsxlByDId", {
+        driver_id: driverId
+      }, {
+        root: true
+      }
+    );
+
+    dispatch(
+      "popupdriverlicense/getPopUpDriverLicense", {
+        driver_id: driverId
+      }, {
+        root: true
+      }
+    );
+
+    dispatch(
+      "popupworkqualification/getPopUpWorkQualification", {
+        driver_id: driverId
+      }, {
+        root: true
+      }
+    );
+
+    dispatch(
+      "popuptraininfo/getPopUpTrainInfo", {
+        driver_id: driverId,
+        training_theme_code: 10
+      }, {
+        root: true
+      }
+    );
+
+    dispatch(
+      "traincountinfo/getTrainCountInfo", {
+        driver_id: driverId,
+        training_type_code: 11,
+        training_theme_code: 10,
+        year: CurrYear,
+        month: null,
+        type: 0
+        // type: '培训时长',
+      }, {
+        root: true
+      }
+    );
+    // 培训详细信息
+    dispatch(
+      "traindetailsinfo/getTrainDetailsInfo", {
+        driver_id: driverId,
+        training_type_code: 12,
+        training_theme_code: 10,
+        year: CurrYear,
+        month: null
+      }, {
+        root: true
+      }
+    );
+    // 奖励信息
+    dispatch(
+      "rewardinfo/getRewardInfo", {
+        driver_id: driverId
+      }, {
+        root: true
+      }
+    );
+    // 奖励统计信息
+    dispatch(
+      "rewardcountinfo/getRewardCountInfo", {
+        driver_id: driverId,
+        reward_type_code: 1,
+        year: CurrYear,
+        month: null,
+        type: "奖励次数"
+      }, {
+        root: true
+      }
+    );
+    // 奖励详细信息
+    dispatch(
+      "rewarddetailsinfo/getRewardDetailsInfo", {
+        driver_id: driverId,
+        year: CurrYear,
+        month: null,
+        day: null
+      }, {
+        root: true
+      }
+    );
+
+    dispatch(
+      "punishinfo/getPunishInfo", {
+        driver_id: driverId
+      }, {
+        root: true
+      }
+    );
+    // 惩罚统计信息
+    dispatch(
+      "punishcountinfo/getPunishCountInfo", {
+        driver_id: driverId,
+        punishment_type_code: 20,
+        year: CurrYear,
+        month: null,
+        type: "惩罚次数"
+      }, {
+        root: true
+      }
+    );
+    // 惩罚详细信息
+    dispatch(
+      "punishdetailsinfo/getPunishDetailsInfo", {
+        driver_id: driverId,
+        year: CurrYear,
+        month: null,
+        day: null
+      }, {
+        root: true
+      }
+    );
+
+    dispatch(
+      "workmileagecountinfo/getWorkMileageCountInfo", {
+        driver_id: driverId,
+        type: "环比"
+      }, {
+        root: true
+      }
+    );
+
+    dispatch(
+      "workstrengthcountinfo/getWorkStrengthCountInfo", {
+        driver_id: driverId,
+        type: "环比"
+      }, {
+        root: true
+      }
+    );
+    // 运单数量统计
+    dispatch(
+      "workordercountinfo/getWorkOrderCountInfo", {
+        driver_id: driverId,
+        year: null,
+        month: null,
+        type: 1,
+        capacity_unit_code: 1
+      }, {
+        root: true
+      }
+    );
+    // 驾驶区间信息
+    dispatch(
+      "workmileagedetailsinfo/getWorkMileageDetailsInfo", {
+        driver_id: driverId,
+        year: CurrYear,
+        month: null,
+        day: null
+      }, {
+        root: true
+      }
+    );
+    // 驾驶时段信息
+    dispatch(
+      "workstrengthdetailsinfo/getWorkStrengthDetailsInfo", {
+        driver_id: driverId,
+        year: CurrYear,
+        month: null,
+        day: null
+      }, {
+        root: true
+      }
+    );
+    // 运单详细信息
+    dispatch(
+      "workorderdetailsinfo/getWorkOrderDetailsInfo", {
+        driver_id: driverId,
+        year: CurrYear,
+        month: null,
+        day: null,
+        route_id: '445200445100201401'
+      }, {
+        root: true
+      }
+    );
+    // 驾驶行为报警次数统计
+    dispatch(
+      "driverbehavioralarmcountinfo/getDriverBehaviorAlarmCountInfo", {
+        driver_id: driverId,
+        drive_event_type_code: 10110,
+        year: CurrYear,
+        month: null
+      }, {
+        root: true
+      }
+    );
+    // 速度标准差变化趋势
+    dispatch(
+      "driverbehaviorspeedcountinfo/getDriverBehaviorSpeedCountInfo", {
+        driver_id: driverId,
+        year: CurrYear,
+        month: CurrMonth
+      }, {
+        root: true
+      }
+    );
+    dispatch(
+      "driverbehaviorspeedcountinfo/getDriverBehaviorSpeedStatistics", {
+        driver_id: driverId
+      }, {
+        root: true
+      }
+    );
+    // 驾驶行为详细信息
+    dispatch(
+      "driverbehavioralarmdetailsinfo/getDriverBehaviorAlarmDetailsInfo", {
+        driver_id: driverId,
+        year: CurrYear,
+        month: null,
+        day: null
+      }, {
+        root: true
+      }
+    );
+    // 违法行为报警次数统计
+    dispatch(
+      "irregalaritybehaviorcountinfo/getIrregalarityBehaviorCountInfo", {
+        driver_id: driverId,
+        drive_event_type_code: 20100,
+        year: CurrYear,
+        month: null
+      }, {
+        root: true
+      }
+    );
+
+    // 违规行为详细信息
+    dispatch(
+      "irregalaritybehaviordetailsinfo/getIrregalarityBehaviorDetailsInfo", {
+        driver_id: driverId,
+        year: CurrYear,
+        month: null,
+        day: null
+      }, {
+        root: true
+      }
+    );
+
+    dispatch(
+      "illegalbehavioralarmcount/getIllegalBehaviorAlarmCount", {
+        driver_id: driverId,
+        drive_event_type_code: 30100,
+        year: CurrYear,
+        month: null
+      }, {
+        root: true
+      }
+    );
+
+    dispatch(
+      "illegalbehaviorproportioncount/getIllegalBehaviorProportionCount", {
+        driver_id: driverId,
+        year: CurrYear,
+        month: null,
+        day: null
+      }, {
+        root: true
+      }
+    );
+    // 违法行为详细信息
+    dispatch(
+      "illegalbehaviordetailsinfo/getIllegalBehaviorDetailsInfo", {
+        driver_id: driverId,
+        year: CurrYear,
+        month: null,
+        day: null
+      }, {
+        root: true
+      }
+    );
+
+    // 有责事故次数统计
+    dispatch(
+      "blameaccidentnumcountinfo/getBlameAccidentNumCountInfo", {
+        driver_id: driverId,
+        year: CurrYear,
+        month: null,
+        accident_level_code: 1,
+        accident_responsibility_code: 1,
+        if_hm_release_code: 1,
+      }, {
+        root: true
+      }
+    );
+
+    dispatch(
+      "blameaccidentproportioninfo/getBlameAccidentProportionInfo", {
+        driver_id: driverId,
+        type: "有责事故类型占比"
+      }, {
+        root: true
+      }
+    );
+    // 有责事故详细信息
+    dispatch(
+      "blameaccidentdetailsinfo/getBlameAccidentDetailsInfo", {
+        driver_id: driverId,
+        year: CurrYear,
+        month: null,
+        day: null
+      }, {
+        root: true
+      }
+    );
+    dispatch(
+      "driverLine/getDriver_runtime_route_info", {
+        driver_id: driverId
+      }, {
+        root: true
+      }
+    );
+    // 驾驶行为报警次数统计(线路)
+    dispatch("driverbehavioralarmcountinfo/getAlarmType", {}, {
+      root: true
+    });
+  }
+};
+
+export default {
+  namespaced: true,
+  state,
+  mutations,
+  actions
+};

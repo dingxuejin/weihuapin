@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<!-- 通过entity_id查询TB_SUBJECT_QY_NDTXCB和TB_SUBJECT_QY_NDRLCB表中最新数据-->
+<mapper namespace="com.mobiusVision.dao.TbSubject.TbSubjectQyNdtxcbTDJMapper" >
+
+    <resultMap id="BaseResultMap" type="com.mobiusVision.pojo.TbSubject.TbSubjectQyNdtxcb" >
+        <id column="tb_subject_qy_ndtxcb_id" property="tb_subject_qy_ndtxcb_id" jdbcType="INTEGER" />
+        <result column="year" property="year" jdbcType="VARCHAR" />
+        <result column="entity_id" property="entity_id" jdbcType="VARCHAR" />
+        <result column="toll_cost" property="toll_cost" jdbcType="VARCHAR" />
+        <result column="tollcost_per_waybill" property="tollcost_per_waybill" jdbcType="VARCHAR" />
+        <result column="million_turnover_cost" property="million_turnover_cost" jdbcType="VARCHAR" />
+    </resultMap>
+    <resultMap id="TbSubjectQyNdTxAndRlcbTDJ" type="com.mobiusVision.pojo.TbSubject.TbSubjectQyNdtxcbTDJ" extends="BaseResultMap"   >
+        <association property="tbSubjectQyNdrlcb" javaType="TbSubjectQyNdrlcb" >
+            <id column="tbSubjectQyNdrlcb_id" property="tbSubjectQyNdrlcb_id" jdbcType="INTEGER" />
+            <result column="fuel_quantity" property="fuel_quantity" jdbcType="VARCHAR" />
+            <result column="fuel_cost" property="fuel_cost" jdbcType="VARCHAR" />
+            <result column="fuelquantity_hundred_km" property="fuelquantity_hundred_km" jdbcType="VARCHAR" />
+            <result column="fuelcost_hundred_km" property="fuelcost_hundred_km" jdbcType="VARCHAR" />
+            <result column="fuelcost_per_waybill" property="fuelcost_per_waybill" jdbcType="VARCHAR" />
+            <result column="million_turnover_cost" property="million_turnover_cost" jdbcType="VARCHAR" />
+        </association>
+    </resultMap>
+
+    <!--通过entity_id查询TB_SUBJECT_QY_NDTXCB和TB_SUBJECT_QY_NDRLCB表中最新数据-->
+    <cache  eviction="LRU" flushInterval="60000"  size="512" readOnly="true"/>
+    <select id="findAllByEntityId" resultMap="TbSubjectQyNdTxAndRlcbTDJ">
+        select t1.*,t2.*  from TB_SUBJECT_QY_NDTXCB t1,TB_SUBJECT_QY_NDRLCB t2 where t1.entity_ID=#{entity_id} order by t1.Year
+    </select>
+
+</mapper>

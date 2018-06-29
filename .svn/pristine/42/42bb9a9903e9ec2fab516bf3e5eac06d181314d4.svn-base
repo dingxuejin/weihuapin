@@ -1,0 +1,32 @@
+package com.mobiusVision.service.TbBusiness;
+
+import com.mobiusVision.dao.TbBusiness.TbBusinessQyDzydMapper;
+import com.mobiusVision.pojo.TbBusiness.TbBusinessQyDzydExtends;
+import com.mobiusVision.util.ApplicationContextUtil;
+import org.springframework.context.ApplicationContext;
+
+import java.util.List;
+
+/**
+ * @Author: zhangzhirong
+ * @Description:电子运单信息数据接口
+ * @Date:Created in 10:31 2018/6/26/026
+ * @Modify By:
+ **/
+public class TbBusinessQyDzydService {
+
+    //通过driver_id等年月数据查询TB_BUSINESS_QY_DZYD表中运单详细信息数据
+    public List<TbBusinessQyDzydExtends> findAllYearMonthDayDzydByDId(
+            String driver_id,
+            String route_id,
+            String year,
+            String month,
+            String day){
+        //获取SpringBean
+        ApplicationContext aplc= ApplicationContextUtil.getApplicationContext();
+        TbBusinessQyDzydMapper tbBusinessQyDzydMapper =(TbBusinessQyDzydMapper)aplc.getBean("tbBusinessQyDzydMapper");
+
+        List<TbBusinessQyDzydExtends> tbBusinessQyDzydExtendsList=tbBusinessQyDzydMapper.findAllYearMonthDayDzydByDId(driver_id,route_id,year,month,day);
+        return tbBusinessQyDzydExtendsList;
+    }
+}

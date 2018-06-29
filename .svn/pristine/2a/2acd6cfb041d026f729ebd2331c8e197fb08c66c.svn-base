@@ -1,0 +1,173 @@
+<template>
+  <div class="PopupWaybillNumStatistics">
+    <pop-up-widget title='运单数统计'></pop-up-widget>
+    <div class="legendWaybillNum" >
+      <div></div>
+      <div>运单数(单)</div>
+    </div>
+    <div class="chartsWaybillNum">
+      <!-- <barhor-sort chartTheme="dark" :data="barhorEventData"></barhor-sort> -->
+      <ul class="list" v-if="showYoM =='y'   && mydata &&  mydata.ThisYear">
+        <li v-for="(item,index) in mydata.ThisYear"  :key="index"> 
+          <div class="name" :title="item.kh_name">{{item.kh_name}}</div>
+          <div class="rect" 
+          :style="{width:410*( Number(item.this_Year_Waybill_Quantity)>max1?max1:Number(item.this_Year_Waybill_Quantity))/max1+'px'}">
+          </div>
+          <div class="num">{{item.this_Year_Waybill_Quantity}}</div>
+        </li>
+      </ul>
+       <ul class="list" v-if="showYoM =='m'   && mydata &&  mydata.ThisMonth ">
+        <li v-for="(item,index) in mydata.ThisMonth"  :key="index"> 
+          <div class="name" :title="item.kh_name">{{item.kh_name}}</div>
+          <div class="rect" 
+          :style="{width:410*(Number(item.this_Month_Waybill_Quantity)>max2?max2:Number(item.this_Month_Waybill_Quantity))/max2+'px'}">
+          </div>
+          <div class="num">{{item.this_Month_Waybill_Quantity}}</div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</template>
+<script>
+/* eslint-disable */
+
+import { mapState } from "vuex";
+import PopUpWidget from "../../../components/PopUpWidget";
+import barhorSort from "../../../components/charts/barhorSort";
+
+export default {
+  name: "popupwaybillnumstatistics",
+  components: {
+    PopUpWidget,
+    barhorSort
+  },
+  computed: {
+     // popupwaybillnumstatisticsStore/getTbSubjectKhHzsYearAMonthByDId
+    ...mapState("accumulatedWorkloadStatistics", ["showYoM"]),
+    ...mapState("popupwaybillnumstatisticsStore", ["ydspop"]),
+   
+    max1(){
+      return  this.mydata &&  this.mydata.ThisYear  &&   this.mydata.ThisYear[0]  &&  this.mydata.ThisYear[0].this_Year_Waybill_Quantity   &&    Number(this.mydata.ThisYear[0].this_Year_Waybill_Quantity )
+    },
+    max2(){
+      return   this.mydata &&  this.mydata.ThisMonth   &&    this.mydata.ThisMonth[0]  &&     this.mydata.ThisMonth[0].this_Month_Waybill_Quantity  &&  Number(this.mydata.ThisMonth[0].this_Month_Waybill_Quantity)
+    }
+    // ...mapState('popupdriverhealthy', ['healthyData']),
+    //  ...mapState('popupwaybillnumstatisticsStore', ['ydspop']),
+    // getBarhorEventData() {
+    //   const b = this.barhorEventData.sort((a, b) => a.value > b.value)
+    //   return b
+    // },
+  },
+  data() {
+    return {
+      // barhorEventData: [
+      //   { name: "危险路段报警1", value: 555 },
+      //   { name: "危险路段报警2", value: 112 },
+      //   { name: "危险路段报警3", value: 200 },
+      //   { name: "危险路段报警4", value: 114 },
+      //   { name: "危险路段报警5", value: 115 },
+      //   { name: "危险路段报警6", value: 16 }
+      // ]
+     mydata: {"ThisYear":[{"tb_subject_kh_id":null,"driver_ID":null,"id":null,"this_Year_Waybill_Quantity":"242","this_Month_Waybill_Quantity":null,"kh_name":"新奥能源贸易有限公司"},{"tb_subject_kh_id":null,"driver_ID":null,"id":null,"this_Year_Waybill_Quantity":"153","this_Month_Waybill_Quantity":null,"kh_name":"永州新奥燃气有限公司"},{"tb_subject_kh_id":null,"driver_ID":null,"id":null,"this_Year_Waybill_Quantity":"96","this_Month_Waybill_Quantity":null,"kh_name":"广州元亨能源有限公司"},{"tb_subject_kh_id":null,"driver_ID":null,"id":null,"this_Year_Waybill_Quantity":"56","this_Month_Waybill_Quantity":null,"kh_name":"汕头市润新燃气有限公司"},{"tb_subject_kh_id":null,"driver_ID":null,"id":null,"this_Year_Waybill_Quantity":"37","this_Month_Waybill_Quantity":null,"kh_name":"北海新奥华恒物流有限公司"}],"ThisMonth":[{"tb_subject_kh_id":null,"driver_ID":null,"id":null,"this_Year_Waybill_Quantity":null,"this_Month_Waybill_Quantity":"24","kh_name":"新奥能源贸易有限公司"},{"tb_subject_kh_id":null,"driver_ID":null,"id":null,"this_Year_Waybill_Quantity":null,"this_Month_Waybill_Quantity":"12","kh_name":"永州新奥燃气有限公司"},{"tb_subject_kh_id":null,"driver_ID":null,"id":null,"this_Year_Waybill_Quantity":null,"this_Month_Waybill_Quantity":"8","kh_name":"广州元亨能源有限公司"},{"tb_subject_kh_id":null,"driver_ID":null,"id":null,"this_Year_Waybill_Quantity":null,"this_Month_Waybill_Quantity":"3","kh_name":"汕头市润新燃气有限公司"},{"tb_subject_kh_id":null,"driver_ID":null,"id":null,"this_Year_Waybill_Quantity":null,"this_Month_Waybill_Quantity":"2","kh_name":"北海新奥华恒物流有限公司"}]}
+    };
+  },
+  methods: {}
+};
+</script>
+<style lang="scss" scoped>
+@mixin size($width, $height) {
+  width: $width;
+  height: $height;
+}
+.PopupWaybillNumStatistics {
+  @include size(550px, 100%);
+  position: relative;
+  .legendWaybillNum {
+    @include size(120px, 20px);
+    margin-right: 33.4px;
+    margin-top: 3px;
+    position: absolute;
+    right: 0;
+    div {
+      &:nth-child(1) {
+        @include size(11.5px, 2px);
+        background: #89dddf;
+        position: absolute;
+        top: 10px;
+        left: 20px;
+      }
+      &:nth-child(2) {
+        @include size(120px, 20px);
+        color: #b5b5b5;
+        font-size: 14px;
+        text-align: right;
+        line-height: 20px;
+      }
+    }
+  }
+  .chartsWaybillNum {
+    @include size(550px, 170px);
+    margin-top: 40px;
+    .list {
+      width: 550px;
+      height: 170px;
+      overflow-y: auto;
+      list-style: none;
+      li {
+        width: 550px;
+        height: 25px;
+        margin-top: 5px;
+        overflow: hidden;
+        div {
+          height: 15px;
+          line-height: 15px;
+          text-align: center;
+          // background: rgba(0, 191, 229, 0.5);
+          color: #fff;
+          float: left;
+          font-size: 14px;
+        }
+        .name {
+          width: 80px;
+          padding-left: 15px;
+          box-sizing: border-box;
+          cursor:default;
+          overflow: hidden;
+          // white-space: nowrap;
+          // text-overflow: ellipsis;
+          // background: red;
+        }
+        .rect {
+          // max-width: 425px;
+          width: 410px;
+          margin-left: 10px;
+          // width: 100px;
+          height: 15px;
+          // margin-top: 10px;
+          background: #89dddf;
+          margin-left: 10px;
+          float: left;
+          // background: green;
+        }
+        .num {
+          width: 40px;
+          height: 15px;
+          margin-left: 10px;
+          padding-left: 5px;
+          box-sizing: border-box;
+          // background: yellow;
+        }
+      }
+    }
+    .list::-webkit-scrollbar {
+      width: 5px;
+      background: rgba(0, 0, 0, 0);
+    }
+    .list::-webkit-scrollbar-thumb {
+      background: #05d0eb;
+      border-radius: 5px;
+    }
+  }
+}
+</style>

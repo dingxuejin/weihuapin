@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobiusVision.dao.TbSubject.TbSubjectYRxslcMapper" >
+
+    <!--mapper缓存参数设定-->
+    <cache  eviction="LRU" flushInterval="60000"  size="512" readOnly="true"/>
+
+    <!--#人员行驶里程等数据按年-&#45;&#45;平均数据需计算-->
+    <!--select year,sum(abs(loaded_km)+abs(empty_km)) as total_km,sum(abs(loaded_km)) as loaded_km,sum(abs(empty_km)) as empty_km,-->
+    <!--sum(abs(empty_km))/sum(abs(loaded_km))*100 as empty_loaded_rate-->
+    <!--from TB_SUBJECT_YXSLC where driver_id=201408000003 group by year order by abs(year);-->
+
+    <!--#人员行驶里程等数据按月-&#45;&#45;平均数据需计算-->
+    <!--select month,sum(abs(loaded_km)+abs(empty_km)) as total_km,sum(abs(loaded_km)) as loaded_km,sum(abs(empty_km)) as empty_km,-->
+    <!--sum(abs(empty_km))/sum(abs(loaded_km))*100 as empty_loaded_rate-->
+    <!--from TB_SUBJECT_YXSLC where driver_id=201408000003 and year=2017 group by month order by abs(month);-->
+
+    <!--#人员行驶里程等数据按天-&#45;&#45;平均数据需计算-->
+    <!--select day,sum(abs(loaded_km)+abs(empty_km)) as total_km,sum(abs(loaded_km)) as loaded_km,sum(abs(empty_km)) as empty_km,-->
+    <!--sum(abs(empty_km))/sum(abs(loaded_km))*100 as empty_loaded_rate-->
+    <!--from TB_SUBJECT_RXSLC where driver_id=201408000003 and year=2017 and month=1 group by day order by abs(day);-->
+
+    <!--TB_SUBJECT_YXSLC档案人员记录中，通过driver_id查询所有年和某年所有月的信息-->
+    <select id="findAllYearAMonthByDId" resultType="TbSubjectYRxslc">
+        select
+        <if test="year==null">
+            year,
+        </if>
+        <if test="year!=null">
+            month,
+        </if>
+        sum(abs(loaded_km)+abs(empty_km)) as total_km,sum(abs(loaded_km)) as loaded_km,sum(abs(empty_km)) as empty_km,
+        sum(abs(empty_km))/sum(abs(loaded_km))*100 as empty_loaded_rate,
+        (select avg(total_km) as avg_total_km
+        from
+        (select driver_id,year,sum(abs(loaded_km)+abs(empty_km)) as total_km,sum(abs(loaded_km)) as loaded_km,sum(abs(empty_km)) as empty_km,
+        sum(abs(empty_km))/sum(abs(loaded_km))*100 as empty_loaded_rate
+        from TB_SUBJECT_YXSLC where driver_id=#{driver_id}
+        <if test="year==null">
+            group by year order by abs(year)
+        </if>
+        <if test="year!=null">
+            and year=#{year} group by month order by abs(month)
+        </if>
+        ) total group by driver_id) as avg_total_km,
+
+        (select avg(loaded_km) as avg_loaded_km
+        from
+        (select driver_id,year,sum(abs(loaded_km)+abs(empty_km)) as total_km,sum(abs(loaded_km)) as loaded_km,sum(abs(empty_km)) as empty_km,
+        sum(abs(empty_km))/sum(abs(loaded_km))*100 as empty_loaded_rate
+        from TB_SUBJECT_YXSLC where driver_id=#{driver_id}
+        <if test="year==null">
+            group by year order by abs(year)
+        </if>
+        <if test="year!=null">
+            and year=#{year} group by month order by abs(month)
+        </if>
+        ) total group by driver_id) as avg_loaded_km,
+
+        (select avg(empty_km) as avg_empty_km
+        from
+        (select driver_id,year,sum(abs(loaded_km)+abs(empty_km)) as total_km,sum(abs(loaded_km)) as loaded_km,sum(abs(empty_km)) as empty_km,
+        sum(abs(empty_km))/sum(abs(loaded_km))*100 as empty_loaded_rate
+        from TB_SUBJECT_YXSLC where driver_id=#{driver_id}
+        <if test="year==null">
+            group by year order by abs(year)
+        </if>
+        <if test="year!=null">
+            and year=#{year} group by month order by abs(month)
+        </if>
+        ) total group by driver_id) as avg_empty_km,
+
+        (select avg(empty_loaded_rate) as avg_empty_loaded_rate
+        from
+        (select driver_id,year,sum(abs(loaded_km)+abs(empty_km)) as total_km,sum(abs(loaded_km)) as loaded_km,sum(abs(empty_km)) as empty_km,
+        sum(abs(empty_km))/sum(abs(loaded_km))*100 as empty_loaded_rate
+        from TB_SUBJECT_YXSLC where driver_id=#{driver_id}
+        <if test="year==null">
+            group by year order by abs(year)
+        </if>
+        <if test="year!=null">
+            and year=#{year} group by month order by abs(month)
+        </if>
+        ) total group by driver_id) as avg_empty_loaded_rate
+
+        from TB_SUBJECT_YXSLC where driver_id=#{driver_id}
+        <if test="year==null">
+            group by year order by abs(year)
+        </if>
+        <if test="year!=null">
+            and year=#{year} group by month order by abs(month)
+        </if>
+    </select>
+
+    <!--TB_SUBJECT_YXSLC档案人员记录中，通过driver_id查询某年某月所有天的信息-->
+    <select id="findAllDayByDId" resultType="TbSubjectYRxslc">
+        select day,sum(abs(loaded_km)+abs(empty_km)) as total_km,sum(abs(loaded_km)) as loaded_km,sum(abs(empty_km)) as empty_km,
+        sum(abs(empty_km))/sum(abs(loaded_km))*100 as empty_loaded_rate,
+
+        (select avg(total_km) as avg_total_km
+        from
+        (select driver_id,day,sum(abs(loaded_km)+abs(empty_km)) as total_km,sum(abs(loaded_km)) as loaded_km,sum(abs(empty_km)) as empty_km,
+        sum(abs(empty_km))/sum(abs(loaded_km))*100 as empty_loaded_rate
+        from TB_SUBJECT_RXSLC where driver_id=#{driver_id} and year=#{year} and month=#{month} group by day order by abs(day)) total group by driver_id)
+        as avg_total_km,
+
+        (select avg(loaded_km) as avg_loaded_km
+        from
+        (select driver_id,day,sum(abs(loaded_km)+abs(empty_km)) as total_km,sum(abs(loaded_km)) as loaded_km,sum(abs(empty_km)) as empty_km,
+        sum(abs(empty_km))/sum(abs(loaded_km))*100 as empty_loaded_rate
+        from TB_SUBJECT_RXSLC where driver_id=#{driver_id} and year=#{year} and month=#{month} group by day order by abs(day)) total group by driver_id)
+        as avg_loaded_km,
+
+        (select avg(empty_km) as avg_empty_km
+        from
+        (select driver_id,day,sum(abs(loaded_km)+abs(empty_km)) as total_km,sum(abs(loaded_km)) as loaded_km,sum(abs(empty_km)) as empty_km,
+        sum(abs(empty_km))/sum(abs(loaded_km))*100 as empty_loaded_rate
+        from TB_SUBJECT_RXSLC where driver_id=#{driver_id} and year=#{year} and month=#{month} group by day order by abs(day)) total group by driver_id)
+        as avg_empty_km,
+
+        (select avg(empty_loaded_rate) as avg_empty_loaded_rate
+        from
+        (select driver_id,day,sum(abs(loaded_km)+abs(empty_km)) as total_km,sum(abs(loaded_km)) as loaded_km,sum(abs(empty_km)) as empty_km,
+        sum(abs(empty_km))/sum(abs(loaded_km))*100 as empty_loaded_rate
+        from TB_SUBJECT_RXSLC where driver_id=#{driver_id} and year=#{year} and month=#{month} group by day order by abs(day)) total group by driver_id)
+        as avg_empty_loaded_rate
+
+        from TB_SUBJECT_RXSLC where driver_id=#{driver_id} and year=#{year} and month=#{month} group by day order by abs(day)
+    </select>
+
+    <!--#人员平均行驶里程等按年-->
+    <!--select avg(total_km) as avg_total_km,-->
+    <!--avg(loaded_km) as avg_loaded_km,-->
+    <!--avg(empty_km) as avg_empty_km,-->
+    <!--avg(empty_loaded_rate) as avg_empty_loaded_rate-->
+    <!--from-->
+    <!--(select driver_id,year,sum(abs(loaded_km)+abs(empty_km)) as total_km,sum(abs(loaded_km)) as loaded_km,sum(abs(empty_km)) as empty_km,-->
+    <!--sum(abs(empty_km))/sum(abs(loaded_km))*100 as empty_loaded_rate-->
+    <!--from TB_SUBJECT_YXSLC where driver_id=201408000003 group by year order by abs(year)) total group by driver_id;-->
+
+    <!--#人员平均行驶里程等按月-->
+    <!--select avg(total_km) as avg_total_km,-->
+    <!--avg(loaded_km) as avg_loaded_km,-->
+    <!--avg(empty_km) as avg_empty_km,-->
+    <!--avg(empty_loaded_rate) as avg_empty_loaded_rate-->
+    <!--from-->
+    <!--(select driver_id,month,sum(abs(loaded_km)+abs(empty_km)) as total_km,sum(abs(loaded_km)) as loaded_km,sum(abs(empty_km)) as empty_km,-->
+    <!--sum(abs(empty_km))/sum(abs(loaded_km))*100 as empty_loaded_rate-->
+    <!--from TB_SUBJECT_YXSLC where driver_id=201408000003 and year=2017 group by month order by abs(month)) total group by driver_id;-->
+
+    <!--#人员平均行驶里程等按天-->
+    <!--select avg(total_km) as avg_total_km,-->
+    <!--avg(loaded_km) as avg_loaded_km,-->
+    <!--avg(empty_km) as avg_empty_km,-->
+    <!--avg(empty_loaded_rate) as avg_empty_loaded_rate-->
+    <!--from-->
+    <!--(select driver_id,day,sum(abs(loaded_km)+abs(empty_km)) as total_km,sum(abs(loaded_km)) as loaded_km,sum(abs(empty_km)) as empty_km,-->
+    <!--sum(abs(empty_km))/sum(abs(loaded_km))*100 as empty_loaded_rate-->
+    <!--from TB_SUBJECT_RXSLC where driver_id=201408000003 and year=2017 and month=1 group by day order by abs(day)) total group by driver_id;-->
+
+    <!--TB_SUBJECT_YXSLC档案人员记录中，通过driver_id查询所有年和某年所有月的平均信息-->
+    <select id="findAllAvgYearAMonthByDId" resultType="TbSubjectYRxslc">
+        select avg(total_km) as avg_total_km,
+        avg(loaded_km) as avg_loaded_km,
+        avg(empty_km) as avg_empty_km,
+        avg(empty_loaded_rate) as avg_empty_loaded_rate
+        from
+        (select driver_id,year,sum(abs(loaded_km)+abs(empty_km)) as total_km,sum(abs(loaded_km)) as loaded_km,sum(abs(empty_km)) as empty_km,
+        sum(abs(empty_km))/sum(abs(loaded_km))*100 as empty_loaded_rate
+        from TB_SUBJECT_YXSLC where driver_id=#{driver_id}
+        <if test="year==null and month==null">
+            group by year order by abs(year)
+        </if>
+        <if test="month==null">
+            and year=#{year} group by month order by abs(month)
+        </if>
+        ) total group by driver_id;
+    </select>
+
+    <!--TB_SUBJECT_YXSLC档案人员记录中，通过driver_id查询某年某月所有天的平均信息-->
+    <select id="findAllAvgDayByDId" resultType="TbSubjectYRxslc">
+        select avg(total_km) as avg_total_km,
+        avg(loaded_km) as avg_loaded_km,
+        avg(empty_km) as avg_empty_km,
+        avg(empty_loaded_rate) as avg_empty_loaded_rate
+        from
+        (select driver_id,day,sum(abs(loaded_km)+abs(empty_km)) as total_km,sum(abs(loaded_km)) as loaded_km,sum(abs(empty_km)) as empty_km,
+        sum(abs(empty_km))/sum(abs(loaded_km))*100 as empty_loaded_rate
+        from TB_SUBJECT_RXSLC where driver_id=#{driver_id} and year=#{year} and month=#{month} group by day order by abs(day)) total group by driver_id;
+    </select>
+</mapper>

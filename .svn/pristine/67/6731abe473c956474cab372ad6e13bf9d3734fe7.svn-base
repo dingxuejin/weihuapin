@@ -1,0 +1,10 @@
+package com.mobiusVision.dao.TbSubject;
+
+/**
+ * @Author: zhangzhirong
+ * @Description:
+ * @Date:Created in 11:18 2018/6/27/027
+ * @Modify By:
+ **/
+public interface TbSubjectLsxlydMapper {
+}

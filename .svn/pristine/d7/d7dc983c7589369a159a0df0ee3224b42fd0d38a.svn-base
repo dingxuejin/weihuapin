@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobiusVision.dao.TbSubject.TbSubjectQyJyzkdcpmMapper">
+  <resultMap id="BaseResult" type="TbSubjectQyJyzkdcpm">
+    <id column="tb_subject_qy_jyzkdcpm_id" property="tb_subject_qy_jyzkdcpm_id" jdbcType="INTEGER"/>
+    <result column="year" property="year" jdbcType="VARCHAR"/>
+    <result column="month" property="month" jdbcType="VARCHAR"/>
+    <result column="entity_id" property="entity_id" jdbcType="VARCHAR"/>
+    <result column="ranking" property="ranking" jdbcType="VARCHAR"/>
+    <result column="ranking_change_code" property="ranking_change_code" jdbcType="VARCHAR"/>
+    <result column="average_income" property="average_income" jdbcType="VARCHAR"/>
+    <result column="year_ranking" property="year_ranking" jdbcType="VARCHAR"/>
+    <result column="year_average_income" property="year_average_income" jdbcType="VARCHAR"/>
+    <result column="ranking_change_code" property="ranking_change_code" jdbcType="VARCHAR"/>
+    <result column="entity_count" property="entity_count" jdbcType="VARCHAR"/>
+  </resultMap>
+  <cache eviction="LRU" flushInterval="60000" size="512" readOnly="true"/>
+  <select id="queryRankingByYearAndEntityId" resultType="TbSubjectQyJyzkdcpm">
+    select year_ranking
+    from
+    (
+    select (@rowNO := @rowNo+1) AS year_ranking,a.* from (select avg(ranking) ,entity_id
+    from  tb_subject_qy_jyzkdcpm
+    where year=#{year}
+    group by entity_id
+    order by avg (ranking)
+    ) a,(select @rowNO :=0) b
+    )d
+    where entity_id=#{entity_id}
+  </select>
+  <select id="queryRankingEntityCountByEntityIdAndYearAndMonth" resultType="TbSubjectQyJyzkdcpm">
+    select ranking ,(select count(DISTINCT entity_id)
+    from tb_subject_qy_jyzkdcpm)as entity_count
+    from tb_subject_qy_jyzkdcpm
+    WHERE entity_id=#{entity_id} and year=#{year} and month=#{month}
+  </select>
+
+  <select id="queryEntityCount" resultType="TbSubjectQyJyzkdcpm">
+    select count(DISTINCT entity_id)as entity_count from
+tb_subject_qy_jyzkdcpm
+  </select>
+  <select id="queryAllByEntityId" resultType="TbSubjectQyJyzkdcpm">
+    select RTRIM((@rowNO := @rowNo+1)) AS year_ranking,year,RTRIM(year_average_income1)as year_average_income
+    from (select year,sum(average_income)as year_average_income1
+    from tb_subject_qy_jyzkdcpm where entity_id=#{entity_id}
+    GROUP BY year ORDER BY year_average_income1 desc)a,(select @rowNO :=0) b
+  </select>
+  <select id="queryAllByEntityIdAndYear" resultType="TbSubjectQyJyzkdcpm">
+    select ranking,month,average_income,ranking_change_code
+    from tb_subject_qy_jyzkdcpm where entity_id=#{entity_id} and year=#{year} order by ranking
+  </select>
+</mapper>

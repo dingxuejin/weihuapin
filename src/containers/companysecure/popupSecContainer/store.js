@@ -240,7 +240,6 @@ const mutations = {
   },
   // 不同周期违规行为数量（违规行为行为数量变化趋势弹框）
   setDriverIrregularityCount(state, data) {
-    console.log('ffffffff',data)
     state.driverIrregularityCount = data
   },
   // 不同周期违法行为数量（违法行为行为数量变化趋势弹框）

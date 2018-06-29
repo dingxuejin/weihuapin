@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobiusVision.dao.TbBusiness.TbBusinessPxMapper" >
+
+    <resultMap id="BaseResultMap" type="TbBusinessPx" >
+        <id column="tb_business_px_id" property="tb_business_px_id" jdbcType="INTEGER" />
+        <result column="Driver_ID" property="driver_ID" jdbcType="VARCHAR" />
+        <result column="Training_Type_Code" property="training_Type_Code" jdbcType="VARCHAR" />
+        <result column="Training_Theme_Code" property="training_Theme_Code" jdbcType="VARCHAR" />
+        <result column="Year" property="year" jdbcType="VARCHAR" />
+        <result column="Month" property="month" jdbcType="VARCHAR" />
+        <result column="Day" property="day" jdbcType="VARCHAR" />
+        <result column="Start_Time" property="start_Time" jdbcType="VARCHAR" />
+        <result column="End_Time" property="end_Time" jdbcType="VARCHAR" />
+        <result column="Training_Location" property="training_Location" jdbcType="VARCHAR" />
+        <result column="Training_Content" property="training_Content" jdbcType="VARCHAR" />
+        <result column="Training_Hours" property="training_Hours" jdbcType="VARCHAR" />
+        <result column="Training_Result_Code" property="training_Result_Code" jdbcType="VARCHAR" />
+        <result column="Training_Institution" property="training_Institution" jdbcType="VARCHAR" />
+        <result column="CertificateNumber" property="certificateNumber" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <resultMap id="TbBusinessPxAndTTT" type="TbBusinessPxATTT" >
+        <result column="total_training_times" property="total_training_times" jdbcType="VARCHAR" />
+        <result column="total_training_time" property="total_training_time" jdbcType="VARCHAR" />
+        <result column="total_result_pass" property="total_result_pass" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <!--mapper缓存参数设定-->
+    <cache  eviction="LRU" flushInterval="60000"  size="512" readOnly="true"/>
+    <!--通过driver_id查询tb_subject_jxjy表及其到期天数和未学习时间数据-->
+    <select id="findPxByDidCodeDate" resultMap="TbBusinessPxAndTTT">
+        select * ,
+        (select count(*)
+        from TB_BUSINESS_PX  where driver_id=#{driver_id} and training_type_code=#{training_type_code} and training_theme_code=#{training_theme_code} and year=#{year} and month=#{month})
+        as total_training_times
+        ,
+        (select sum(Training_Hours)
+        from TB_BUSINESS_PX  where driver_id=#{driver_id} and training_type_code=#{training_type_code} and training_theme_code=#{training_theme_code} and year=#{year} and month=#{month})
+        as total_training_time
+        ,
+        (select count(*)
+        from TB_BUSINESS_PX  where driver_id=#{driver_id} and training_type_code=#{training_type_code} and training_theme_code=#{training_theme_code} and year=#{year} and month=#{month} and Training_Result_Code="1")
+        as total_result_pass
+        from TB_BUSINESS_PX
+        where driver_id=#{driver_id} and training_type_code=#{training_type_code} and training_theme_code=#{training_theme_code} and year=#{year} and month=#{month}
+    </select>
+    <!--通过driver_id等数据查询Px表中人员培训次数,人员培训时长,培训通过人数-->
+    <select id="findAllTrainingTTT" resultType="TbBusinessPxOrTTT">
+        select count(*) as total_training_times,sum(Training_Hours) as total_training_time,t1.month,(select count(*)
+        from TB_BUSINESS_PX
+        where driver_id=#{driver_id} and training_type_code=#{training_type_code} and training_theme_code=#{training_theme_code} and year=#{year} and month=t1.month and Training_Result_Code="1") as total_result_pass
+        from TB_BUSINESS_PX t1 where driver_id=#{driver_id} and training_type_code=#{training_type_code} and training_theme_code=#{training_theme_code} and year=#{year} and month  between "01" and "12"  group by month order by month
+    </select>
+
+
+
+</mapper>

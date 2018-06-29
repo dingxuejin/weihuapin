@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobiusVision.dao.TbSubject.TbSubjectDydslMapper" >
+
+    <!--mapper缓存参数设定-->
+    <cache  eviction="LRU" flushInterval="60000"  size="512" readOnly="true"/>
+
+    <!--通过driver_id查询tb_subject_dydsl_day表全月每天数据
+        select * from tb_subject_dydsl_day where driver_id="201408000001" and year="2017" and month="10" and Capacity_Unit_Code="1"
+    -->
+    <select id="findYdslAllOneDayByDId" resultType="TbSubjectDydslDay">
+        select * from tb_subject_dydsl_day where driver_id=#{driver_id} and year=#{year} and month=#{month} and day=#{day}
+    </select>
+
+    <!--通过driver_id查询tb_subject_dydsl_day表全月每天数据
+        select * from tb_subject_dydsl_day where driver_id="201408000001" and year="2017" and month="10" and Capacity_Unit_Code="1"
+    -->
+    <select id="findYdslAllDayByDId" resultType="TbSubjectDydslDay">
+        select * from tb_subject_dydsl_day where driver_id=#{driver_id} and year=#{year} and month=#{month} order by abs(day)
+    </select>
+
+    <!--通过driver_id查询tb_subject_dydsl_month表全年每月数据
+        select * from tb_subject_dydsl_month where driver_id="201408000001" and year="2017"  and Capacity_Unit_Code="1"
+    -->
+    <select id="findYdslAllMonthByDId" resultType="TbSubjectDydslMonth">
+        select * from TB_SUBJECT_DYDSL_month where driver_id=#{driver_id} and year=#{year} order by abs(month)
+    </select>
+
+    <!--#sql-->
+    <!--select day,Waybill_Quantity,volume from tb_subject_dydsl_day-->
+    <!--where driver_id="201408000001" and year="2017" and month="10" and Capacity_Unit_Code="1" order by abs(day);-->
+    <!--通过driver_id查询tb_subject_dydsl_day表计算每天运单数量的同比环比
+        select select day,Waybill_Quantity,volume from tb_subject_dydsl_day where driver_id="201408000001" and year="2017" and month="10" and Capacity_Unit_Code="1"
+    -->
+    <select id="findYdslAllDayTongHuanbiByDId" resultType="TbSubjectDydslDay">
+        select day,Waybill_Quantity,volume from tb_subject_dydsl_day
+        where driver_id=#{driver_id} and year=#{year} and month=#{month} and Capacity_Unit_Code=#{capacity_unit_code} order by abs(day);
+    </select>
+
+    <!--#计算每月运单数量的同比环比sql-->
+    <!--select month,Waybill_Quantity,volume from tb_subject_dydsl_month-->
+    <!--where driver_id="201408000001" and year="2017" and Capacity_Unit_Code="1" order by abs(month);-->
+    <!--通过driver_id查询tb_subject_dydsl_month表计算每月运单数量的同比环比-->
+    <select id="findYdslAllMonthTongHuanbiByDId" resultType="TbSubjectDydslMonth">
+        select month,Waybill_Quantity,volume from tb_subject_dydsl_month
+        where driver_id=#{driver_id} and year=#{year} and Capacity_Unit_Code=#{capacity_unit_code} order by abs(month);
+    </select>
+
+    <!--#计算年份运单数量的环比sql-->
+    <!--select year,sum(Waybill_Quantity) as waybill_quantity,sum(volume) as volume from tb_subject_dydsl_month-->
+    <!--where driver_id="201408000001" and Capacity_Unit_Code="1" group by year order by abs(year);-->
+    <!--通过driver_id查询tb_subject_dydsl_month表计算年份运单数量的同比环比-->
+    <select id="findYdslAllYearTongHuanbiByDId" resultType="TbSubjectDydslMonth">
+        select year,sum(Waybill_Quantity) as waybill_quantity,sum(volume) as volume from tb_subject_dydsl_month
+        where driver_id=#{driver_id} and Capacity_Unit_Code=#{capacity_unit_code} group by year order by abs(year);
+    </select>
+</mapper>

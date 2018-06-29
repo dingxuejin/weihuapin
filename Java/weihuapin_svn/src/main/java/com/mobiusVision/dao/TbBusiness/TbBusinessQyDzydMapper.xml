@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobiusVision.dao.TbBusiness.TbBusinessQyDzydMapper" >
+
+    <resultMap id="BaseResultMap" type="TbBusinessQyDzyd" >
+        <id column="tb_business_qy_dzyd_id" property="tb_business_qy_dzyd_id" jdbcType="INTEGER" />
+        <result column="waybill_id" property="waybill_id" jdbcType="VARCHAR" />
+        <result column="route_id" property="route_id" jdbcType="VARCHAR" />
+        <result column="vehicle_id" property="vehicle_id" jdbcType="VARCHAR" />
+        <result column="driver_id" property="driver_id" jdbcType="VARCHAR" />
+        <result column="supercargo_id" property="supercargo_id" jdbcType="VARCHAR" />
+        <result column="cargo_id" property="cargo_id" jdbcType="VARCHAR" />
+        <result column="volume" property="volume" jdbcType="VARCHAR" />
+        <result column="start_time" property="start_time" jdbcType="VARCHAR" />
+        <result column="start_km" property="start_km" jdbcType="VARCHAR" />
+        <result column="arrive_time" property="arrive_time" jdbcType="VARCHAR" />
+        <result column="arrive_km" property="arrive_km" jdbcType="VARCHAR" />
+        <result column="driving_time" property="driving_time" jdbcType="VARCHAR" />
+        <result column="finish_time" property="finish_time" jdbcType="VARCHAR" />
+        <result column="return_time" property="return_time" jdbcType="VARCHAR" />
+        <result column="return_km" property="return_km" jdbcType="VARCHAR" />
+        <result column="entity_id" property="entity_id" jdbcType="VARCHAR" />
+        <result column="partner_id" property="partner_id" jdbcType="VARCHAR" />
+        <result column="phone_number" property="phone_number" jdbcType="VARCHAR" />
+        <result column="actual_toll_cost" property="actual_toll_cost" jdbcType="VARCHAR" />
+        <result column="actual_fuel_cost" property="actual_fuel_cost" jdbcType="VARCHAR" />
+        <result column="actual_fuel_price" property="actual_fuel_price" jdbcType="VARCHAR" />
+        <result column="apply_reserve_amount" property="apply_reserve_amount" jdbcType="VARCHAR" />
+        <result column="remain_reserve_amount" property="remain_reserve_amount" jdbcType="VARCHAR" />
+        <result column="arrival_source_time" property="arrival_source_time" jdbcType="VARCHAR" />
+        <result column="arrival_destination_time" property="arrival_destination_time" jdbcType="VARCHAR" />
+        <result column="money" property="money" jdbcType="VARCHAR" />
+        <result column="waybill_status_code" property="waybill_status_code" jdbcType="VARCHAR" />
+        <result column="create_time" property="create_time" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <resultMap id="TbBusinessQyDzydExtendsCljcxx" type="TbBusinessQyDzydExtends" extends="BaseResultMap" >
+        <result column="driver_name" property="driver_name" jdbcType="VARCHAR" />
+        <result column="supercargo_name" property="supercargo_name" jdbcType="VARCHAR" />
+        <result column="plate_number" property="plate_number" jdbcType="VARCHAR" />
+        <result column="cargo_name" property="cargo_name" jdbcType="VARCHAR" />
+        <result column="source_db_name" property="source_db_name" jdbcType="VARCHAR" />
+        <result column="destination_db_name" property="destination_db_name" jdbcType="VARCHAR" />
+        <result column="customer_name" property="customer_name" jdbcType="VARCHAR" />
+        <association property="xlxx" javaType="TbBasicQyXlxx">
+            <id column="tb_basic_qy_xlxx_id" property="tb_basic_qy_xlxx_id" jdbcType="INTEGER" />
+            <result column="route_id" property="route_id" jdbcType="VARCHAR" />
+            <result column="route_name" property="route_name" jdbcType="VARCHAR" />
+            <result column="source_db_id" property="source_db_id" jdbcType="VARCHAR" />
+            <result column="destination_db_id" property="destination_db_id" jdbcType="VARCHAR" />
+            <result column="station_name" property="station_name" jdbcType="VARCHAR" />
+            <result column="route_type_code" property="route_type_code" jdbcType="VARCHAR" />
+            <result column="km" property="km" jdbcType="VARCHAR" />
+            <result column="highway_km" property="highway_km" jdbcType="VARCHAR" />
+            <result column="plan_time" property="plan_time" jdbcType="VARCHAR" />
+            <result column="standard_toll_cost" property="standard_toll_cost" jdbcType="VARCHAR" />
+            <result column="standard_fuel_cost" property="standard_fuel_cost" jdbcType="VARCHAR" />
+            <result column="standard_oil_use" property="standard_oil_use" jdbcType="VARCHAR" />
+            <result column="standard_gas_use" property="standard_gas_use" jdbcType="VARCHAR" />
+            <result column="total_risk_location" property="total_risk_location" jdbcType="VARCHAR" />
+            <result column="if_interprovince" property="if_interprovince" jdbcType="VARCHAR" />
+            <result column="entity_id" property="entity_id" jdbcType="VARCHAR" />
+            <result column="route_status_code" property="route_status_code" jdbcType="VARCHAR" />
+            <result column="create_time" property="create_time" jdbcType="VARCHAR" />
+        </association>
+    </resultMap>
+    <!--mapper缓存参数设定-->
+    <cache  eviction="LRU" flushInterval="60000"  size="512" readOnly="true"/>
+
+    <!--#运营数据excel和地图线路GPS，数据不完整需填充-->
+    <!--#运单详细信息-->
+    <!--#全年数据-->
+    <!--select t1.*,t2.* from TB_BUSINESS_QY_DZYD t1,TB_BASIC_CLJCXX t2-->
+    <!--where t1.vehicle_id=t2.vehicle_id and t1.driver_id="201408000001" and t1.route_id="445200431100201501"-->
+    <!--and substring(t1.start_time,1,4)="2017";-->
+    <!--#全月数据-->
+    <!--select t1.*,t2.* from TB_BUSINESS_QY_DZYD t1,TB_BASIC_CLJCXX t2-->
+    <!--where t1.vehicle_id=t2.vehicle_id and t1.driver_id="201408000001" and t1.route_id="445200431100201501"-->
+    <!--and substring(t1.start_time,1,4)="2017" and substring(t1.start_time,5,2)="11";-->
+    <!--#全天数据-->
+    <!--select t1.*,t2.* from TB_BUSINESS_QY_DZYD t1,TB_BASIC_CLJCXX t2-->
+    <!--where t1.vehicle_id=t2.vehicle_id and t1.driver_id="201408000001" and t1.route_id="445200431100201501"-->
+    <!--and substring(t1.start_time,1,4)="2017" and substring(t1.start_time,5,2)="11" and substring(t1.start_time,7,2)="30";-->
+    <!--通过driver_id等年月数据查询TB_BUSINESS_QY_DZYD电子运单表中运单详细信息数据-->
+    <select id="findAllYearMonthDayDzydByDId" resultMap="TbBusinessQyDzydExtendsCljcxx">
+        select
+        t1.*,
+        t2.plate_number,
+        ryjb.name as driver_name,
+        (select name from TB_BASIC_RYJB where driver_id=t1.supercargo_id) as supercargo_name,
+        xlxx.*,
+        cjhw.cargo_name,
+        db_source.name as source_db_name,
+        db_destination.name as destination_db_name,
+        hzs.name as customer_name
+        from TB_BUSINESS_QY_DZYD t1,
+        TB_BASIC_CLJCXX t2,
+        TB_BASIC_RYJB ryjb,
+        TB_BASIC_QY_XLXX xlxx,
+        TB_DICTIONARY_CJHWFL cjhw,
+        TB_BASIC_QY_DBXX db_source,
+        TB_BASIC_QY_DBXX db_destination,
+        TB_BASIC_QY_HZSXX hzs
+        where
+        t1.vehicle_id=t2.vehicle_id and
+        t1.driver_id=#{driver_id}  and
+        t1.route_id=#{route_id} and
+        t1.driver_id=ryjb.driver_id and
+        t1.route_id=xlxx.route_id and
+        t1.cargo_id=cjhw.cargo_id and
+        xlxx.source_db_id=db_source.tb_basic_qy_dbxx_id and
+        xlxx.destination_db_id=db_destination.tb_basic_qy_dbxx_id and
+        t1.partner_id=hzs.id
+        <if test="year != null and year != ''">
+            and substring(t1.start_time,1,4) = #{year}
+        </if>
+        <if test="month != null and month != '' ">
+            and substring(t1.start_time,5,2) = #{month}
+        </if>
+        <if test="day != null and day != '' ">
+            and substring(t1.start_time,7,2) = #{day}
+        </if>
+    </select>
+
+    <!--查询人员所有运单里程，以车辆品牌进行汇总-->
+    <!--select sum(abs(dzyd.start_km)+abs(arrive_km)),clpp.vehicle_brand-->
+    <!--from TB_BUSINESS_QY_DZYD dzyd,TB_BASIC_CLJCXX cljcxx,TB_DICTIONARY_CLPP clpp-->
+    <!--where dzyd.vehicle_id=cljcxx.vehicle_id-->
+    <!--and cljcxx.vehicle_brand_code=clpp.vehicle_brand_code-->
+    <!--and substring(dzyd.start_time,1,4)=2017-->
+    <!--and substring(dzyd.start_time,5,2)=10-->
+    <!--group by clpp.vehicle_brand;-->
+    <!--通过driver_id查询TB_BUSINESS_QY_DZYD电子运单表中所有运单里程，以车辆品牌进行汇总-->
+    <select id="findDzydLcTjByDId" resultType="TbBusinessQyDzydAndLcTj">
+        select sum(abs(dzyd.start_km)+abs(arrive_km)) as total_km,clpp.vehicle_brand
+        from TB_BUSINESS_QY_DZYD dzyd,TB_BASIC_CLJCXX cljcxx,TB_DICTIONARY_CLPP clpp
+        where dzyd.driver_id=#{driver_id}
+        and dzyd.vehicle_id=cljcxx.vehicle_id
+        and cljcxx.vehicle_brand_code=clpp.vehicle_brand_code
+        <if test="year != null and year != ''">
+            and substring(dzyd.start_time,1,4) = #{year}
+        </if>
+        <if test="month != null and month != '' ">
+            and substring(dzyd.start_time,5,2) = #{month}
+        </if>
+        group by clpp.vehicle_brand
+        order by sum(abs(dzyd.start_km)+abs(arrive_km)) desc
+    </select>
+
+</mapper>

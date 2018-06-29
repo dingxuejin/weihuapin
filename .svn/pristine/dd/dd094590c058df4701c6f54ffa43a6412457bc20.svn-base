@@ -1,0 +1,38 @@
+import * as DriverAPI from '@/api/driver'
+
+const state = {
+  // healthyData: null,
+  // popupwaybillnumstatisticsStore,
+  ydspop: null,
+}
+const mutations = {
+  // setDriverHealthy(state, data) {
+  //   state.healthyData = data
+  // },
+  setydspop(state, data) {
+    state.ydspop = data
+  },
+}
+
+const actions = {
+  // async getDriverHealthy({
+  //   commit,
+  // }, param) {
+  //   const Healthy = await DriverAPI.getDriverHealthy(param)
+  //   commit('setDriverHealthy', Healthy.data)
+  // },
+  async getTbSubjectKhHzsYearAMonthByDId({
+    commit,
+  }, param) {
+    const setydspopData = await DriverAPI.getTbSubjectKhHzsYearAMonthByDId(param)
+    commit('setydspop', setydspopData.data)
+    console.log('store.js', JSON.stringify(state.ydspop))
+  },
+}
+
+export default {
+  namespaced: true,
+  state,
+  mutations,
+  actions,
+}

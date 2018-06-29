@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobiusVision.dao.TbSubject.TbSubjectNYRxslcMapper" >
+
+    <!--mapper缓存参数设定-->
+    <cache  eviction="LRU" flushInterval="60000"  size="512" readOnly="true"/>
+    <!--年份的行驶里程数据TB_SUBJECT_YXSLC-->
+    <select id="findNYxslcByDId" resultType="TbSubjectNYRxslc">
+        select year, sum(Loaded_KM) as year_total_loaded_km,
+        sum(empty_KM) as year_total_empty_km,
+        sum(Loaded_KM+empty_KM) as year_total_km,
+        sum(empty_KM)/sum(Loaded_KM+empty_KM) as year_total_empty_km_d_loaded_km
+        from TB_SUBJECT_YXSLC
+        where driver_id=#{driver_id} group by year order by abs(year);
+    </select>
+
+    <!--月份的行驶里程数据TB_SUBJECT_YXSLC-->
+    <select id="findYYxslcByDId" resultType="TbSubjectNYRxslc">
+        select year, month,sum(Loaded_KM) as month_total_loaded_km,
+        sum(empty_KM) as month_total_empty_km,
+        sum(Loaded_KM+empty_KM) as month_total_km,
+        sum(empty_KM)/sum(Loaded_KM+empty_KM) as month_total_empty_km_d_loaded_km
+        from TB_SUBJECT_YXSLC
+        where driver_id=#{driver_id} and year=#{year} group by month order by abs(month);
+    </select>
+
+    <!--月份的行驶里程数据TB_SUBJECT_RXSLC-->
+    <select id="findRRxslcByDId" resultType="TbSubjectNYRxslc">
+        select year, month,day,sum(Loaded_KM) as day_total_loaded_km,
+        sum(empty_KM) as day_total_empty_km,
+        sum(Loaded_KM+empty_KM) as day_total_km,
+        sum(empty_KM)/sum(Loaded_KM+empty_KM) as day_total_empty_km_d_loaded_km
+        from TB_SUBJECT_RXSLC
+        where driver_id=#{driver_id} and year=#{year} and month=#{month} group by day order by abs(day);
+    </select>
+</mapper>

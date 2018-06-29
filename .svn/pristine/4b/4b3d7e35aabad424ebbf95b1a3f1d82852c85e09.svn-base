@@ -1,0 +1,4944 @@
+<template>
+  <div class="centerMap_wrap">
+    <div class="centerMap">
+      <!-- 地图 -->
+      <companyCurrentGoodsMap :data="companyCargoFlowMap"
+                              v-if='centerShow===0'></companyCurrentGoodsMap>
+      <companyGoodsMap :data="cargoHistoryFlowMap[checkShow]"
+                       v-if='centerShow===1'></companyGoodsMap>
+      <companyCarStatus :data="vehicleStateMap"
+                        v-if='centerShow===2'></companyCarStatus>
+    </div>
+    <div class="center_header"
+         @click='popshow'>
+      <div class="num"
+           v-if="safeProductDay">
+        <div>
+          <span>{{safeProductDay.safe_transport_days}}</span>
+          <span>天</span>
+        </div>
+        <div>
+          <span>{{parseFloat(safeProductDay.safe_transport_tenthousand_km).toLocaleString()}}</span>
+          <span>公里</span>
+        </div>
+      </div>
+      <div class="name">
+        <div>安全运输天数</div>
+        <div>安全行驶里程</div>
+      </div>
+      <div class="task_progress" v-if="safeProductDay">
+        <div class="progress">
+          <el-progress :text-inside="true" :stroke-width="35" :percentage="safeProductDay.current_task_ratio" color="rgba(3, 139, 252, 0.7)"></el-progress>
+        </div>
+        <div class="task_text">
+          <p>已完成任务<span>{{safeProductDay.current_task}}</span></p>
+          <p>本年任务额<span>{{safeProductDay.annual_task}}</span></p>
+        </div>
+      </div>
+    </div>
+    <div class="center_left_icon"
+         @click='layerShow=!layerShow'></div>
+    <div class="center_right_icon" @click="showWarningTip=true">
+      <div class="over">{{WarningTipStatisticsData.alert_car_counts || 0}}</div>
+    </div>
+    <div class="center_right_icon_expire" @click="showExprieTip=true">
+      <div>{{companyExpireNum}}</div>
+    </div>
+    <div class="center_left_center">
+      <div v-for='(item,index) in center' :key='index'>
+        <div :class='{hover:centerShow===index}'
+             @click='centerShow=index'>{{item}}</div>
+      </div>
+    </div>
+    <!-- 实时货物 -->
+    <div class="center_bottom"
+         v-show='centerShow===0'>
+      <div class="title">实时货物运单信息</div>
+      <!-- 客户要求：要增加车牌号及车辆类型（牵引车+挂车）， -->
+      <div class="header">
+        <div v-for='(item,index) in realtitle' :key='index'>{{item}}</div>
+      </div>
+      <ul class="real_ul"
+          v-if="companyCargoFlow">
+        <!-- <li v-for='item in realdata'>
+          <div v-for='item2 in item'>{{item2}}</div>
+        </li> -->
+        <li v-for='(item,index) in companyCargoFlow'
+            :key='index'>
+          <div :title="item.route_id">{{item.route_id || "-"}}</div>
+          <div>{{item.cljcxx_vehicle_id.cllx.vehicle_category || "-"}}</div>
+          <div>{{item.qy_dzyd_waybill_id.ryjb.name || "-"}}</div>
+          <div>{{item.qy_dzyd_waybill_id.cjhwfl.hwlx.description || "-"}}</div>
+          <div>{{item.volume || "-"}}</div>
+          <div :title="item.qy_dzyd_waybill_id.qy_hzsxx&&item.qy_dzyd_waybill_id.qy_hzsxx.name">{{item.qy_dzyd_waybill_id.qy_hzsxx && item.qy_dzyd_waybill_id.qy_hzsxx.name || "-"}}</div>
+          <div :title="item.qy_dzyd_waybill_id&&item.qy_dzyd_waybill_id.start_time">{{item.qy_dzyd_waybill_id.start_time || "-"}}</div>
+          <div :title="item.qy_dbxx_source_db_id&&item.qy_dbxx_source_db_id.name">{{item.qy_dbxx_source_db_id.name || "-"}}</div>
+          <div :title="item.qy_dbxx_destination_db_id&&item.qy_dbxx_destination_db_id.name">{{item.qy_dbxx_destination_db_id.name || "-"}}</div>
+        </li>
+      </ul>
+      <div class="arrow_up"
+           @click='up_real'></div>
+      <div class="arrow_down"
+           @click='down_real'></div>
+    </div>
+    <!-- 历史货物 -->
+    <div class="check_year_month"
+         v-show='centerShow===1'>
+      <div :class='{hover:checkShow==="thisYear"}'
+           @click='check_ym("thisYear")'>本年</div>
+      <div :class='{hover:checkShow==="thisMonth"}'
+           @click='check_ym("thisMonth")'>本月</div>
+    </div>
+    <div class="center_bottom"
+         v-show='centerShow===1'>
+      <div class="center_x1"
+           v-if="cargoHistoryFlow">
+        <centerRanking name='本年周转量线路排名TOP10'
+                       :title='["排名","周转量","线路"]'
+                       type='turnover'
+                       :data='cargoHistoryFlow[this.checkShow]'></centerRanking>
+      </div>
+      <div class="center_x2"></div>
+      <div class="center_x3" 
+        v-if="cargoHistoryFlow">
+        <centerRanking name='本年运单数线路排名TOP10'
+                       :title='["排名","运单数","线路"]'
+                       type='waybill_quantity'
+                       :data='cargoHistoryFlow[this.checkShow]'></centerRanking>
+      </div>
+    </div>
+    <!-- 车辆状态 -->
+    <div class="center_bottom"
+         v-show='centerShow===2'>
+      <div class="title">车辆状态信息</div>
+      <div class="header_car carcar">
+        <div v-for='(item,index) in realcar'
+             :key='index'>{{item}}</div>
+      </div>
+      <div class="header_car">
+        <div v-for='(item,index) in realcar'
+             :key='index'>{{item}}</div>
+      </div>
+      <ul class="car_ul"
+          v-if="vehicleState">
+        <li v-for='(item,index) in vehicleState'
+            :key='index'>
+          <div>{{item.cljcxx.plate_number}}</div>
+          <div>{{item.kzc.vehicle_loading_status}}</div>
+          <div>{{item.address}}</div>
+        </li>
+      </ul>
+      <div class="arrow_up"
+           @click='up_car'></div>
+      <div class="arrow_down"
+           @click='down_car'></div>
+    </div>
+    <!-- 弹窗 -->
+    <div class="center_left_layer"
+         v-show='layerShow'>
+      <!-- 工商注册信息 -->
+      <div class="son">
+        <div @click='gs=!gs'>
+          <layerTitle icon='gs'
+                      name='工商注册信息'
+                      @up='changegs'></layerTitle>
+        </div>
+        <div class="tbg">
+          <div class="next"
+               v-if='gs && companyRegisterInfo'>
+            <layerSon icon='icon1'
+                      labelname='公司名称'
+                      :labelvalue='companyRegisterInfo.company_name'></layerSon>
+            <layerSon icon='icon2'
+                      labelname='类型'
+                      :labelvalue='companyRegisterInfo.jjlx.economic_type'></layerSon>
+            <layerSon icon='icon3'
+                      labelname='营业期限'
+                      :labelvalue="formatDate(companyRegisterInfo.operation_expiry_date||'')"></layerSon>
+            <layerSon icon='icon4'
+                      labelname='注册时间'
+                      :labelvalue="formatDate(companyRegisterInfo.registration_date||'')"></layerSon>
+            <layerSon icon='icon5'
+                      labelname='注册地址'
+                      :labelvalue='companyRegisterInfo.registration_address'></layerSon>
+            <layerSon icon='icon6'
+                      labelname='法人'
+                      :labelvalue='companyRegisterInfo.legal_person_name'></layerSon>
+            <layerSon icon='icon7'
+                      labelname='注册资金'
+                      :labelvalue="qf(companyRegisterInfo.registered_capital)+'万'"></layerSon>
+          </div>
+        </div>
+      </div>
+      <!-- 经营许可信息 -->
+      <div class="son">
+        <div @click='jy=!jy'>
+          <layerTitle icon='jy'
+                      name='经营许可信息'
+                      @up=changejy></layerTitle>
+        </div>
+        <div class="tbg">
+          <div class="next"
+               v-if='jy'>
+            <layerSon icon='icon8'
+                      labelname='经营区域范围'
+                      :labelvalue="CompanyMsg.hwlx && CompanyMsg.hwlx.cargo_type"></layerSon>
+            <layerSon icon='icon9'
+                      labelname='经营许可有效期'
+                      :labelvalue="CompanyMsg.expire_date"
+                      bgcolor='yellow'></layerSon>
+          </div>
+        </div>
+      </div>
+      <!-- 保险信息 -->
+      <!-- <div class="son">
+        <div @click='bx=!bx'>
+          <layerTitle icon='bx'
+                      name='保险信息'
+                      @up='changebx'></layerTitle>
+        </div>
+        <div class="tbg">
+          <div class="next"
+               v-if='bx'>
+            <layerSon icon='icon9'
+                      labelname='承运人责任险'
+                      :labelvalue="formatDate(companyRegisterInfo.insurance_expired_date||'')"
+                      bgcolor='yellow'></layerSon>
+          </div>
+        </div>
+      </div> -->
+      <!-- 证件信息 -->
+      <div class="son">
+        <div @click='zj=!zj'>
+          <layerTitle icon='zj'
+                      name='证件信息'
+                      @up='changezj'></layerTitle>
+        </div>
+        <div class="tbg">
+          <div class="next"
+               v-if='zj'>
+            <layerSon v-for="(item,index) in companySecureAbility"
+                      :key="index"
+                      icon='icon10'
+                      :labelname='item.certificate_name'
+                      :labelvalue="formatDate(item.expire_date||'')"
+                      bgcolor='red'
+                      @up='book(item.certificate_name)'></layerSon>
+
+          </div>
+        </div>
+      </div>
+      <!-- 分公司和车队信息 -->
+      <div class="son">
+        <div @click='bx=!bx'>
+          <layerTitle icon='fgs'
+                      name='分公司和车队信息'
+                      @up='changebx'></layerTitle>
+        </div>
+        <div class="tbg">
+          <div class="fleet_box"
+               v-if='bx'>
+               <div class="fleet_box_content">
+                <div class="fleet_detail">
+                  <p class="over" :title="getAllFleetInfo.entity_name">{{getAllFleetInfo.entity_name}}</p>
+                  <el-select
+                    v-model="AllFleet"
+                    placeholder="全部车队"
+                    @change="onChangekFleet">
+                    <el-option
+                      v-for="item in getAllFleetInfo.childrens"
+                      :key="item.tb_basic_qy_cdxx_id"
+                      :label="item.entity_name"
+                      :value="item.entity_id">
+                    </el-option>
+                  </el-select>
+                </div>
+                <div class="fleet_detail" v-for="(item,index) in getNewCompanyCarInfo" :key="index">
+                  <p class="over">{{item.entity_name}}</p>
+                  <el-select
+                    v-model="CompanyFleetList[index]"
+                    placeholder="请选择车队" 
+                    @change="onChangekFleet"
+                  >
+                    <el-option
+                      v-for="v in item.children"
+                      :key="v.tb_basic_qy_cdxx_id"
+                      :label="v.entity_name"
+                      :value="v.entity_id"
+                    >
+                    </el-option>
+                  </el-select>
+                </div>
+               </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- 证书二层弹窗 -->
+    <div class="center_second_layer"
+         v-if='second_show && companySecureAbility'>
+      <centerSecond :data='certificateData'
+                    @upx='closeBook' @onClickImg="onClickImg"></centerSecond>
+    </div>
+    <transition name="fade" appear>
+      <div class="zoomimg" v-if="showZoomImg" @click="showZoomImg=false;imgUrl=''">
+        <img :src="imgUrl" alt="" >
+      </div>
+    </transition>
+    <!-- 分公司和车队信息弹框 -->
+    <div class="center_second_layer" v-if="showFleetDetails && Mv.isEmpty(CarGroupInfo)">
+      <FleetDetails @upx="showFleetDetails=false" :data="CarGroupInfo"></FleetDetails>
+    </div>
+    <!-- 预计统计弹框 -->
+    <div v-if="showWarningTip">
+      <WarningTipHome @onCloseHome="showWarningTip=false"></WarningTipHome>
+    </div>
+    <!-- 过期提前弹框信息 -->
+    <div v-if="showExprieTip">
+      <ExpireTipHome @onCloseHome="showExprieTip=false"></ExpireTipHome>
+    </div>
+    <!-- 实时货物流向运单列表 -->
+    <div v-if="centerShow===0">
+      <WaybillList></WaybillList>
+    </div>
+  </div>
+</template>
+
+<script>
+/* eslint-disable */
+import { mapActions, mapState } from 'vuex'
+import layerTitle from '../../../components/company/layerTitle'
+import layerSon from '../../../components/company/layerSon'
+import centerSecond from '../centerPopup/centerScond'
+import centerRanking from '../../../components/company/centerRanking'
+import FleetDetails from '../centerPopup/FleetDetails'
+import ExpireTipHome from '../ExpireTip/ExpireTipHome.vue'
+import WarningTipHome from '../WarningTip/WarningTipHome.vue'
+import WaybillList from '../centerPopup/WaybillList.vue'
+
+import companyCurrentGoodsMap from '../companyCurrentGoodsMap/companyCurrentGoodsMap'
+import companyGoodsMap from '../companyGoodsMap/companyGoodsMap'
+import companyCarStatus from '../companyCarStatus/companyCarStatus'
+
+export default {
+  components: {
+    layerTitle,
+    layerSon,
+    centerSecond,
+    FleetDetails,
+    ExpireTipHome,
+    WarningTipHome,
+    centerRanking,
+    WaybillList,
+    companyCurrentGoodsMap,
+    companyGoodsMap,
+    companyCarStatus,
+  },
+  computed: {
+    ...mapState('headerMsgStore', ['selectedEntity']),
+    ...mapState('centerMsgStore', [
+      'centerdata',
+      'companyRegisterInfo',
+      'companySecureAbility',
+      'companyCargoFlow',
+      'companyCargoFlowMap',
+      'cargoHistoryFlow',
+      'cargoHistoryFlowMap',
+      'vehicleState',
+      'vehicleStateMap',
+      'safeProductDay',
+      'CompanyMsg',
+      'companyCarInfo',
+      'CarGroupInfo',
+    ]),
+    ...mapState('ExpireTipStore',['companyExpireNum']),
+    ...mapState('WarningTipStore',['WarningTipStatisticsData']),
+    certificateData() {
+      return this.companySecureAbility.filter(
+        c => c.certificate_name === this.center_up_title,
+      )[0]
+    },
+    getNewCompanyCarInfo() {
+      const info=this.Mv.isEmpty(this.companyCarInfo)?this.companyCarInfo.filter(item => item.entity_id == this.selectedEntity)[0].children:[]
+      return info
+    },
+    getAllFleetInfo(){
+      let info=this.Mv.isEmpty(this.companyCarInfo)?this.companyCarInfo.filter(item => item.entity_id == this.selectedEntity)[0]:{}
+      let list=[]
+      info.children.map((item)=>{
+        item.children.map((info)=>{
+          list.push(info)
+        })
+      })
+      info.childrens=list
+      return info
+    }
+  },
+  methods: {
+    ...mapActions('centerMsgStore', ['getCompanyRegisterInfo','getCarGroupInfo']),
+    changegs(x) {
+      this.gs = Boolean(x)
+    },
+    changejy(x) {
+      this.jy = Boolean(x)
+    },
+    check_ym(name) {
+      this.checkShow = name
+    },
+    changebx(x) {
+      this.bx = Boolean(x)
+    },
+    changezj(x) {
+      this.zj = Boolean(x)
+    },
+    popshow() {
+      this.$emit('up')
+    },
+    book(name) {
+      this.center_up_title = name
+      this.second_show = true
+    },
+    closeBook() {
+      this.second_show = false
+    },
+    up_car() {
+      document.querySelector('.car_ul').scrollTop -= 35
+    },
+    down_car() {
+      document.querySelector('.car_ul').scrollTop += 35
+    },
+    up_real() {
+      document.querySelector('.real_ul').scrollTop -= 35
+    },
+    down_real() {
+      document.querySelector('.real_ul').scrollTop += 35
+    },
+    onChangekFleet(v){
+      const arg={
+        entity_id:v
+      }
+      this.getCarGroupInfo(arg)
+      this.showFleetDetails=true
+    },
+    onClickImg(v){
+      this.imgUrl=v
+      this.showZoomImg=true
+    }
+  },
+  beforeUpdate() {
+    // console.log(this.CarGroupInfo)
+  },
+  mounted() {
+    // this.getCompanyRegisterInfo()
+  },
+  data() {
+    return {
+      gs: false,
+      bx: false,
+      jy: false,
+      zj: false,
+      layerShow: false,
+      center_up_title: '证件信息',
+      second_show: false,
+      showFleetDetails: false,
+      AllFleet: '',
+      CompanyFleetList:[],
+      showZoomImg:false,
+      imgUrl:'',
+      showWarningTip:false,
+      showExprieTip:false,
+      checkShow: 'thisYear',
+      center: ['实时货物流向', '历史货物流向', '车辆状态'],
+      centerShow: 0,
+      realtitle: [
+        '运单编号',
+        '车辆',
+        '驾驶员',
+        '货物类型',
+        '货物数量',
+        '客户',
+        '出发时间',
+        '起源地',
+        '目的地',
+      ],
+      realcar: ['车辆', '状态', '位置'],
+      realcardata: [
+        { car: '冀233456', store: '待卸车', position: '广东省广州市花都区' },
+        { car: '冀233456', store: '待卸车', position: '广东省广州市花都区' },
+        { car: '冀233456', store: '待卸车', position: '广东省广州市花都区' },
+        { car: '冀233456', store: '待卸车', position: '广东省广州市花都区' },
+        { car: '冀233456', store: '待卸车', position: '广东省广州市花都区' },
+        { car: '冀233456', store: '待卸车', position: '广东省广州市花都区' },
+        { car: '冀233456', store: '待卸车', position: '广东省广州市花都区' },
+        { car: '冀233456', store: '待卸车', position: '广东省广州市花都区' },
+        { car: '冀233456', store: '待卸车', position: '广东省广州市花都区' },
+        { car: '冀233456', store: '待卸车', position: '广东省广州市花都区' },
+      ],
+      realdata: [
+        {
+          bh: '20171130445243110016',
+          cl: '货车',
+          jsy: '王明',
+          hw: '爆炸品',
+          hwnum: 20,
+          kh: '全海石油化工有限公司',
+          sj: '2018-01-27',
+          qy: '天津大港',
+          md: '东营自提',
+        },
+        {
+          bh: '20171130445243110016',
+          cl: '货车',
+          jsy: '王明',
+          hw: '爆炸品',
+          hwnum: 20,
+          kh: '全海石油化工有限公司',
+          sj: '2018-01-27',
+          qy: '天津大港',
+          md: '东营自提',
+        },
+        {
+          bh: '20171130445243110016',
+          cl: '货车',
+          jsy: '王明',
+          hw: '爆炸品',
+          hwnum: 20,
+          kh: '全海石油化工有限公司',
+          sj: '2018-01-27',
+          qy: '天津大港',
+          md: '东营自提',
+        },
+        {
+          bh: '20171130445243110016',
+          cl: '货车',
+          jsy: '王明',
+          hw: '爆炸品',
+          hwnum: 20,
+          kh: '全海石油化工有限公司',
+          sj: '2018-01-27',
+          qy: '天津大港',
+          md: '东营自提',
+        },
+        {
+          bh: '20171130445243110016',
+          cl: '货车',
+          jsy: '王明',
+          hw: '爆炸品',
+          hwnum: 20,
+          kh: '全海石油化工有限公司',
+          sj: '2018-01-27',
+          qy: '天津大港',
+          md: '东营自提',
+        },
+        {
+          bh: '20171130445243110016',
+          cl: '货车',
+          jsy: '王明',
+          hw: '爆炸品',
+          hwnum: 20,
+          kh: '全海石油化工有限公司',
+          sj: '2018-01-27',
+          qy: '天津大港',
+          md: '东营自提',
+        },
+        {
+          bh: '20171130445243110016',
+          cl: '货车',
+          jsy: '王明',
+          hw: '爆炸品',
+          hwnum: 20,
+          kh: '全海石油化工有限公司',
+          sj: '2018-01-27',
+          qy: '天津大港',
+          md: '东营自提',
+        },
+        {
+          bh: '20171130445243110016',
+          cl: '货车',
+          jsy: '王明',
+          hw: '爆炸品',
+          hwnum: 20,
+          kh: '全海石油化工有限公司',
+          sj: '2018-01-27',
+          qy: '天津大港',
+          md: '东营自提',
+        },
+        {
+          bh: '20171130445243110016',
+          cl: '货车',
+          jsy: '王明',
+          hw: '爆炸品',
+          hwnum: 20,
+          kh: '全海石油化工有限公司',
+          sj: '2018-01-27',
+          qy: '天津大港',
+          md: '东营自提',
+        },
+      ],
+      // 实时货物流向
+      companyCurrentGoodsMapData: {
+        citys: [
+          {
+            name: '黑龙江',
+            value: [126.661669, 45.742347, 20],
+            symbolSize: 14,
+            itemStyle: { normal: { color: '#05d0eb' } },
+          },
+          {
+            name: '吉林',
+            value: [126.549572, 43.83788, 20],
+            symbolSize: 12,
+            itemStyle: { normal: { color: '#05d0eb' } },
+          },
+          {
+            name: '临江',
+            value: [126.918087, 41.811979, 2],
+            symbolSize: 2,
+            itemStyle: { normal: { color: '#e75029' } },
+          },
+          {
+            name: '石家庄',
+            value: [114.51486, 38.042307, 4],
+            symbolSize: 2,
+            itemStyle: { normal: { color: '#e75029' } },
+          },
+          {
+            name: '邢台',
+            value: [114.504844, 37.070589, 1],
+            symbolSize: 2,
+            itemStyle: { normal: { color: '#e75029' } },
+          },
+          {
+            name: '赣州',
+            value: [114.93503, 25.831829, 1],
+            symbolSize: 2,
+            itemStyle: { normal: { color: '#e75029' } },
+          },
+          {
+            name: '义乌',
+            value: [120.075058, 29.306841, 3],
+            symbolSize: 2,
+            itemStyle: { normal: { color: '#e75029' } },
+          },
+          {
+            name: '南昌',
+            value: [115.858198, 28.682892, 2],
+            symbolSize: 2,
+            itemStyle: { normal: { color: '#e75029' } },
+          },
+          {
+            name: '三河',
+            value: [117.078295, 39.982718, 4],
+            symbolSize: 2,
+            itemStyle: { normal: { color: '#e75029' } },
+          },
+          {
+            name: '大连',
+            value: [121.614682, 38.914003, 40],
+            symbolSize: 3,
+            itemStyle: { normal: { color: '#e75029' } },
+          },
+          {
+            name: '辉南',
+            value: [126.046912, 42.684993, 1],
+            symbolSize: 2,
+            itemStyle: { normal: { color: '#e75029' } },
+          },
+          {
+            name: '无锡',
+            value: [120.31191, 31.49117, 14],
+            symbolSize: 2,
+            itemStyle: { normal: { color: '#e75029' } },
+          },
+          {
+            name: '常州',
+            value: [119.973987, 31.810689, 4],
+            symbolSize: 2,
+            itemStyle: { normal: { color: '#e75029' } },
+          },
+          {
+            name: '广西',
+            value: [108.327546, 22.815478, -1],
+            symbolSize: 2,
+            itemStyle: { normal: { color: '#05d0eb' } },
+          },
+
+          {
+            name: '张家港',
+            value: [120.553284, 31.870367, 4],
+            symbolSize: 2,
+            itemStyle: { normal: { color: '#e75029' } },
+          },
+          {
+            name: '临安',
+            value: [119.724733, 30.233873, 1],
+            symbolSize: 2,
+            itemStyle: { normal: { color: '#e75029' } },
+          },
+          {
+            name: '延安',
+            value: [109.489727, 36.585455, 1],
+            symbolSize: 2,
+            itemStyle: { normal: { color: '#e75029' } },
+          },
+          {
+            name: '天津',
+            value: [117.200983, 39.084158, 28],
+            symbolSize: 2,
+            itemStyle: { normal: { color: '#e75029' } },
+          },
+          {
+            name: '城阳',
+            value: [120.39631, 36.307064, 15],
+            symbolSize: 2,
+            itemStyle: { normal: { color: '#e75029' } },
+          },
+
+          {
+            name: '丰台',
+            value: [116.287149, 39.858427, 3],
+            symbolSize: 2,
+            itemStyle: { normal: { color: '#e75029' } },
+          },
+          {
+            name: '山东',
+            value: [117.020359, 36.66853, -6],
+            symbolSize: 2,
+            itemStyle: { normal: { color: '#05d0eb' } },
+          },
+          {
+            name: '舟山',
+            value: [122.207216, 29.985295, 1],
+            symbolSize: 2,
+            itemStyle: { normal: { color: '#e75029' } },
+          },
+          {
+            name: '连云港',
+            value: [119.221611, 34.596653, 1],
+            symbolSize: 2,
+            itemStyle: { normal: { color: '#e75029' } },
+          },
+          {
+            name: '西安',
+            value: [108.940175, 34.341568, 3],
+            symbolSize: 2,
+            itemStyle: { normal: { color: '#e75029' } },
+          },
+
+          {
+            name: '兰山',
+            value: [118.347707, 35.051729, 1],
+            symbolSize: 2,
+            itemStyle: { normal: { color: '#e75029' } },
+          },
+          {
+            name: '阳泉',
+            value: [113.580519, 37.856972, 1],
+            symbolSize: 2,
+            itemStyle: { normal: { color: '#e75029' } },
+          },
+          {
+            name: '勃利',
+            value: [130.592171, 45.755063, 1],
+            symbolSize: 2,
+            itemStyle: { normal: { color: '#e75029' } },
+          },
+          {
+            name: '长春',
+            value: [125.323544, 43.817072, 8],
+            symbolSize: 2,
+            itemStyle: { normal: { color: '#e75029' } },
+          },
+        ],
+        moveLines: [
+          {
+            name: '线路1',
+            source: '黑龙江',
+            target: '珠海',
+            orderNum: 1234,
+            carCategory: '华北配送中心',
+            goodsType: '爆炸品',
+            goodsAmount: 19,
+            coords: [[126.661669, 45.742347], [113.576726, 22.270715]],
+            carCode: '京A154512',
+            carType: '车辆类型',
+          },
+          {
+            name: '线路2',
+            source: '黑龙江',
+            target: '晋中',
+            orderNum: 1234,
+            carCategory: '华北配送中心',
+            goodsType: '爆炸品',
+            goodsAmount: 19,
+            coords: [[126.661669, 45.742347], [112.752695, 37.687024]],
+          },
+          {
+            name: '线路3',
+            source: '西藏',
+            target: '广州',
+            orderNum: 1234,
+            carCategory: '华北配送中心',
+            goodsType: '爆炸品',
+            goodsAmount: 19,
+            coords: [[91.117212, 29.646923], [113.264435, 23.129163]],
+          },
+          {
+            name: '线路4',
+            source: '辽宁',
+            target: '无锡',
+            orderNum: 1234,
+            carCategory: '华北配送中心',
+            goodsType: '爆炸品',
+            goodsAmount: 19,
+            coords: [[123.42944, 41.835441], [120.31191, 31.49117]],
+          },
+          {
+            name: '线路5',
+            source: '黑龙江',
+            target: '城阳',
+            orderNum: 1234,
+            carCategory: '华北配送中心',
+            goodsType: '爆炸品',
+            goodsAmount: 19,
+            coords: [[126.661669, 45.742347], [120.39631, 36.307064]],
+          },
+
+          {
+            name: '线路6',
+            source: '辽宁',
+            target: '天津',
+            orderNum: 1234,
+            carCategory: '华北配送中心',
+            goodsType: '爆炸品',
+            goodsAmount: 19,
+            coords: [[123.42944, 41.835441], [117.200983, 39.084158]],
+          },
+          {
+            name: '线路7',
+            source: '吉林',
+            target: '扬州',
+            orderNum: 1234,
+            carCategory: '华北配送中心',
+            goodsType: '爆炸品',
+            goodsAmount: 19,
+            coords: [[126.549572, 43.837883], [119.412966, 32.39421]],
+          },
+          {
+            name: '线路8',
+            source: '吉林',
+            target: '嘉兴',
+            orderNum: 1234,
+            carCategory: '华北配送中心',
+            goodsType: '爆炸品',
+            goodsAmount: 19,
+            coords: [[126.549572, 43.837883], [120.755486, 30.746129]],
+          },
+          {
+            name: '线路9',
+            source: '河北',
+            target: '延寿',
+            orderNum: 1234,
+            carCategory: '华北配送中心',
+            goodsType: '爆炸品',
+            goodsAmount: 19,
+            coords: [[114.475704, 38.584854], [128.331644, 45.451897]],
+          },
+          {
+            name: '线路10',
+            source: '吉林',
+            target: '义乌',
+            orderNum: 1234,
+            carCategory: '华北配送中心',
+            goodsType: '爆炸品',
+            goodsAmount: 19,
+            coords: [[126.549572, 43.837883], [120.075058, 29.306841]],
+          },
+          {
+            name: '线路11',
+            source: '内蒙古',
+            target: '中山',
+            orderNum: 1234,
+            carCategory: '华北配送中心',
+            goodsType: '爆炸品',
+            goodsAmount: 19,
+            coords: [[111.765618, 40.817498], [113.392782, 22.517646]],
+          },
+          {
+            name: '线路12',
+            source: '黑龙江',
+            target: '北京',
+            orderNum: 1234,
+            carCategory: '华北配送中心',
+            goodsType: '爆炸品',
+            goodsAmount: 19,
+            coords: [[126.661669, 45.742347], [116.407526, 39.90403]],
+          },
+          {
+            name: '线路13',
+            source: '黑龙江',
+            target: '三河',
+            orderNum: 1234,
+            carCategory: '华北配送中心',
+            goodsType: '爆炸品',
+            goodsAmount: 19,
+            coords: [[126.661669, 45.742347], [117.078295, 39.982718]],
+          },
+          {
+            name: '线路14',
+            source: '河北',
+            target: '安庆',
+            orderNum: 1234,
+            carCategory: '华北配送中心',
+            goodsType: '爆炸品',
+            goodsAmount: 19,
+            coords: [[114.475704, 38.584854], [127.507825, 46.880102]],
+          },
+          {
+            name: '线路15',
+            source: '吉林',
+            target: '长沙',
+            orderNum: 1234,
+            carCategory: '华北配送中心',
+            goodsType: '爆炸品',
+            goodsAmount: 19,
+            coords: [[126.549572, 43.837883], [112.938814, 28.228209]],
+          },
+
+          {
+            name: '线路16',
+            source: '吉林',
+            target: '南通',
+            orderNum: 1234,
+            carCategory: '华北配送中心',
+            goodsType: '爆炸品',
+            goodsAmount: 19,
+            coords: [[126.549572, 43.837883], [120.894291, 31.980172]],
+          },
+          {
+            name: '线路17',
+            source: '黑龙江',
+            target: '张家港',
+            orderNum: 1234,
+            carCategory: '华北配送中心',
+            goodsType: '爆炸品',
+            goodsAmount: 19,
+            coords: [[126.661669, 45.742347], [120.553284, 31.870367]],
+          },
+          {
+            name: '线路18',
+            source: '吉林',
+            target: '三河',
+            orderNum: 1234,
+            carCategory: '华北配送中心',
+            goodsType: '爆炸品',
+            goodsAmount: 19,
+            coords: [[126.549572, 43.837883], [117.078295, 39.982718]],
+          },
+          {
+            name: '线路19',
+            source: '吉林',
+            target: '咸阳',
+            orderNum: 1234,
+            carCategory: '华北配送中心',
+            goodsType: '爆炸品',
+            goodsAmount: 19,
+            coords: [[126.549572, 43.837883], [108.708991, 34.329605]],
+          },
+          {
+            name: '线路20',
+            source: '吉林',
+            target: '中山',
+            orderNum: 1234,
+            carCategory: '华北配送中心',
+            goodsType: '爆炸品',
+            goodsAmount: 19,
+            coords: [[126.549572, 43.837883], [113.392782, 22.517646]],
+          },
+        ],
+      },
+      // 历史货物流向
+      companyGoodsMapData: [
+        {
+          name: '线路1',
+          source: '天津大港',
+          target: '东营自提',
+          station: '湖州',
+          trafficMileage: 20456320,
+          orderNum: 795,
+          coords: [
+            [125.285963, 43.947375],
+            [125.285442, 43.946817],
+            [125.283852, 43.945152],
+            [125.282379, 43.94361],
+            [125.284171, 43.943607],
+            [125.290733, 43.943575],
+            [125.29787, 43.943487],
+            [125.300206, 43.943506],
+            [125.300426, 43.943532],
+            [125.300709, 43.943506],
+            [125.300673, 43.943068],
+            [125.300444, 43.94003],
+            [125.300367, 43.938174],
+            [125.300304, 43.937048],
+            [125.30021, 43.93583],
+            [125.300098, 43.934448],
+            [125.300183, 43.934376],
+            [125.300188, 43.93412],
+            [125.300134, 43.93326],
+            [125.300071, 43.931799],
+            [125.299977, 43.931718],
+            [125.299914, 43.931075],
+            [125.299878, 43.930364],
+            [125.299756, 43.929436],
+            [125.299855, 43.929257],
+            [125.299932, 43.92904],
+            [125.299959, 43.928796],
+            [125.299887, 43.928524],
+            [125.299738, 43.928141],
+            [125.299662, 43.926504],
+            [125.29959, 43.926391],
+            [125.299532, 43.925592],
+            [125.299438, 43.924027],
+            [125.299312, 43.922803],
+            [125.29919, 43.921803],
+            [125.299029, 43.920502],
+            [125.299092, 43.920385],
+            [125.299051, 43.920115],
+            [125.298899, 43.918719],
+            [125.298755, 43.917362],
+            [125.298539, 43.915264],
+            [125.298422, 43.915147],
+            [125.29827, 43.913699],
+            [125.297991, 43.911439],
+            [125.297861, 43.909825],
+            [125.297677, 43.908387],
+            [125.297448, 43.906399],
+            [125.297151, 43.905286],
+            [125.296689, 43.904334],
+            [125.296253, 43.903675],
+            [125.294483, 43.901073],
+            [125.293608, 43.899807],
+            [125.293307, 43.899362],
+            [125.293172, 43.899268],
+            [125.292363, 43.898105],
+            [125.291501, 43.896822],
+            [125.290616, 43.895487],
+            [125.290702, 43.895237],
+            [125.290832, 43.895042],
+            [125.292327, 43.894461],
+            [125.29624, 43.893018],
+            [125.298728, 43.89206],
+            [125.302456, 43.890569],
+            [125.303682, 43.890092],
+            [125.303781, 43.889997],
+            [125.305272, 43.889448],
+            [125.306, 43.889208],
+            [125.306534, 43.889156],
+            [125.311039, 43.889065],
+            [125.311098, 43.885813],
+            [125.311124, 43.884004],
+            [125.307882, 43.884043],
+            [125.30798, 43.881327],
+            [125.308052, 43.879634],
+            [125.308075, 43.879481],
+            [125.308205, 43.879326],
+            [125.308856, 43.878874],
+            [125.308816, 43.878789],
+            [125.308416, 43.878487],
+            [125.305847, 43.876713],
+            [125.307756, 43.875284],
+            [125.310774, 43.872977],
+            [125.310702, 43.872934],
+            [125.31359, 43.870709],
+            [125.313797, 43.870605],
+            [125.313972, 43.870585],
+            [125.314327, 43.870683],
+            [125.31465, 43.870722],
+            [125.314978, 43.87066],
+            [125.315252, 43.870523],
+            [125.315504, 43.870338],
+            [125.315629, 43.870147],
+            [125.315715, 43.869984],
+            [125.328134, 43.869922],
+            [125.331938, 43.869919],
+            [125.332113, 43.863501],
+            [125.331988, 43.863498],
+            [125.332024, 43.862533],
+            [125.332136, 43.862529],
+            [125.332298, 43.857979],
+            [125.332351, 43.855031],
+            [125.332414, 43.850221],
+            [125.32764, 43.850286],
+          ],
+          lineStyle: {
+            normal: {
+              color: 'rgba(90,221,223,1)',
+            },
+          },
+        },
+        {
+          name: '线路2',
+          source: '天津大港2',
+          target: '东营自提2',
+          station: '湖州2',
+          trafficMileage: 654154,
+          orderNum: 872,
+          coords: [
+            [125.397393, 43.712478],
+            [125.397519, 43.712699],
+            [125.398058, 43.714582],
+            [125.398305, 43.715677],
+            [125.39888, 43.717655],
+            [125.399082, 43.718163],
+            [125.399733, 43.719815],
+            [125.400483, 43.721645],
+            [125.400982, 43.723131],
+            [125.401472, 43.724545],
+            [125.401867, 43.726098],
+            [125.402464, 43.727997],
+            [125.40312, 43.729769],
+            [125.403789, 43.73159],
+            [125.404337, 43.733059],
+            [125.405348, 43.735782],
+            [125.406147, 43.737908],
+            [125.4067, 43.739592],
+            [125.40723, 43.741015],
+            [125.407567, 43.741826],
+            [125.407993, 43.743057],
+            [125.409116, 43.746304],
+            [125.409345, 43.747473],
+            [125.409718, 43.749325],
+            [125.409574, 43.750117],
+            [125.409422, 43.750419],
+            [125.408627, 43.751679],
+            [125.408025, 43.752751],
+            [125.407293, 43.753848],
+            [125.407086, 43.75446],
+            [125.407086, 43.754782],
+            [125.407382, 43.756671],
+            [125.407688, 43.758367],
+            [125.408029, 43.760131],
+            [125.408442, 43.762628],
+            [125.40838, 43.763048],
+            [125.408222, 43.763488],
+            [125.407962, 43.763855],
+            [125.407553, 43.764204],
+            [125.405604, 43.765574],
+            [125.403071, 43.767306],
+            [125.401364, 43.768514],
+            [125.400757, 43.769067],
+            [125.400443, 43.76962],
+            [125.400407, 43.769916],
+            [125.400465, 43.770753],
+            [125.400564, 43.772556],
+            [125.400726, 43.774154],
+            [125.400865, 43.775925],
+            [125.400807, 43.776159],
+            [125.400816, 43.776732],
+            [125.401031, 43.777832],
+            [125.401305, 43.778444],
+            [125.40206, 43.780032],
+            [125.402949, 43.781734],
+            [125.404018, 43.783885],
+            [125.404997, 43.785942],
+            [125.40577, 43.787556],
+            [125.406183, 43.788516],
+            [125.406471, 43.789469],
+            [125.406529, 43.790237],
+            [125.406466, 43.79064],
+            [125.406039, 43.79201],
+            [125.405891, 43.792778],
+            [125.405927, 43.793917],
+            [125.406053, 43.794233],
+            [125.406538, 43.795515],
+            [125.407957, 43.798156],
+            [125.408052, 43.798908],
+            [125.408115, 43.799357],
+            [125.408092, 43.800021],
+            [125.407948, 43.800466],
+            [125.407445, 43.802207],
+            [125.406974, 43.803749],
+            [125.40634, 43.805759],
+            [125.4063, 43.806208],
+            [125.406282, 43.806628],
+            [125.406336, 43.807135],
+            [125.406673, 43.808693],
+            [125.407019, 43.810346],
+            [125.407436, 43.812382],
+            [125.408092, 43.813572],
+            [125.40899, 43.814701],
+            [125.410544, 43.81649],
+            [125.411506, 43.817657],
+            [125.411973, 43.818617],
+            [125.41253, 43.819892],
+            [125.413109, 43.821469],
+            [125.413778, 43.823189],
+            [125.414353, 43.824672],
+            [125.414722, 43.825619],
+            [125.415296, 43.826649],
+            [125.415656, 43.827388],
+            [125.416038, 43.828542],
+            [125.416065, 43.829752],
+            [125.415993, 43.829979],
+            [125.415323, 43.831995],
+            [125.414775, 43.833793],
+            [125.414088, 43.835874],
+            [125.413459, 43.837955],
+            [125.412718, 43.840312],
+            [125.412152, 43.842175],
+            [125.411784, 43.843287],
+            [125.411434, 43.844256],
+            [125.411106, 43.844903],
+            [125.410868, 43.845026],
+            [125.410859, 43.845111],
+            [125.410648, 43.845117],
+            [125.410208, 43.845198],
+            [125.409821, 43.845358],
+            [125.409543, 43.845546],
+            [125.409341, 43.845796],
+            [125.409237, 43.84606],
+            [125.409206, 43.846326],
+            [125.409273, 43.846599],
+            [125.409381, 43.846827],
+            [125.409525, 43.846983],
+            [125.409749, 43.847162],
+            [125.410032, 43.847302],
+            [125.410432, 43.847396],
+            [125.41041, 43.847477],
+            [125.410235, 43.847558],
+            [125.409884, 43.84867],
+            [125.409264, 43.850624],
+            [125.408469, 43.852948],
+            [125.4082, 43.853591],
+            [125.407167, 43.855805],
+            [125.406578, 43.856825],
+            [125.405523, 43.858821],
+            [125.404364, 43.861021],
+            [125.403434, 43.862806],
+            [125.402518, 43.864694],
+            [125.401934, 43.866614],
+            [125.401355, 43.868801],
+            [125.400897, 43.870842],
+            [125.400452, 43.872593],
+            [125.400497, 43.872727],
+            [125.400209, 43.87387],
+            [125.399621, 43.876106],
+            [125.399787, 43.878019],
+            [125.399944, 43.879624],
+            [125.399998, 43.879858],
+            [125.399909, 43.879868],
+            [125.400097, 43.881532],
+            [125.399549, 43.881535],
+            [125.396122, 43.881515],
+            [125.396118, 43.882522],
+            [125.3961, 43.884797],
+            [125.396064, 43.886444],
+            [125.395969, 43.888558],
+            [125.396212, 43.888672],
+            [125.393584, 43.88862],
+            [125.389987, 43.888545],
+            [125.386973, 43.888454],
+            [125.384651, 43.888399],
+            [125.384166, 43.888445],
+            [125.383222, 43.88848],
+            [125.382594, 43.888493],
+            [125.38077, 43.888285],
+            [125.379373, 43.888217],
+            [125.37384, 43.888061],
+            [125.370745, 43.887996],
+            [125.366972, 43.887811],
+            [125.362831, 43.887652],
+            [125.358735, 43.887574],
+            [125.355878, 43.887577],
+            [125.355986, 43.890459],
+            [125.355869, 43.890465],
+            [125.355137, 43.890429],
+            [125.354728, 43.890387],
+            [125.354149, 43.890244],
+            [125.353996, 43.890257],
+            [125.353138, 43.891323],
+            [125.351652, 43.892921],
+            [125.350187, 43.894376],
+            [125.349199, 43.895432],
+            [125.347942, 43.896861],
+            [125.347349, 43.897517],
+            [125.34716, 43.897864],
+            [125.346926, 43.898988],
+            [125.346747, 43.90057],
+            [125.34667, 43.901953],
+            [125.344245, 43.901168],
+          ],
+          lineStyle: {
+            normal: {
+              color: 'rgba(90,117,223,1)',
+            },
+          },
+        },
+        {
+          name: '线路3',
+          source: '天津大港3',
+          target: '东营自提3',
+          station: '湖州3',
+          trafficMileage: 2848741,
+          orderNum: 528,
+          coords: [
+            [125.326813, 43.8263],
+            [125.326817, 43.826303],
+            [125.3275, 43.827256],
+            [125.326063, 43.827766],
+            [125.322887, 43.828927],
+            [125.319334, 43.830218],
+            [125.319002, 43.830342],
+            [125.319123, 43.830488],
+            [125.319195, 43.830807],
+            [125.319298, 43.831249],
+            [125.319878, 43.832195],
+            [125.320628, 43.83305],
+            [125.32224, 43.834897],
+            [125.322896, 43.835645],
+            [125.322856, 43.836708],
+            [125.322815, 43.837817],
+            [125.322775, 43.838948],
+            [125.32503, 43.838935],
+            [125.327545, 43.838922],
+            [125.330069, 43.838906],
+            [125.330864, 43.838913],
+            [125.331493, 43.838958],
+            [125.331632, 43.838987],
+            [125.331735, 43.839101],
+            [125.331812, 43.839182],
+            [125.331906, 43.839244],
+            [125.331983, 43.839293],
+            [125.332131, 43.839351],
+            [125.332324, 43.839537],
+            [125.332306, 43.839907],
+            [125.332265, 43.841585],
+            [125.332225, 43.842762],
+            [125.332185, 43.844306],
+            [125.332144, 43.845808],
+            [125.332117, 43.847043],
+            [125.332068, 43.848665],
+            [125.332054, 43.850252],
+            [125.332032, 43.85137],
+            [125.332009, 43.852943],
+            [125.332005, 43.854354],
+            [125.331987, 43.855332],
+            [125.331978, 43.856639],
+            [125.33192, 43.858358],
+            [125.331857, 43.860071],
+            [125.331812, 43.86164],
+            [125.331771, 43.863382],
+            [125.331731, 43.864816],
+            [125.331673, 43.866343],
+            [125.331641, 43.867776],
+            [125.331592, 43.869986],
+            [125.331578, 43.870779],
+            [125.331547, 43.872549],
+            [125.331511, 43.873865],
+            [125.331488, 43.875012],
+            [125.331461, 43.876432],
+            [125.33143, 43.878063],
+            [125.33139, 43.879795],
+            [125.33139, 43.88076],
+            [125.331349, 43.882206],
+            [125.331304, 43.883411],
+            [125.331259, 43.884883],
+            [125.33121, 43.886338],
+            [125.331174, 43.888024],
+            [125.331134, 43.889775],
+            [125.331066, 43.89097],
+            [125.331201, 43.891087],
+            [125.331201, 43.891188],
+            [125.330954, 43.891487],
+            [125.330599, 43.891584],
+            [125.330397, 43.891688],
+            [125.330145, 43.891841],
+            [125.329943, 43.892029],
+            [125.329795, 43.892283],
+            [125.329746, 43.892461],
+            [125.329728, 43.89276],
+            [125.329773, 43.8929],
+            [125.329827, 43.893014],
+            [125.329921, 43.89316],
+            [125.33006, 43.893303],
+            [125.330186, 43.89341],
+            [125.330464, 43.893569],
+            [125.330666, 43.89364],
+            [125.330855, 43.893696],
+            [125.331008, 43.893709],
+            [125.331125, 43.894027],
+            [125.330976, 43.894235],
+            [125.330981, 43.895167],
+            [125.330954, 43.896505],
+            [125.330931, 43.897587],
+            [125.330896, 43.899094],
+            [125.33086, 43.900546],
+            [125.330833, 43.902358],
+            [125.330806, 43.903881],
+            [125.330801, 43.90542],
+            [125.330788, 43.906119],
+            [125.33086, 43.906265],
+            [125.33086, 43.906346],
+            [125.330842, 43.906554],
+            [125.330828, 43.907356],
+            [125.330806, 43.908457],
+            [125.330779, 43.909636],
+            [125.330756, 43.910863],
+            [125.330761, 43.911574],
+            [125.330734, 43.911918],
+            [125.330689, 43.912756],
+            [125.330671, 43.913243],
+            [125.330936, 43.913701],
+            [125.330909, 43.913828],
+            [125.33086, 43.913951],
+            [125.330357, 43.914],
+            [125.330159, 43.914055],
+            [125.33002, 43.914156],
+          ],
+          lineStyle: {
+            normal: {
+              color: 'rgba(90,223,170,1)',
+            },
+          },
+        },
+        {
+          name: '线路4',
+          source: '天津大港4',
+          target: '东营自提4',
+          station: '湖州4',
+          trafficMileage: 5242841,
+          orderNum: 628,
+          coords: [
+            [125.328744, 43.919535],
+            [125.328089, 43.919538],
+            [125.327815, 43.919473],
+            [125.325834, 43.919502],
+            [125.324657, 43.91946],
+            [125.323727, 43.919428],
+            [125.323727, 43.918934],
+            [125.323705, 43.918177],
+            [125.323664, 43.917908],
+            [125.323597, 43.917833],
+            [125.323619, 43.916914],
+            [125.323638, 43.915611],
+            [125.32366, 43.914379],
+            [125.323682, 43.913203],
+            [125.323723, 43.912307],
+            [125.323763, 43.911849],
+            [125.323813, 43.911667],
+            [125.323898, 43.911534],
+            [125.324024, 43.911446],
+            [125.324482, 43.911118],
+            [125.324814, 43.910862],
+            [125.325066, 43.910859],
+            [125.325138, 43.9108],
+            [125.325281, 43.910774],
+            [125.325389, 43.910713],
+            [125.326656, 43.911654],
+            [125.327374, 43.912297],
+            [125.327922, 43.912768],
+            [125.328412, 43.913057],
+            [125.329113, 43.913479],
+            [125.329225, 43.913554],
+            [125.329714, 43.91393],
+            [125.330051, 43.914145],
+            [125.329953, 43.914252],
+            [125.329894, 43.914366],
+            [125.329921, 43.91445],
+            [125.329984, 43.914499],
+            [125.330042, 43.914534],
+            [125.330132, 43.914544],
+            [125.331161, 43.914518],
+            [125.331345, 43.914447],
+            [125.331381, 43.914398],
+            [125.331399, 43.914281],
+            [125.331349, 43.914142],
+            [125.331322, 43.914077],
+            [125.331224, 43.913963],
+            [125.331224, 43.913869],
+            [125.330995, 43.913492],
+            [125.330918, 43.91331],
+            [125.330882, 43.913051],
+            [125.330923, 43.912736],
+            [125.330923, 43.91095],
+            [125.330981, 43.909063],
+            [125.331004, 43.907407],
+            [125.331017, 43.90628],
+            [125.331507, 43.905913],
+            [125.332355, 43.905273],
+            [125.332921, 43.904815],
+            [125.333919, 43.904],
+            [125.33444, 43.903575],
+            [125.335127, 43.903195],
+            [125.33558, 43.902854],
+            [125.336133, 43.902471],
+            [125.336286, 43.90237],
+            [125.336573, 43.902045],
+            [125.33709, 43.901561],
+            [125.337381, 43.901285],
+            [125.337723, 43.90085],
+            [125.338495, 43.90021],
+            [125.33872, 43.899999],
+            [125.339201, 43.89958],
+            [125.340741, 43.900012],
+            [125.341657, 43.900308],
+            [125.34327, 43.900869],
+            [125.343827, 43.901064],
+            [125.343854, 43.901022],
+            [125.344581, 43.899885],
+            [125.344676, 43.8997],
+            [125.344837, 43.899431],
+            [125.345219, 43.898914],
+            [125.345543, 43.898502],
+            [125.345911, 43.898027],
+            [125.346248, 43.897615],
+            [125.347101, 43.897966],
+            [125.347169, 43.897946],
+            [125.347272, 43.897722],
+            [125.347483, 43.89743],
+            [125.347815, 43.897066],
+            [125.348103, 43.896728],
+            [125.348485, 43.896264],
+            [125.348799, 43.89592],
+            [125.34958, 43.895065],
+            [125.349854, 43.89477],
+            [125.351512, 43.89311],
+            [125.352186, 43.89241],
+            [125.352823, 43.891742],
+            [125.353385, 43.89107],
+            [125.354032, 43.890274],
+            [125.354014, 43.890216],
+            [125.35338, 43.889868],
+            [125.35307, 43.889686],
+            [125.352752, 43.889469],
+            [125.351862, 43.888754],
+            [125.350528, 43.887697],
+            [125.349558, 43.887006],
+            [125.34883, 43.886434],
+            [125.348449, 43.886123],
+            [125.348345, 43.886048],
+            [125.350007, 43.885619],
+            [125.350057, 43.885538],
+            [125.350034, 43.885392],
+            [125.349693, 43.885252],
+            [125.347312, 43.884303],
+            [125.34711, 43.88431],
+            [125.346558, 43.884082],
+            [125.346131, 43.883975],
+            [125.346068, 43.883949],
+            [125.345929, 43.883881],
+            [125.343575, 43.883858],
+            [125.343611, 43.883275],
+            [125.343625, 43.882955],
+            [125.343611, 43.88237],
+            [125.343611, 43.882045],
+            [125.34362, 43.88149],
+            [125.343629, 43.881116],
+            [125.343634, 43.880704],
+            [125.343652, 43.879969],
+            [125.343921, 43.879976],
+            [125.346131, 43.880044],
+            [125.346194, 43.880031],
+            [125.347146, 43.879199],
+            [125.347299, 43.879138],
+            [125.347748, 43.878719],
+            [125.347986, 43.878436],
+            [125.348049, 43.878319],
+            [125.348094, 43.878179],
+            [125.348125, 43.877234],
+            [125.348184, 43.876564],
+            [125.348197, 43.876292],
+            [125.348215, 43.875382],
+            [125.348224, 43.874449],
+            [125.348242, 43.87364],
+            [125.348152, 43.873351],
+            [125.348017, 43.873107],
+            [125.347923, 43.872961],
+            [125.347829, 43.872883],
+            [125.347663, 43.872734],
+            [125.347537, 43.872626],
+            [125.347362, 43.872357],
+            [125.347326, 43.872198],
+            [125.347285, 43.872006],
+            [125.347321, 43.870995],
+            [125.347357, 43.869988],
+            [125.348094, 43.869994],
+            [125.350097, 43.870007],
+            [125.351656, 43.87002],
+            [125.351817, 43.869981],
+            [125.351907, 43.869933],
+            [125.351921, 43.869874],
+            [125.351889, 43.86979],
+            [125.351786, 43.869673],
+            [125.351615, 43.869393],
+            [125.351638, 43.869323],
+            [125.35171, 43.869271],
+            [125.351808, 43.869202],
+            [125.350982, 43.868139],
+            [125.350533, 43.867531],
+            [125.350384, 43.867242],
+            [125.350021, 43.866589],
+            [125.349931, 43.866374],
+            [125.349702, 43.865903],
+            [125.34932, 43.86512],
+            [125.349118, 43.864649],
+            [125.348812, 43.863914],
+            [125.348624, 43.863498],
+            [125.348314, 43.862699],
+            [125.348062, 43.86212],
+            [125.34782, 43.861604],
+            [125.34733, 43.860752],
+            [125.346809, 43.859878],
+            [125.346562, 43.859283],
+            [125.346387, 43.858675],
+            [125.34618, 43.858022],
+            [125.34601, 43.85731],
+            [125.345853, 43.856855],
+            [125.345565, 43.856296],
+            [125.345269, 43.855731],
+            [125.344573, 43.854374],
+            [125.344393, 43.853839],
+            [125.344289, 43.853485],
+            [125.3442, 43.853043],
+            [125.344074, 43.852406],
+            [125.344069, 43.851847],
+            [125.344105, 43.851567],
+            [125.344123, 43.851437],
+            [125.344343, 43.850247],
+            [125.344397, 43.850004],
+            [125.344608, 43.849201],
+            [125.344882, 43.848173],
+            [125.345026, 43.847705],
+            [125.34512, 43.847292],
+            [125.345219, 43.846841],
+            [125.345237, 43.846597],
+            [125.34543, 43.844893],
+            [125.345574, 43.843798],
+            [125.345745, 43.843281],
+            [125.345906, 43.842962],
+            [125.346293, 43.842166],
+            [125.346454, 43.84174],
+            [125.346683, 43.840875],
+            [125.34685, 43.840232],
+            [125.347142, 43.839012],
+            [125.347339, 43.838043],
+            [125.34742, 43.837549],
+            [125.347618, 43.83622],
+            [125.34782, 43.834886],
+            [125.347923, 43.833996],
+            [125.347937, 43.833209],
+            [125.347901, 43.832692],
+            [125.347734, 43.831905],
+            [125.347452, 43.83105],
+            [125.347285, 43.830738],
+            [125.347065, 43.830367],
+            [125.346917, 43.830146],
+            [125.345947, 43.828721],
+            [125.345287, 43.827759],
+            [125.345004, 43.82719],
+            [125.344784, 43.826536],
+            [125.344685, 43.82558],
+            [125.344716, 43.825096],
+            [125.344748, 43.824367],
+            [125.344914, 43.824266],
+            [125.345237, 43.824208],
+            [125.345435, 43.824133],
+            [125.347276, 43.824146],
+            [125.348781, 43.824166],
+          ],
+          lineStyle: {
+            normal: {
+              color: 'rgba(90,161,223,1)',
+            },
+          },
+        },
+        {
+          name: '线路5',
+          source: '天津大港5',
+          target: '东营自提5',
+          station: '湖州5',
+          trafficMileage: 8541918,
+          orderNum: 1000,
+          coords: [
+            [125.127964, 43.810999],
+            [125.128009, 43.811035],
+            [125.126711, 43.811855],
+            [125.123787, 43.813719],
+            [125.120958, 43.815091],
+            [125.119291, 43.814128],
+            [125.11855, 43.813979],
+            [125.114813, 43.813367],
+            [125.114108, 43.813429],
+            [125.113884, 43.813384],
+            [125.113677, 43.813156],
+            [125.112469, 43.81138],
+            [125.110879, 43.810274],
+            [125.109019, 43.808222],
+            [125.10923, 43.80787],
+            [125.11034, 43.805961],
+            [125.111126, 43.804634],
+            [125.112271, 43.802659],
+            [125.113133, 43.801198],
+            [125.114027, 43.799689],
+            [125.114988, 43.798111],
+            [125.115725, 43.796891],
+            [125.116578, 43.795488],
+            [125.117405, 43.794083],
+            [125.118155, 43.79285],
+            [125.119035, 43.791584],
+            [125.115128, 43.79011],
+            [125.112626, 43.78877],
+            [125.11338, 43.787832],
+            [125.114759, 43.786072],
+            [125.11626, 43.784178],
+            [125.117791, 43.782265],
+            [125.11899, 43.779957],
+            [125.119732, 43.778431],
+            [125.120648, 43.776446],
+            [125.121658, 43.774171],
+            [125.122871, 43.771394],
+            [125.123877, 43.769099],
+            [125.124861, 43.766837],
+            [125.128315, 43.768569],
+            [125.132743, 43.770795],
+            [125.133974, 43.771284],
+            [125.13494, 43.771593],
+            [125.136368, 43.771941],
+            [125.141448, 43.773243],
+            [125.145459, 43.774239],
+            [125.150036, 43.775365],
+            [125.153104, 43.776039],
+            [125.153813, 43.776426],
+            [125.15442, 43.776706],
+            [125.15512, 43.777057],
+            [125.155574, 43.77736],
+            [125.156248, 43.777933],
+            [125.156962, 43.778649],
+            [125.157213, 43.778952],
+            [125.158943, 43.781077],
+            [125.160474, 43.782925],
+            [125.160609, 43.78287],
+            [125.163407, 43.782131],
+            [125.164162, 43.781734],
+            [125.165069, 43.781031],
+            [125.166012, 43.780628],
+            [125.166502, 43.780644],
+            [125.167, 43.780719],
+            [125.168676, 43.781955],
+            [125.169278, 43.782499],
+            [125.171681, 43.781044],
+            [125.171748, 43.780894],
+            [125.172938, 43.781799],
+            [125.174452, 43.783114],
+            [125.173589, 43.7837],
+            [125.173347, 43.783843],
+            [125.172835, 43.7841],
+            [125.172538, 43.784269],
+            [125.172453, 43.784351],
+            [125.173284, 43.78477],
+            [125.173679, 43.784865],
+            [125.173962, 43.785021],
+            [125.175292, 43.785831],
+            [125.175651, 43.786095],
+            [125.176087, 43.786254],
+          ],
+          lineStyle: {
+            normal: {
+              color: 'rgba(139,223,90,1)',
+            },
+          },
+        },
+        {
+          name: '线路6',
+          source: '天津大港6',
+          target: '东营自提6',
+          station: '湖州6',
+          trafficMileage: 517482428,
+          orderNum: 561,
+          coords: [
+            [125.343966, 43.90086],
+            [125.344577, 43.899876],
+            [125.34477, 43.899532],
+            [125.34517, 43.89896],
+            [125.345633, 43.898376],
+            [125.346234, 43.897606],
+            [125.347128, 43.897963],
+            [125.347232, 43.897752],
+            [125.347384, 43.897525],
+            [125.347851, 43.897025],
+            [125.348395, 43.896352],
+            [125.349832, 43.894783],
+            [125.351889, 43.892724],
+            [125.354018, 43.894072],
+            [125.35621, 43.895475],
+            [125.356354, 43.894868],
+            [125.356408, 43.894053],
+            [125.356403, 43.892808],
+            [125.356282, 43.892692],
+            [125.356242, 43.891188],
+            [125.356327, 43.891142],
+            [125.356354, 43.891045],
+            [125.356286, 43.888098],
+            [125.356399, 43.887985],
+            [125.356623, 43.887832],
+            [125.356861, 43.887738],
+            [125.357212, 43.887676],
+            [125.35815, 43.887683],
+            [125.359022, 43.887725],
+            [125.359341, 43.887705],
+            [125.361443, 43.887754],
+            [125.364928, 43.887838],
+            [125.368032, 43.887972],
+            [125.370695, 43.888095],
+            [125.371405, 43.888108],
+            [125.376076, 43.888225],
+            [125.376516, 43.888274],
+            [125.376831, 43.888251],
+            [125.380509, 43.888365],
+            [125.381632, 43.888524],
+            [125.382728, 43.888608],
+            [125.383155, 43.888586],
+            [125.38391, 43.888576],
+            [125.385122, 43.888524],
+            [125.386003, 43.888537],
+            [125.388231, 43.888644],
+            [125.390265, 43.888687],
+            [125.390598, 43.888726],
+            [125.391649, 43.888716],
+            [125.396782, 43.888839],
+            [125.401521, 43.888956],
+            [125.401548, 43.888732],
+            [125.401516, 43.888437],
+            [125.401081, 43.887751],
+            [125.400888, 43.88652],
+            [125.400798, 43.885851],
+            [125.400627, 43.884158],
+            [125.400412, 43.882521],
+            [125.400169, 43.880552],
+            [125.399953, 43.878632],
+            [125.399814, 43.876907],
+            [125.39972, 43.876114],
+            [125.399765, 43.875851],
+            [125.40003, 43.875035],
+            [125.400362, 43.87369],
+            [125.400986, 43.87137],
+            [125.401103, 43.871363],
+            [125.40157, 43.869596],
+            [125.402186, 43.86723],
+            [125.402891, 43.864715],
+            [125.40369, 43.863057],
+            [125.404449, 43.861475],
+            [125.405491, 43.859466],
+            [125.405801, 43.858881],
+            [125.4063, 43.85802],
+            [125.406592, 43.857458],
+            [125.407513, 43.855667],
+            [125.408231, 43.854334],
+            [125.408694, 43.853346],
+            [125.408923, 43.852764],
+            [125.409624, 43.850577],
+            [125.410571, 43.847596],
+            [125.410509, 43.847508],
+            [125.41054, 43.847401],
+            [125.410913, 43.847427],
+            [125.411384, 43.847342],
+            [125.411735, 43.847215],
+            [125.412085, 43.846988],
+            [125.412283, 43.846738],
+            [125.412422, 43.846419],
+            [125.412413, 43.846084],
+            [125.412296, 43.845785],
+            [125.412107, 43.845567],
+            [125.41186, 43.845382],
+            [125.411573, 43.845258],
+            [125.411546, 43.845128],
+            [125.411407, 43.84494],
+            [125.411878, 43.843324],
+            [125.412444, 43.841582],
+            [125.413055, 43.839582],
+            [125.413599, 43.837781],
+            [125.414277, 43.835599],
+            [125.414874, 43.833743],
+            [125.415332, 43.832296],
+            [125.416127, 43.829831],
+            [125.416163, 43.829711],
+            [125.416136, 43.829383],
+            [125.416123, 43.828544],
+            [125.415997, 43.828053],
+            [125.415692, 43.827214],
+            [125.414892, 43.82575],
+            [125.414461, 43.824703],
+            [125.413787, 43.82295],
+            [125.413006, 43.820901],
+            [125.412381, 43.819292],
+            [125.411941, 43.818231],
+            [125.4116, 43.817607],
+            [125.410931, 43.816781],
+            [125.410333, 43.816085],
+            [125.40921, 43.814797],
+            [125.408712, 43.814211],
+            [125.408438, 43.813873],
+            [125.408115, 43.813444],
+            [125.407854, 43.813047],
+            [125.407683, 43.812673],
+            [125.407517, 43.812328],
+            [125.407144, 43.81051],
+            [125.406605, 43.807891],
+            [125.406367, 43.806685],
+            [125.406394, 43.806258],
+            [125.406493, 43.806171],
+            [125.40709, 43.804147],
+            [125.407526, 43.802745],
+            [125.408101, 43.800848],
+            [125.408025, 43.800822],
+            [125.408074, 43.800676],
+            [125.408285, 43.800032],
+            [125.408281, 43.799261],
+            [125.408119, 43.798112],
+            [125.407634, 43.797192],
+            [125.4067, 43.795484],
+            [125.406569, 43.795106],
+            [125.406093, 43.793893],
+            [125.406053, 43.792777],
+            [125.406192, 43.792058],
+            [125.406646, 43.790639],
+            [125.406713, 43.790287],
+            [125.406646, 43.789402],
+            [125.406534, 43.788944],
+            [125.406457, 43.788739],
+            [125.406224, 43.788192],
+            [125.405891, 43.787391],
+            [125.405011, 43.785582],
+            [125.404288, 43.784121],
+            [125.403313, 43.782061],
+            [125.402424, 43.780385],
+            [125.402015, 43.779471],
+            [125.401413, 43.778312],
+            [125.401184, 43.777778],
+            [125.401009, 43.776662],
+            [125.400973, 43.776164],
+            [125.400892, 43.776011],
+            [125.40087, 43.775497],
+            [125.400686, 43.773404],
+            [125.400456, 43.769964],
+            [125.400488, 43.769654],
+            [125.400641, 43.769332],
+            [125.400825, 43.769059],
+            [125.401391, 43.768525],
+            [125.404234, 43.766575],
+            [125.407329, 43.764433],
+            [125.407939, 43.763932],
+            [125.408276, 43.763496],
+            [125.408442, 43.76305],
+            [125.408505, 43.76264],
+            [125.408357, 43.761793],
+            [125.407908, 43.759251],
+            [125.407513, 43.757141],
+            [125.407131, 43.75481],
+            [125.407144, 43.754422],
+            [125.407364, 43.75383],
+            [125.408056, 43.752785],
+            [125.408182, 43.752531],
+            [125.409484, 43.750405],
+            [125.409624, 43.750138],
+            [125.409731, 43.749714],
+            [125.409763, 43.749255],
+            [125.409565, 43.748308],
+            [125.409161, 43.746312],
+            [125.408469, 43.744296],
+            [125.407782, 43.742277],
+            [125.407549, 43.741723],
+            [125.406852, 43.739893],
+            [125.406282, 43.738177],
+            [125.405981, 43.737366],
+            [125.405429, 43.735894],
+            [125.404656, 43.733816],
+            [125.404175, 43.73253],
+            [125.403776, 43.731412],
+            [125.403412, 43.730429],
+            [125.402828, 43.728846],
+            [125.402307, 43.727419],
+            [125.401943, 43.726237],
+            [125.40153, 43.724595],
+            [125.400924, 43.722771],
+            [125.400349, 43.721214],
+            [125.399626, 43.719409],
+            [125.398938, 43.717673],
+            [125.398485, 43.716141],
+            [125.398085, 43.714509],
+            [125.397577, 43.712688],
+            [125.397285, 43.712212],
+            [125.396994, 43.711945],
+            [125.394842, 43.710072],
+            [125.393409, 43.708736],
+            [125.393176, 43.708348],
+            [125.393054, 43.707628],
+            [125.39309, 43.707207],
+            [125.39384, 43.705461],
+            [125.394375, 43.704213],
+            [125.39539, 43.701476],
+            [125.395552, 43.700922],
+            [125.396279, 43.698468],
+            [125.397038, 43.695838],
+            [125.397703, 43.693543],
+            [125.398395, 43.691233],
+            [125.398893, 43.690431],
+            [125.399383, 43.689828],
+            [125.399778, 43.689417],
+            [125.400385, 43.688977],
+            [125.401198, 43.688765],
+            [125.401647, 43.688713],
+            [125.405375, 43.688299],
+            [125.406057, 43.6881],
+            [125.406637, 43.687801],
+            [125.407333, 43.687184],
+            [125.409332, 43.685366],
+            [125.41169, 43.683198],
+            [125.413455, 43.681529],
+            [125.414919, 43.679772],
+            [125.416303, 43.678034],
+            [125.418279, 43.675563],
+            [125.419617, 43.673747],
+            [125.419896, 43.673154],
+            [125.419968, 43.672805],
+            [125.419932, 43.670233],
+            [125.41959, 43.669294],
+            [125.419204, 43.668785],
+            [125.416877, 43.667311],
+            [125.415593, 43.666499],
+            [125.413482, 43.665146],
+            [125.409687, 43.662691],
+            [125.407715, 43.661429],
+            [125.406745, 43.660637],
+            [125.406165, 43.659867],
+            [125.405932, 43.659211],
+            [125.405819, 43.657871],
+            [125.405626, 43.655376],
+            [125.405411, 43.653097],
+            [125.405159, 43.650918],
+            [125.404696, 43.648769],
+            [125.404126, 43.646277],
+            [125.403421, 43.643145],
+            [125.402864, 43.640464],
+            [125.402262, 43.637991],
+            [125.40175, 43.635665],
+            [125.401117, 43.632879],
+            [125.4006, 43.631819],
+            [125.400214, 43.631349],
+            [125.399468, 43.630831],
+            [125.396998, 43.629649],
+            [125.393427, 43.628015],
+            [125.390108, 43.626426],
+            [125.389295, 43.625835],
+            [125.388644, 43.624922],
+            [125.38828, 43.623972],
+            [125.388141, 43.622866],
+            [125.38775, 43.620027],
+            [125.38753, 43.618327],
+            [125.387153, 43.615602],
+            [125.386838, 43.613076],
+            [125.38651, 43.610837],
+            [125.386164, 43.608217],
+            [125.385886, 43.605994],
+            [125.38589, 43.604143],
+            [125.385958, 43.601796],
+            [125.38607, 43.599146],
+            [125.38612, 43.595986],
+            [125.386187, 43.593772],
+            [125.386146, 43.592385],
+            [125.38598, 43.591817],
+            [125.385675, 43.591063],
+            [125.384907, 43.589182],
+            [125.383932, 43.586783],
+            [125.3832, 43.584964],
+            [125.38302, 43.58418],
+            [125.383079, 43.583367],
+            [125.383501, 43.581973],
+            [125.384233, 43.579746],
+            [125.384305, 43.57874],
+            [125.384094, 43.576735],
+            [125.38386, 43.573793],
+            [125.38364, 43.571729],
+            [125.383353, 43.570834],
+            [125.382737, 43.569492],
+            [125.381147, 43.565873],
+            [125.381017, 43.565102],
+            [125.380923, 43.563378],
+            [125.380779, 43.558743],
+            [125.380707, 43.555689],
+            [125.380622, 43.553503],
+            [125.380555, 43.551311],
+            [125.380478, 43.548449],
+            [125.380379, 43.545832],
+            [125.380334, 43.543764],
+            [125.380546, 43.542947],
+            [125.380882, 43.542326],
+            [125.381273, 43.541895],
+          ],
+          lineStyle: {
+            normal: {
+              color: 'rgba(223,123,90,1)',
+            },
+          },
+        },
+        {
+          name: '线路7',
+          source: '天津大港7',
+          target: '东营自提7',
+          station: '湖州7',
+          trafficMileage: 5678457465,
+          orderNum: 174,
+          coords: [
+            [125.272735, 43.873464],
+            [125.273095, 43.873656],
+            [125.273175, 43.873649],
+            [125.273333, 43.873549],
+            [125.273373, 43.873454],
+            [125.273364, 43.87337],
+            [125.272012, 43.872639],
+            [125.270692, 43.871924],
+            [125.270499, 43.871892],
+            [125.270184, 43.871706],
+            [125.268751, 43.870933],
+            [125.268405, 43.870738],
+            [125.267045, 43.869955],
+            [125.26602, 43.869428],
+            [125.264395, 43.86859],
+            [125.263209, 43.867982],
+            [125.261956, 43.867339],
+            [125.261565, 43.867125],
+            [125.260123, 43.866315],
+            [125.259216, 43.865841],
+            [125.258196, 43.865305],
+            [125.256754, 43.864551],
+            [125.255946, 43.864138],
+            [125.255461, 43.863868],
+            [125.253736, 43.862916],
+            [125.25207, 43.862026],
+            [125.250915, 43.861431],
+            [125.249775, 43.860817],
+            [125.247897, 43.859881],
+            [125.247107, 43.859471],
+            [125.245103, 43.858447],
+            [125.24363, 43.857768],
+            [125.242004, 43.857092],
+            [125.240675, 43.856562],
+            [125.23926, 43.856039],
+            [125.237495, 43.855317],
+            [125.235195, 43.854385],
+            [125.233403, 43.853663],
+            [125.231319, 43.852824],
+            [125.229922, 43.852262],
+            [125.228543, 43.851716],
+            [125.227021, 43.851118],
+            [125.22544, 43.850559],
+            [125.225076, 43.850432],
+            [125.224424, 43.850253],
+            [125.223337, 43.849964],
+            [125.221783, 43.849584],
+            [125.221042, 43.849408],
+            [125.218958, 43.848908],
+            [125.21819, 43.848696],
+            [125.217337, 43.848495],
+            [125.215334, 43.84802],
+            [125.213258, 43.847529],
+            [125.210025, 43.846772],
+            [125.207433, 43.846167],
+            [125.206939, 43.846047],
+            [125.204513, 43.845455],
+            [125.203126, 43.84513],
+            [125.200925, 43.844613],
+            [125.198975, 43.844184],
+            [125.196685, 43.843651],
+            [125.19364, 43.842942],
+            [125.190621, 43.842243],
+            [125.188578, 43.841765],
+            [125.186237, 43.841232],
+            [125.183745, 43.840657],
+            [125.181432, 43.840111],
+            [125.179774, 43.839714],
+            [125.179774, 43.839568],
+            [125.179738, 43.839441],
+            [125.179657, 43.839298],
+            [125.179554, 43.83921],
+            [125.17941, 43.839126],
+            [125.179289, 43.839083],
+            [125.179132, 43.839044],
+            [125.178939, 43.839035],
+            [125.178777, 43.839048],
+            [125.17857, 43.839093],
+            [125.17831, 43.839226],
+            [125.178171, 43.839353],
+            [125.176603, 43.838973],
+            [125.174191, 43.83841],
+            [125.172534, 43.838014],
+            [125.171272, 43.837711],
+            [125.169228, 43.837224],
+            [125.167647, 43.836843],
+            [125.167463, 43.836785],
+            [125.166803, 43.836609],
+            [125.165311, 43.836229],
+            [125.163784, 43.835845],
+            [125.161723, 43.835335],
+            [125.159562, 43.834808],
+            [125.156324, 43.834011],
+          ],
+          lineStyle: {
+            normal: {
+              color: 'rgba(223,157,90,1)',
+            },
+          },
+        },
+        {
+          name: '线路8',
+          source: '天津大港8',
+          target: '东营自提8',
+          station: '湖州8',
+          trafficMileage: 26524524,
+          orderNum: 547,
+          coords: [
+            [125.273292, 43.879611],
+            [125.270054, 43.877951],
+            [125.271271, 43.876733],
+            [125.273032, 43.874978],
+            [125.273894, 43.874065],
+            [125.274896, 43.87323],
+            [125.275718, 43.872346],
+            [125.277802, 43.870423],
+            [125.2795, 43.869149],
+            [125.281979, 43.867466],
+            [125.283502, 43.866348],
+            [125.285352, 43.864999],
+            [125.286309, 43.864278],
+            [125.287014, 43.863706],
+            [125.288056, 43.862932],
+            [125.288321, 43.862916],
+            [125.289125, 43.86239],
+            [125.289781, 43.861967],
+            [125.290392, 43.861441],
+            [125.290913, 43.86107],
+            [125.29319, 43.859409],
+            [125.293275, 43.859283],
+            [125.293275, 43.859153],
+            [125.29491, 43.857976],
+            [125.295157, 43.857856],
+            [125.295377, 43.857752],
+            [125.295813, 43.857856],
+            [125.296289, 43.857833],
+            [125.296779, 43.857657],
+            [125.297147, 43.857306],
+            [125.297178, 43.856897],
+            [125.296999, 43.856617],
+            [125.296729, 43.856416],
+            [125.296392, 43.856299],
+            [125.296114, 43.855925],
+            [125.296091, 43.854645],
+            [125.29615, 43.854355],
+            [125.296105, 43.852112],
+            [125.296271, 43.852077],
+            [125.296293, 43.85036],
+            [125.296132, 43.850165],
+            [125.296293, 43.846248],
+            [125.296352, 43.845975],
+            [125.288505, 43.845936],
+            [125.288568, 43.843631],
+            [125.288617, 43.840797],
+            [125.288667, 43.838622],
+            [125.285918, 43.838625],
+            [125.285092, 43.838566],
+            [125.284422, 43.83843],
+            [125.283915, 43.838257],
+            [125.282949, 43.837848],
+            [125.281853, 43.837318],
+            [125.278534, 43.835669],
+            [125.275134, 43.833972],
+            [125.272425, 43.832639],
+            [125.27093, 43.831859],
+            [125.26916, 43.830873],
+            [125.268051, 43.829836],
+            [125.266497, 43.828389],
+            [125.265342, 43.8273],
+            [125.263941, 43.825885],
+            [125.26232, 43.824246],
+            [125.261363, 43.823375],
+            [125.259813, 43.821863],
+            [125.258187, 43.820253],
+            [125.25724, 43.819339],
+            [125.254967, 43.817114],
+            [125.252479, 43.814655],
+            [125.249671, 43.816161],
+            [125.24792, 43.81446],
+            [125.245503, 43.812157],
+            [125.242844, 43.813585],
+            [125.242076, 43.812889],
+            [125.239291, 43.813254],
+            [125.236255, 43.81365],
+            [125.234108, 43.813963],
+            [125.232419, 43.81489],
+            [125.230591, 43.812941],
+            [125.234131, 43.812437],
+            [125.231615, 43.811227],
+          ],
+          lineStyle: {
+            normal: {
+              color: 'rgba(194,223,90,1)',
+            },
+          },
+        },
+        {
+          name: '线路9',
+          source: '天津大港9',
+          target: '东营自提9',
+          station: '湖州9',
+          trafficMileage: 32479247,
+          orderNum: 682,
+          coords: [
+            [125.334328, 43.894498],
+            [125.334727, 43.893942],
+            [125.335796, 43.894332],
+            [125.335877, 43.894222],
+            [125.333146, 43.893325],
+            [125.33294, 43.893215],
+            [125.332711, 43.893026],
+            [125.332828, 43.892724],
+            [125.332828, 43.892435],
+            [125.332697, 43.892068],
+            [125.332289, 43.891727],
+            [125.331992, 43.891594],
+            [125.331579, 43.89151],
+            [125.33139, 43.891211],
+            [125.33139, 43.891084],
+            [125.331516, 43.890964],
+            [125.33157, 43.887719],
+            [125.331458, 43.887569],
+            [125.331525, 43.884496],
+            [125.331664, 43.878655],
+            [125.331777, 43.872956],
+            [125.331835, 43.869869],
+            [125.332028, 43.862531],
+            [125.33214, 43.862531],
+            [125.332158, 43.862222],
+            [125.332172, 43.861507],
+            [125.332401, 43.850677],
+            [125.332477, 43.846331],
+            [125.332688, 43.839735],
+            [125.332702, 43.839488],
+            [125.332837, 43.839342],
+            [125.333124, 43.839192],
+            [125.333326, 43.83902],
+            [125.333447, 43.83875],
+            [125.333358, 43.838379],
+            [125.332765, 43.837849],
+            [125.332805, 43.836331],
+            [125.332899, 43.832572],
+            [125.332783, 43.832572],
+            [125.332823, 43.829737],
+            [125.332841, 43.826092],
+            [125.332931, 43.82322],
+            [125.333061, 43.81881],
+            [125.333214, 43.818635],
+            [125.33329, 43.816963],
+            [125.33334, 43.815103],
+            [125.333308, 43.813854],
+            [125.335316, 43.813857],
+            [125.335473, 43.813909],
+            [125.335518, 43.814],
+            [125.335338, 43.814085],
+            [125.334876, 43.814176],
+            [125.332819, 43.814163],
+            [125.328736, 43.814137],
+            [125.327936, 43.814137],
+            [125.326809, 43.81406],
+            [125.325893, 43.813989],
+            [125.325048, 43.813859],
+            [125.323288, 43.813585],
+            [125.323377, 43.812792],
+            [125.323261, 43.812343],
+            [125.323081, 43.811939],
+            [125.322793, 43.811497],
+            [125.322344, 43.8111],
+            [125.321203, 43.810333],
+            [125.320682, 43.809858],
+            [125.320404, 43.809396],
+            [125.320287, 43.80894],
+            [125.320224, 43.807952],
+            [125.320278, 43.80531],
+            [125.320521, 43.804302],
+            [125.32106, 43.803527],
+            [125.321805, 43.802708],
+            [125.32229, 43.802532],
+            [125.327761, 43.802415],
+            [125.331175, 43.802369],
+            [125.331848, 43.802259],
+            [125.332621, 43.801937],
+            [125.33307, 43.801458],
+            [125.33342, 43.800821],
+            [125.3336, 43.800164],
+            [125.333483, 43.796904],
+            [125.333843, 43.782414],
+            [125.33431, 43.765802],
+            [125.334741, 43.747284],
+            [125.334957, 43.737097],
+            [125.335316, 43.724512],
+            [125.335675, 43.710881],
+            [125.335675, 43.700193],
+            [125.335244, 43.696439],
+            [125.334489, 43.692606],
+            [125.332405, 43.686375],
+            [125.327842, 43.673361],
+            [125.322237, 43.657214],
+            [125.319578, 43.649622],
+            [125.318751, 43.645916],
+            [125.31814, 43.641559],
+            [125.318158, 43.622997],
+            [125.318293, 43.608066],
+            [125.31841, 43.587305],
+            [125.318414, 43.585052],
+            [125.318702, 43.584507],
+            [125.318953, 43.584157],
+            [125.31933, 43.583815],
+            [125.31964, 43.583521],
+            [125.31978, 43.583331],
+            [125.319834, 43.583103],
+            [125.319766, 43.582835],
+            [125.319591, 43.582564],
+            [125.319326, 43.582352],
+            [125.318944, 43.582166],
+            [125.317273, 43.581611],
+            [125.315257, 43.580971],
+            [125.312432, 43.580007],
+            [125.311124, 43.579589],
+            [125.3071, 43.578313],
+            [125.305914, 43.577878],
+            [125.303624, 43.577059],
+            [125.302011, 43.576497],
+            [125.303565, 43.57553],
+            [125.304769, 43.574858],
+            [125.305667, 43.574453],
+            [125.305959, 43.574378],
+            [125.307379, 43.572497],
+            [125.308753, 43.570789],
+            [125.30896, 43.57025],
+            [125.308924, 43.569636],
+            [125.308757, 43.568966],
+            [125.308708, 43.568372],
+            [125.308897, 43.567186],
+            [125.308856, 43.566791],
+            [125.308587, 43.566157],
+            [125.3082, 43.565583],
+            [125.307042, 43.564211],
+            [125.306831, 43.563825],
+            [125.306691, 43.563234],
+            [125.306723, 43.561307],
+            [125.306763, 43.559076],
+            [125.306579, 43.558318],
+            [125.306512, 43.558122],
+            [125.306566, 43.557851],
+            [125.306732, 43.557505],
+            [125.30723, 43.557162],
+            [125.308834, 43.556508],
+            [125.309606, 43.55612],
+            [125.311156, 43.554947],
+            [125.311547, 43.554506],
+            [125.311735, 43.554078],
+            [125.312297, 43.552369],
+            [125.312346, 43.55204],
+            [125.311614, 43.550337],
+            [125.311628, 43.54987],
+            [125.311884, 43.549563],
+            [125.312629, 43.549145],
+            [125.312988, 43.548766],
+            [125.313186, 43.547796],
+            [125.313258, 43.54708],
+            [125.313303, 43.544558],
+            [125.313505, 43.5408],
+            [125.313433, 43.53553],
+            [125.313456, 43.533739],
+            [125.313366, 43.533255],
+            [125.313227, 43.532677],
+            [125.312512, 43.530105],
+            [125.312396, 43.529468],
+            [125.312324, 43.528566],
+            [125.312454, 43.523787],
+            [125.312467, 43.522398],
+            [125.312405, 43.521686],
+            [125.312485, 43.521398],
+            [125.31267, 43.521153],
+            [125.313905, 43.520267],
+            [125.31426, 43.520019],
+            [125.314475, 43.519702],
+            [125.314547, 43.519336],
+            [125.314601, 43.516547],
+            [125.314632, 43.515093],
+            [125.314295, 43.513677],
+            [125.314152, 43.513239],
+            [125.31408, 43.51288],
+            [125.314165, 43.512347],
+            [125.314183, 43.511696],
+            [125.314071, 43.511134],
+            [125.313891, 43.510451],
+            [125.3139, 43.510032],
+            [125.31403, 43.509513],
+            [125.314569, 43.508218],
+            [125.315531, 43.505926],
+            [125.31571, 43.505495],
+            [125.315877, 43.50502],
+            [125.315868, 43.504615],
+            [125.315751, 43.504174],
+            [125.315522, 43.503857],
+            [125.313712, 43.502506],
+            [125.312216, 43.501529],
+            [125.311785, 43.501352],
+            [125.311336, 43.50109],
+            [125.311057, 43.500871],
+            [125.3109, 43.500685],
+            [125.310657, 43.500224],
+            [125.310078, 43.498932],
+            [125.309265, 43.497546],
+            [125.307837, 43.495329],
+            [125.307554, 43.49496],
+            [125.307253, 43.494731],
+            [125.305631, 43.494162],
+            [125.305321, 43.493923],
+            [125.305115, 43.493629],
+            [125.305047, 43.493393],
+            [125.305025, 43.49304],
+            [125.305169, 43.492213],
+            [125.305133, 43.491869],
+            [125.304958, 43.491516],
+            [125.304149, 43.490342],
+            [125.302811, 43.488602],
+            [125.301755, 43.487311],
+            [125.301661, 43.487042],
+            [125.301652, 43.486856],
+            [125.301701, 43.486535],
+            [125.302105, 43.485643],
+          ],
+          lineStyle: {
+            normal: {
+              color: 'rgba(183,223,90,1)',
+            },
+          },
+        },
+        {
+          name: '线路10',
+          source: '天津大港10',
+          target: '东营自提10',
+          station: '湖州10',
+          trafficMileage: 452984428,
+          orderNum: 123,
+          coords: [
+            [125.343931, 43.900903],
+            [125.34455, 43.899922],
+            [125.344757, 43.899545],
+            [125.345197, 43.898931],
+            [125.346226, 43.897606],
+            [125.347164, 43.89798],
+            [125.347349, 43.897561],
+            [125.349819, 43.89479],
+            [125.351894, 43.892731],
+            [125.356197, 43.895463],
+            [125.356345, 43.894966],
+            [125.356404, 43.894131],
+            [125.356395, 43.892809],
+            [125.356273, 43.892666],
+            [125.356255, 43.89123],
+            [125.356368, 43.891048],
+            [125.356269, 43.888134],
+            [125.356696, 43.887816],
+            [125.357167, 43.887676],
+            [125.3669, 43.88793],
+            [125.370817, 43.888105],
+            [125.376054, 43.888242],
+            [125.376476, 43.888284],
+            [125.376755, 43.888245],
+            [125.380456, 43.888362],
+            [125.381574, 43.888524],
+            [125.382719, 43.888622],
+            [125.383101, 43.888583],
+            [125.384862, 43.888537],
+            [125.385733, 43.888531],
+            [125.388091, 43.888651],
+            [125.390494, 43.888716],
+            [125.393495, 43.888768],
+            [125.399684, 43.888927],
+            [125.401525, 43.888979],
+            [125.401566, 43.888758],
+            [125.401543, 43.88845],
+            [125.401094, 43.887715],
+            [125.400753, 43.885354],
+            [125.400479, 43.882992],
+            [125.400286, 43.881533],
+            [125.399971, 43.878635],
+            [125.399751, 43.876104],
+            [125.399774, 43.875893],
+            [125.399989, 43.875175],
+            [125.400443, 43.873423],
+            [125.400995, 43.87138],
+            [125.40109, 43.871386],
+            [125.401445, 43.87009],
+            [125.402177, 43.867269],
+            [125.402877, 43.864747],
+            [125.402931, 43.864643],
+            [125.403515, 43.863438],
+            [125.404414, 43.861556],
+            [125.405482, 43.859473],
+            [125.405927, 43.858686],
+            [125.406682, 43.857289],
+            [125.40789, 43.854991],
+            [125.40877, 43.853213],
+            [125.408972, 43.852667],
+            [125.409543, 43.850824],
+            [125.41058, 43.847602],
+            [125.410513, 43.847505],
+            [125.410553, 43.84742],
+            [125.410913, 43.84744],
+            [125.411362, 43.847368],
+            [125.411811, 43.84717],
+            [125.412229, 43.846845],
+            [125.412422, 43.846328],
+            [125.41239, 43.845918],
+            [125.412054, 43.845512],
+            [125.411573, 43.845232],
+            [125.411546, 43.845128],
+            [125.411411, 43.844959],
+            [125.412332, 43.84192],
+            [125.413087, 43.839527],
+            [125.414003, 43.836503],
+            [125.414641, 43.83452],
+            [125.415669, 43.831291],
+            [125.416172, 43.829721],
+            [125.416141, 43.828527],
+            [125.415764, 43.827357],
+            [125.415256, 43.826397],
+            [125.414704, 43.825334],
+            [125.414223, 43.824063],
+            [125.414066, 43.823627],
+            [125.413356, 43.821734],
+            [125.412597, 43.819802],
+            [125.41195, 43.818222],
+            [125.411609, 43.817597],
+            [125.411398, 43.817314],
+            [125.410019, 43.815691],
+            [125.408604, 43.814055],
+            [125.408146, 43.813473],
+            [125.407908, 43.813099],
+            [125.407531, 43.812325],
+            [125.407315, 43.811339],
+            [125.406983, 43.809557],
+            [125.406417, 43.80688],
+            [125.406381, 43.806626],
+            [125.406412, 43.806232],
+            [125.406489, 43.806177],
+            [125.406547, 43.805985],
+            [125.407329, 43.803363],
+            [125.407989, 43.801216],
+            [125.408106, 43.800845],
+            [125.408038, 43.800813],
+            [125.408267, 43.800087],
+            [125.408308, 43.799612],
+            [125.408312, 43.799245],
+            [125.408119, 43.798109],
+            [125.407885, 43.79765],
+            [125.406686, 43.795451],
+            [125.40612, 43.793967],
+            [125.406057, 43.79278],
+            [125.406138, 43.792399],
+            [125.406188, 43.792129],
+            [125.406538, 43.791052],
+            [125.406709, 43.790362],
+            [125.406682, 43.789474],
+            [125.406538, 43.788918],
+            [125.405909, 43.787401],
+            [125.404539, 43.784619],
+            [125.403457, 43.782328],
+            [125.402662, 43.780782],
+            [125.401925, 43.779233],
+            [125.401404, 43.778276],
+            [125.401211, 43.777775],
+            [125.401027, 43.776656],
+            [125.400991, 43.77618],
+            [125.400888, 43.775969],
+            [125.400766, 43.77412],
+            [125.400465, 43.769999],
+            [125.400515, 43.769619],
+            [125.400829, 43.769072],
+            [125.401328, 43.768574],
+            [125.403309, 43.76722],
+            [125.407324, 43.764443],
+            [125.407935, 43.763942],
+            [125.408254, 43.763522],
+            [125.408433, 43.763079],
+            [125.408496, 43.762623],
+            [125.408128, 43.760465],
+            [125.407602, 43.75759],
+            [125.40714, 43.754807],
+            [125.40714, 43.754429],
+            [125.407355, 43.75384],
+            [125.408047, 43.752795],
+            [125.409381, 43.750561],
+            [125.409637, 43.750128],
+            [125.409767, 43.749288],
+            [125.40917, 43.746276],
+            [125.408892, 43.745511],
+            [125.40842, 43.74413],
+            [125.407917, 43.742616],
+            [125.407414, 43.741395],
+            [125.406736, 43.739581],
+            [125.406017, 43.737467],
+            [125.405658, 43.736483],
+            [125.40462, 43.733686],
+            [125.403924, 43.731829],
+            [125.403097, 43.729562],
+            [125.402464, 43.727807],
+            [125.402271, 43.727295],
+            [125.401862, 43.725944],
+            [125.401436, 43.724282],
+            [125.40091, 43.722712],
+            [125.400439, 43.721435],
+            [125.399765, 43.719761],
+            [125.399087, 43.718054],
+            [125.398601, 43.716493],
+            [125.398112, 43.714558],
+            [125.397586, 43.712691],
+            [125.397294, 43.712235],
+            [125.396971, 43.711929],
+            [125.395112, 43.710313],
+            [125.393418, 43.708758],
+            [125.393167, 43.708354],
+            [125.39305, 43.707644],
+            [125.393095, 43.707211],
+            [125.394366, 43.704226],
+            [125.395399, 43.701476],
+            [125.39579, 43.700162],
+            [125.39694, 43.696209],
+            [125.398404, 43.691252],
+            [125.398898, 43.690421],
+            [125.399262, 43.689978],
+            [125.399774, 43.689424],
+            [125.400371, 43.688977],
+            [125.401117, 43.688788],
+            [125.405375, 43.688309],
+            [125.40603, 43.688107],
+            [125.406641, 43.687794],
+            [125.409296, 43.685411],
+            [125.413432, 43.681539],
+            [125.41429, 43.680509],
+            [125.415629, 43.678895],
+            [125.417448, 43.67662],
+            [125.419595, 43.67378],
+            [125.419909, 43.673164],
+            [125.419972, 43.672831],
+            [125.419936, 43.670233],
+            [125.419608, 43.669339],
+            [125.419218, 43.668798],
+            [125.412651, 43.664611],
+            [125.409817, 43.662772],
+            [125.407688, 43.661396],
+            [125.406754, 43.660643],
+            [125.406156, 43.65987],
+            [125.405932, 43.659198],
+            [125.405694, 43.656384],
+            [125.40533, 43.652396],
+            [125.405132, 43.650709],
+            [125.404526, 43.648266],
+            [125.404018, 43.645925],
+            [125.403407, 43.643129],
+            [125.403151, 43.641883],
+            [125.406057, 43.641642],
+            [125.406848, 43.641727],
+            [125.407288, 43.641909],
+            [125.410082, 43.643596],
+            [125.410603, 43.643749],
+            [125.411649, 43.643811],
+            [125.415265, 43.643736],
+            [125.420013, 43.642858],
+            [125.431547, 43.640347],
+            [125.433164, 43.640069],
+            [125.435095, 43.640109],
+            [125.442556, 43.640343],
+            [125.445466, 43.640484],
+            [125.44596, 43.640679],
+            [125.448413, 43.642862],
+            [125.454126, 43.645553],
+            [125.454265, 43.645543],
+            [125.454534, 43.645406],
+            [125.455154, 43.644496],
+            [125.455496, 43.644326],
+            [125.456174, 43.644248],
+            [125.463172, 43.644796],
+            [125.463405, 43.644727],
+            [125.46539, 43.639883],
+            [125.465498, 43.639655],
+            [125.465584, 43.639502],
+            [125.465718, 43.639381],
+            [125.473035, 43.638207],
+            [125.47573, 43.637659],
+            [125.478263, 43.63714],
+            [125.482849, 43.636073],
+            [125.485104, 43.635307],
+            [125.484852, 43.63484],
+            [125.483469, 43.632286],
+            [125.482481, 43.630609],
+            [125.481803, 43.62945],
+            [125.481731, 43.629049],
+            [125.481906, 43.627281],
+            [125.482009, 43.626191],
+            [125.483572, 43.625891],
+            [125.490368, 43.624589],
+            [125.496782, 43.623584],
+            [125.503892, 43.622386],
+            [125.503568, 43.621607],
+            [125.50307, 43.619887],
+            [125.502778, 43.618131],
+            [125.502257, 43.616271],
+            [125.501426, 43.613301],
+            [125.501264, 43.612691],
+            [125.500936, 43.610394],
+            [125.500874, 43.610142],
+            [125.500379, 43.608703],
+            [125.499827, 43.60666],
+            [125.499665, 43.606219],
+            [125.499108, 43.605178],
+            [125.498475, 43.603507],
+            [125.498331, 43.602766],
+            [125.497864, 43.599374],
+            [125.497653, 43.59895],
+            [125.496831, 43.597886],
+            [125.494617, 43.595003],
+            [125.494487, 43.594739],
+            [125.494469, 43.594487],
+            [125.494567, 43.594252],
+            [125.494837, 43.593893],
+            [125.49636, 43.592796],
+            [125.496831, 43.592343],
+            [125.497078, 43.592039],
+            [125.497936, 43.590599],
+            [125.49852, 43.589695],
+            [125.501916, 43.584608],
+            [125.501956, 43.58433],
+            [125.501844, 43.584184],
+            [125.498884, 43.582368],
+            [125.498614, 43.582179],
+          ],
+          lineStyle: {
+            normal: {
+              color: 'rgba(90,199,223,1)',
+            },
+          },
+        },
+        {
+          name: '线路11',
+          source: '天津大港11',
+          target: '东营自提11',
+          station: '湖州11',
+          trafficMileage: 576496398,
+          orderNum: 351,
+          coords: [
+            [125.333025, 43.826545],
+            [125.333039, 43.826223],
+            [125.332846, 43.826064],
+            [125.332841, 43.825492],
+            [125.332702, 43.825537],
+            [125.332693, 43.828405],
+            [125.332522, 43.828409],
+            [125.332405, 43.834466],
+            [125.332342, 43.837012],
+            [125.332316, 43.837858],
+            [125.3321, 43.838072],
+            [125.332001, 43.838114],
+            [125.331848, 43.838225],
+            [125.331723, 43.838319],
+            [125.331642, 43.838436],
+            [125.331574, 43.838596],
+            [125.331547, 43.838765],
+            [125.33161, 43.838953],
+            [125.331727, 43.839103],
+            [125.331862, 43.83923],
+            [125.332091, 43.839334],
+            [125.332329, 43.839382],
+            [125.332572, 43.839389],
+            [125.332832, 43.839356],
+            [125.333048, 43.839262],
+            [125.333196, 43.839168],
+            [125.333353, 43.839005],
+            [125.333402, 43.838895],
+            [125.335109, 43.838888],
+            [125.337939, 43.838878],
+            [125.344362, 43.838888],
+            [125.34765, 43.83894],
+            [125.351593, 43.839008],
+            [125.353942, 43.839025],
+            [125.354441, 43.839054],
+            [125.357181, 43.839122],
+            [125.3605, 43.839217],
+            [125.363851, 43.839301],
+            [125.365027, 43.839363],
+            [125.367471, 43.839457],
+            [125.370583, 43.839496],
+            [125.370678, 43.839438],
+            [125.371688, 43.839473],
+            [125.371688, 43.841352],
+            [125.371634, 43.843007],
+            [125.371585, 43.845397],
+            [125.371549, 43.847123],
+            [125.371531, 43.848989],
+            [125.371495, 43.85079],
+            [125.371518, 43.852255],
+            [125.371441, 43.85469],
+            [125.371356, 43.857654],
+            [125.371288, 43.858997],
+            [125.371266, 43.861944],
+            [125.371199, 43.865201],
+            [125.371145, 43.868889],
+            [125.371095, 43.870517],
+            [125.372268, 43.870553],
+            [125.377114, 43.870702],
+            [125.38338, 43.8709],
+            [125.387229, 43.871027],
+            [125.391065, 43.871131],
+            [125.395772, 43.871255],
+            [125.396068, 43.871381],
+            [125.396225, 43.871544],
+            [125.396216, 43.872512],
+            [125.396252, 43.872636],
+            [125.396266, 43.873438],
+            [125.396207, 43.874289],
+            [125.396172, 43.87595],
+            [125.396176, 43.878263],
+            [125.396154, 43.879907],
+            [125.396109, 43.881483],
+            [125.396113, 43.883299],
+            [125.3961, 43.885108],
+            [125.395992, 43.888019],
+            [125.39592, 43.890082],
+            [125.395848, 43.892872],
+            [125.395835, 43.893647],
+            [125.397375, 43.893694],
+            [125.401606, 43.893717],
+            [125.401934, 43.896422],
+            [125.401943, 43.897218],
+            [125.401386, 43.899842],
+            [125.401063, 43.901515],
+            [125.400564, 43.903707],
+            [125.400165, 43.905402],
+            [125.399702, 43.907656],
+            [125.399383, 43.909322],
+            [125.399069, 43.910355],
+            [125.398453, 43.913235],
+            [125.398781, 43.913589],
+            [125.403389, 43.917531],
+            [125.40524, 43.919148],
+          ],
+          lineStyle: {
+            normal: {
+              color: 'rgba(103,223,90,1)',
+            },
+          },
+        },
+        {
+          name: '线路12',
+          source: '天津大港12',
+          target: '东营自提12',
+          station: '湖州12',
+          trafficMileage: 2564298,
+          orderNum: 245,
+          coords: [
+            [125.37684, 43.937522],
+            [125.379477, 43.937567],
+            [125.379607, 43.933776],
+            [125.37958, 43.932374],
+            [125.37962, 43.929764],
+            [125.3821, 43.929838],
+            [125.382589, 43.929851],
+            [125.382639, 43.926774],
+            [125.382639, 43.926527],
+            [125.382679, 43.925108],
+            [125.382679, 43.924371],
+            [125.382648, 43.92392],
+            [125.382675, 43.922683],
+            [125.382675, 43.922469],
+            [125.38276, 43.921232],
+            [125.382809, 43.919719],
+            [125.382782, 43.919239],
+            [125.382827, 43.918122],
+            [125.382868, 43.916053],
+            [125.382908, 43.915092],
+            [125.382931, 43.913141],
+            [125.382971, 43.911456],
+            [125.382778, 43.911111],
+            [125.3828, 43.909868],
+            [125.382778, 43.908176],
+            [125.382764, 43.906591],
+            [125.382764, 43.905081],
+            [125.382746, 43.903253],
+            [125.382796, 43.901427],
+            [125.382827, 43.900391],
+            [125.382971, 43.899508],
+            [125.38298, 43.897306],
+            [125.383074, 43.895627],
+            [125.383061, 43.89486],
+            [125.383173, 43.894711],
+            [125.383128, 43.894116],
+            [125.383142, 43.893317],
+            [125.383164, 43.892086],
+            [125.383209, 43.890943],
+            [125.383254, 43.889809],
+            [125.383227, 43.889484],
+            [125.38311, 43.889296],
+            [125.383173, 43.88851],
+            [125.383173, 43.887356],
+            [125.383245, 43.887314],
+            [125.38329, 43.886213],
+            [125.383339, 43.884985],
+            [125.383209, 43.88481],
+            [125.383245, 43.883942],
+            [125.383321, 43.883841],
+            [125.383375, 43.883627],
+            [125.383407, 43.883208],
+            [125.383366, 43.882526],
+            [125.383393, 43.881265],
+            [125.383407, 43.880018],
+            [125.383501, 43.877662],
+            [125.383532, 43.876496],
+            [125.383496, 43.875628],
+            [125.383528, 43.874748],
+            [125.383555, 43.873432],
+            [125.383559, 43.872483],
+            [125.383465, 43.872158],
+            [125.383478, 43.870774],
+            [125.381534, 43.870728],
+            [125.377869, 43.870595],
+            [125.374114, 43.870484],
+            [125.371284, 43.870377],
+            [125.371324, 43.867102],
+            [125.371365, 43.86509],
+            [125.37145, 43.861353],
+            [125.371441, 43.859019],
+            [125.371482, 43.857787],
+            [125.371522, 43.856377],
+            [125.371666, 43.85232],
+            [125.371625, 43.850861],
+            [125.371702, 43.847233],
+            [125.37172, 43.845484],
+            [125.371787, 43.843469],
+            [125.371783, 43.842419],
+            [125.371854, 43.841635],
+            [125.371845, 43.840949],
+            [125.371895, 43.837136],
+            [125.371922, 43.835552],
+          ],
+          lineStyle: {
+            normal: {
+              color: 'rgba(90,170,223,1)',
+            },
+          },
+        },
+        {
+          name: '线路13',
+          source: '天津大港13',
+          target: '东营自提13',
+          station: '湖州13',
+          trafficMileage: 4289342,
+          orderNum: 1895,
+          coords: [
+            [125.303529, 43.878426],
+            [125.303835, 43.878189],
+            [125.303772, 43.878143],
+            [125.305074, 43.877159],
+            [125.305779, 43.876636],
+            [125.304715, 43.875911],
+            [125.304019, 43.875391],
+            [125.303273, 43.874894],
+            [125.301557, 43.873692],
+            [125.299451, 43.872256],
+            [125.29637, 43.870108],
+            [125.300583, 43.867122],
+            [125.301328, 43.86653],
+            [125.305321, 43.863573],
+            [125.305348, 43.863449],
+            [125.303817, 43.86238],
+            [125.300592, 43.860138],
+            [125.298085, 43.858422],
+            [125.297533, 43.857954],
+            [125.297156, 43.857655],
+            [125.297048, 43.85746],
+            [125.297124, 43.857359],
+            [125.297196, 43.857018],
+            [125.297111, 43.856732],
+            [125.296823, 43.856472],
+            [125.296469, 43.856312],
+            [125.296325, 43.856212],
+            [125.296141, 43.855922],
+            [125.2961, 43.8547],
+            [125.296172, 43.854395],
+            [125.296145, 43.853923],
+            [125.296123, 43.852123],
+            [125.29628, 43.852093],
+            [125.296289, 43.850367],
+            [125.296154, 43.850143],
+            [125.296311, 43.846259],
+            [125.296347, 43.845982],
+            [125.296379, 43.844724],
+            [125.296491, 43.844094],
+            [125.296549, 43.843281],
+            [125.296689, 43.842234],
+            [125.29668, 43.840631],
+            [125.296644, 43.838521],
+            [125.296239, 43.838515],
+            [125.293926, 43.838612],
+            [125.290198, 43.838619],
+            [125.286399, 43.838609],
+            [125.285455, 43.838583],
+            [125.284849, 43.838508],
+            [125.284175, 43.838336],
+            [125.283488, 43.838069],
+            [125.281911, 43.837325],
+            [125.277977, 43.835364],
+            [125.27428, 43.833547],
+            [125.270903, 43.831869],
+            [125.269843, 43.831267],
+            [125.269133, 43.830874],
+            [125.269084, 43.830786],
+            [125.268158, 43.829931],
+            [125.266034, 43.827925],
+            [125.263959, 43.825882],
+            [125.262342, 43.824253],
+            [125.26134, 43.823359],
+            [125.257437, 43.819502],
+            [125.258812, 43.818809],
+            [125.259777, 43.818568],
+            [125.260074, 43.818526],
+            [125.262602, 43.818438],
+            [125.26594, 43.818289],
+            [125.27022, 43.818233],
+            [125.271469, 43.818178],
+            [125.273701, 43.818133],
+            [125.275269, 43.818113],
+            [125.275174, 43.814308],
+          ],
+          lineStyle: {
+            normal: {
+              color: 'rgba(223,205,90,1)',
+            },
+          },
+        },
+        {
+          name: '线路14',
+          source: '天津大港14',
+          target: '东营自提14',
+          station: '湖州14',
+          trafficMileage: 51782578,
+          orderNum: 542,
+          coords: [
+            [125.197772, 43.863688],
+            [125.202529, 43.864591],
+            [125.206099, 43.865283],
+            [125.206248, 43.864055],
+            [125.206526, 43.861374],
+            [125.206841, 43.858546],
+            [125.211876, 43.859294],
+            [125.215383, 43.86033],
+            [125.218954, 43.861318],
+            [125.222889, 43.862306],
+            [125.226725, 43.863356],
+            [125.230152, 43.864272],
+            [125.230259, 43.864269],
+            [125.231782, 43.862319],
+            [125.23741, 43.864565],
+            [125.240145, 43.865673],
+            [125.240244, 43.865667],
+            [125.241839, 43.863519],
+            [125.244731, 43.864734],
+            [125.245216, 43.864968],
+            [125.247404, 43.862771],
+            [125.243617, 43.861192],
+            [125.244161, 43.860577],
+            [125.245733, 43.859011],
+            [125.246141, 43.859238],
+            [125.246213, 43.859173],
+            [125.24933, 43.860753],
+            [125.252057, 43.862193],
+            [125.255798, 43.864207],
+            [125.261314, 43.867171],
+            [125.265504, 43.869342],
+            [125.269399, 43.871435],
+            [125.270517, 43.872049],
+            [125.270571, 43.872188],
+            [125.27164, 43.872803],
+            [125.272067, 43.873075],
+            [125.273773, 43.873976],
+            [125.27173, 43.876091],
+            [125.270688, 43.877117],
+            [125.269888, 43.877998],
+            [125.271272, 43.87871],
+            [125.274829, 43.880548],
+            [125.274896, 43.880431],
+            [125.273445, 43.879678],
+          ],
+          lineStyle: {
+            normal: {
+              color: 'rgba(90,223,134,1)',
+            },
+          },
+        },
+        {
+          name: '线路15',
+          source: '天津大港15',
+          target: '东营自提15',
+          station: '湖州15',
+          trafficMileage: 517452752,
+          orderNum: 666,
+          coords: [
+            [125.456358, 43.776516],
+            [125.455459, 43.77621],
+            [125.453919, 43.775679],
+            [125.452558, 43.775302],
+            [125.452014, 43.775204],
+            [125.451085, 43.775211],
+            [125.448888, 43.77523],
+            [125.447348, 43.775263],
+            [125.445272, 43.775334],
+            [125.442825, 43.775396],
+            [125.440808, 43.775455],
+            [125.440318, 43.775465],
+            [125.439115, 43.775523],
+            [125.437713, 43.775598],
+            [125.437709, 43.774924],
+            [125.437691, 43.773922],
+            [125.437655, 43.773346],
+            [125.43761, 43.772288],
+            [125.437574, 43.771266],
+            [125.43757, 43.77067],
+            [125.437534, 43.769251],
+            [125.437516, 43.767969],
+            [125.437498, 43.767793],
+            [125.437372, 43.767718],
+            [125.437336, 43.767724],
+            [125.435971, 43.76777],
+            [125.434587, 43.767803],
+            [125.432898, 43.767832],
+            [125.431259, 43.767884],
+            [125.431223, 43.768034],
+            [125.431254, 43.768828],
+            [125.431299, 43.769557],
+            [125.431317, 43.770784],
+            [125.431344, 43.77232],
+            [125.431358, 43.773212],
+            [125.431376, 43.774036],
+            [125.431385, 43.7747],
+            [125.431398, 43.775712],
+            [125.430284, 43.775741],
+            [125.42944, 43.775777],
+            [125.428488, 43.775858],
+            [125.428497, 43.776249],
+            [125.428528, 43.777746],
+            [125.42856, 43.779474],
+            [125.428582, 43.780633],
+            [125.428591, 43.781961],
+            [125.428308, 43.782009],
+            [125.425397, 43.782504],
+            [125.423439, 43.782852],
+            [125.422577, 43.783073],
+            [125.420906, 43.783503],
+            [125.419415, 43.78389],
+            [125.418314, 43.784177],
+            [125.418656, 43.78488],
+            [125.419172, 43.785999],
+            [125.419734, 43.787177],
+            [125.420318, 43.7884],
+            [125.420915, 43.789673],
+            [125.421445, 43.790779],
+            [125.421813, 43.791576],
+            [125.422173, 43.792325],
+            [125.422698, 43.793382],
+            [125.423138, 43.794261],
+            [125.423731, 43.795435],
+          ],
+          lineStyle: {
+            normal: {
+              color: 'rgba(223,163,90,1)',
+            },
+          },
+        },
+        {
+          name: '线路16',
+          source: '天津大港16',
+          target: '东营自提16',
+          station: '湖州16',
+          trafficMileage: 25428741,
+          orderNum: 455,
+          coords: [
+            [125.291537, 43.852099],
+            [125.295601, 43.852122],
+            [125.295597, 43.854602],
+            [125.295709, 43.854735],
+            [125.2957, 43.856123],
+            [125.295601, 43.856292],
+            [125.29539, 43.856354],
+            [125.295125, 43.856494],
+            [125.294923, 43.856656],
+            [125.294838, 43.856832],
+            [125.294775, 43.857033],
+            [125.294775, 43.857144],
+            [125.294838, 43.857329],
+            [125.295031, 43.857566],
+            [125.295247, 43.857713],
+            [125.295593, 43.857813],
+            [125.295952, 43.857859],
+            [125.296302, 43.857823],
+            [125.296697, 43.857703],
+            [125.296895, 43.857703],
+            [125.297093, 43.857775],
+            [125.297978, 43.858464],
+            [125.299954, 43.859809],
+            [125.302187, 43.861363],
+            [125.304958, 43.8633],
+            [125.306247, 43.864197],
+            [125.309611, 43.866598],
+            [125.311947, 43.868191],
+            [125.313582, 43.869269],
+            [125.313627, 43.869464],
+            [125.313487, 43.869637],
+            [125.31342, 43.869845],
+            [125.31342, 43.870059],
+            [125.313505, 43.870228],
+            [125.313631, 43.870374],
+            [125.313627, 43.870514],
+            [125.313564, 43.870624],
+            [125.311731, 43.872061],
+            [125.311655, 43.872012],
+            [125.31059, 43.872844],
+            [125.309198, 43.873851],
+            [125.308452, 43.874381],
+            [125.307568, 43.875076],
+            [125.306934, 43.875511],
+            [125.306126, 43.876093],
+            [125.305582, 43.876519],
+            [125.304702, 43.875924],
+            [125.304051, 43.87542],
+            [125.30322, 43.874891],
+            [125.301805, 43.873832],
+            [125.299716, 43.872454],
+            [125.296276, 43.87004],
+            [125.294762, 43.871226],
+            [125.292867, 43.872711],
+            [125.291694, 43.873585],
+            [125.289345, 43.874907],
+            [125.287023, 43.87597],
+            [125.284638, 43.877061],
+            [125.284221, 43.877334],
+            [125.283956, 43.877617],
+            [125.283336, 43.878367],
+            [125.282384, 43.878981],
+            [125.281611, 43.879534],
+            [125.280003, 43.88071],
+            [125.278467, 43.881886],
+            [125.278364, 43.881834],
+            [125.278179, 43.881798],
+            [125.277959, 43.881818],
+            [125.277811, 43.881863],
+            [125.277685, 43.881951],
+            [125.2776, 43.882058],
+            [125.277582, 43.882221],
+            [125.277623, 43.88238],
+            [125.277721, 43.882477],
+            [125.277838, 43.882565],
+            [125.278081, 43.882614],
+            [125.277834, 43.890043],
+            [125.277676, 43.890059],
+            [125.277375, 43.890154],
+            [125.277146, 43.890345],
+            [125.277119, 43.89043],
+            [125.27676, 43.890599],
+            [125.276576, 43.890433],
+            [125.274901, 43.890387],
+            [125.274434, 43.890443],
+            [125.274303, 43.890413],
+            [125.27358, 43.890423],
+            [125.273463, 43.890524],
+            [125.272179, 43.890501],
+            [125.268684, 43.890417],
+            [125.268541, 43.895318],
+            [125.268379, 43.902317],
+            [125.268572, 43.902412],
+            [125.270005, 43.902447],
+            [125.272933, 43.902512],
+            [125.276828, 43.902561],
+            [125.276594, 43.908738],
+            [125.276607, 43.908822],
+            [125.277488, 43.908842],
+            [125.281719, 43.908926],
+            [125.281746, 43.909056],
+            [125.281872, 43.909267],
+            [125.282047, 43.909423],
+            [125.282307, 43.90954],
+            [125.282577, 43.909589],
+            [125.282487, 43.915008],
+            [125.282676, 43.915901],
+            [125.282887, 43.916414],
+            [125.283502, 43.917908],
+            [125.284292, 43.919833],
+            [125.285406, 43.922278],
+            [125.286237, 43.92405],
+            [125.287154, 43.925907],
+            [125.28723, 43.926307],
+            [125.287149, 43.926842],
+            [125.287028, 43.927492],
+            [125.286273, 43.930897],
+            [125.290684, 43.930767],
+            [125.29253, 43.930689],
+            [125.292777, 43.930783],
+            [125.293437, 43.93079],
+            [125.293891, 43.93077],
+            [125.295045, 43.930747],
+            [125.295054, 43.930274],
+            [125.294839, 43.93029],
+            [125.293743, 43.930312],
+            [125.293464, 43.925362],
+          ],
+          lineStyle: {
+            normal: {
+              color: 'rgba(90,139,223,1)',
+            },
+          },
+        },
+        {
+          name: '线路17',
+          source: '天津大港17',
+          target: '东营自提17',
+          station: '湖州17',
+          trafficMileage: 45784284,
+          orderNum: 666,
+          coords: [
+            [125.338896, 43.948447],
+            [125.335302, 43.948457],
+            [125.335253, 43.951245],
+            [125.33519, 43.953305],
+            [125.335136, 43.955336],
+            [125.335069, 43.9573],
+            [125.33391, 43.957199],
+            [125.333645, 43.957264],
+            [125.330285, 43.956881],
+            [125.326135, 43.956433],
+            [125.324572, 43.956245],
+            [125.32455, 43.95546],
+            [125.324518, 43.953928],
+            [125.324487, 43.952815],
+            [125.324505, 43.951287],
+            [125.32446, 43.949444],
+            [125.32437, 43.946478],
+            [125.324307, 43.944706],
+            [125.324262, 43.943138],
+            [125.324222, 43.941723],
+            [125.324334, 43.941704],
+            [125.32424, 43.939152],
+            [125.324217, 43.936913],
+            [125.324172, 43.935582],
+            [125.324127, 43.934332],
+            [125.324096, 43.933287],
+            [125.324123, 43.932203],
+            [125.324114, 43.932064],
+            [125.324096, 43.931301],
+            [125.324033, 43.929872],
+            [125.324015, 43.928733],
+            [125.323966, 43.928548],
+            [125.323795, 43.928558],
+            [125.323764, 43.927441],
+            [125.323714, 43.925581],
+            [125.323898, 43.925561],
+            [125.323773, 43.921614],
+            [125.323705, 43.919529],
+            [125.323705, 43.918331],
+            [125.323647, 43.917938],
+            [125.323579, 43.917844],
+            [125.32366, 43.913584],
+            [125.323732, 43.911853],
+            [125.323827, 43.911577],
+            [125.32481, 43.910856],
+            [125.325048, 43.91085],
+            [125.325129, 43.910798],
+            [125.325381, 43.91071],
+            [125.3279, 43.912724],
+            [125.327918, 43.913526],
+            [125.328102, 43.913516],
+          ],
+          lineStyle: {
+            normal: {
+              color: 'rgba(223,159,90,1)',
+            },
+          },
+        },
+        {
+          name: '线路18',
+          source: '天津大港18',
+          target: '东营自提18',
+          station: '湖州18',
+          trafficMileage: 567428742,
+          orderNum: 254,
+          coords: [
+            [125.155251, 43.829079],
+            [125.15556, 43.829163],
+            [125.155596, 43.829098],
+            [125.152412, 43.828116],
+            [125.15132, 43.829013],
+            [125.149438, 43.83076],
+            [125.148657, 43.831468],
+            [125.148464, 43.831826],
+            [125.148423, 43.831979],
+            [125.149452, 43.832343],
+            [125.150889, 43.832792],
+            [125.152331, 43.833146],
+            [125.155843, 43.83404],
+            [125.159086, 43.83484],
+            [125.162176, 43.835582],
+            [125.164777, 43.836245],
+            [125.167373, 43.836908],
+            [125.16731, 43.836986],
+            [125.166699, 43.837659],
+            [125.165675, 43.838342],
+            [125.165347, 43.838651],
+            [125.16502, 43.839028],
+            [125.164849, 43.839321],
+            [125.164808, 43.839538],
+            [125.164813, 43.839883],
+            [125.164665, 43.840179],
+            [125.164449, 43.840371],
+            [125.163699, 43.840777],
+            [125.163605, 43.840797],
+            [125.163457, 43.84091],
+            [125.162419, 43.842208],
+            [125.16144, 43.843748],
+            [125.161292, 43.844272],
+            [125.161085, 43.844603],
+            [125.161539, 43.844711],
+            [125.165657, 43.84541],
+            [125.169884, 43.846112],
+            [125.174043, 43.846749],
+            [125.175615, 43.846996],
+            [125.179738, 43.847659],
+            [125.182366, 43.848066],
+            [125.185303, 43.848537],
+            [125.185478, 43.847604],
+            [125.185991, 43.845078],
+            [125.188712, 43.845257],
+            [125.190927, 43.845345],
+            [125.19196, 43.84539],
+            [125.192445, 43.84397],
+            [125.192795, 43.8429],
+            [125.193172, 43.84225],
+            [125.194102, 43.840673],
+            [125.195005, 43.839503],
+            [125.19514, 43.839418],
+            [125.196092, 43.838241],
+            [125.197583, 43.836427],
+            [125.198688, 43.83512],
+            [125.200112, 43.833546],
+            [125.200067, 43.833286],
+            [125.200669, 43.832558],
+            [125.202191, 43.833189],
+            [125.204801, 43.834281],
+            [125.206746, 43.835091],
+            [125.209275, 43.836154],
+            [125.211435, 43.837061],
+            [125.213456, 43.837936],
+            [125.214687, 43.838495],
+            [125.214575, 43.838804],
+            [125.21457, 43.83909],
+            [125.214624, 43.839295],
+            [125.214795, 43.839503],
+            [125.214754, 43.839613],
+            [125.214804, 43.839737],
+            [125.214817, 43.839873],
+            [125.214723, 43.840052],
+            [125.214094, 43.84067],
+            [125.212248, 43.8425],
+            [125.21197, 43.842861],
+            [125.21166, 43.843209],
+            [125.211269, 43.843996],
+            [125.211053, 43.844655],
+            [125.210106, 43.846632],
+            [125.210007, 43.846892],
+            [125.215073, 43.848062],
+            [125.218581, 43.84892],
+            [125.220607, 43.849411],
+            [125.225026, 43.850542],
+            [125.22698, 43.851225],
+            [125.227596, 43.851479],
+            [125.231804, 43.853117],
+            [125.235559, 43.854632],
+            [125.239305, 43.856192],
+            [125.240877, 43.856777],
+            [125.244717, 43.858415],
+            [125.248158, 43.860167],
+            [125.250938, 43.8616],
+            [125.250893, 43.86171],
+            [125.252492, 43.862565],
+          ],
+          lineStyle: {
+            normal: {
+              color: 'rgba(223,101,90,1)',
+            },
+          },
+        },
+        {
+          name: '线路19',
+          source: '天津大港19',
+          target: '东营自提19',
+          station: '湖州19',
+          trafficMileage: 52274887,
+          orderNum: 2410,
+          coords: [
+            [125.382661, 43.92591],
+            [125.382692, 43.924988],
+            [125.38223, 43.924979],
+            [125.382216, 43.92604],
+            [125.382176, 43.927524],
+            [125.382145, 43.928423],
+            [125.382118, 43.930059],
+            [125.382028, 43.931585],
+            [125.382014, 43.932085],
+            [125.382041, 43.93361],
+            [125.38201, 43.934224],
+            [125.381992, 43.93534],
+            [125.381947, 43.937213],
+            [125.381933, 43.937992],
+            [125.382005, 43.938408],
+            [125.38218, 43.938852],
+            [125.382383, 43.939141],
+            [125.38165, 43.939735],
+            [125.380761, 43.940472],
+            [125.379881, 43.941199],
+            [125.37896, 43.941874],
+            [125.378619, 43.942156],
+            [125.379503, 43.943279],
+            [125.380837, 43.945003],
+            [125.381853, 43.946297],
+            [125.382809, 43.947534],
+            [125.383447, 43.948381],
+            [125.38444, 43.9499],
+            [125.385378, 43.951347],
+            [125.385432, 43.952255],
+            [125.385496, 43.953393],
+            [125.385504, 43.954134],
+            [125.385464, 43.954358],
+            [125.385414, 43.954481],
+            [125.385176, 43.954994],
+            [125.384592, 43.956305],
+            [125.384588, 43.956626],
+            [125.384696, 43.957035],
+            [125.385792, 43.957616],
+            [125.386052, 43.9577],
+            [125.387431, 43.957817],
+            [125.388064, 43.957833],
+            [125.388347, 43.956756],
+            [125.390831, 43.956759],
+            [125.391168, 43.956837],
+            [125.391451, 43.956847],
+            [125.394119, 43.956938],
+            [125.395987, 43.957009],
+            [125.398588, 43.957003],
+            [125.401988, 43.957016],
+            [125.405132, 43.957071],
+            [125.405119, 43.958158],
+            [125.405119, 43.959787],
+            [125.404162, 43.95979],
+            [125.401031, 43.959806],
+            [125.398417, 43.959812],
+          ],
+          lineStyle: {
+            normal: {
+              color: 'rgba(223,110,90,1)',
+            },
+          },
+        },
+        {
+          name: '线路20',
+          source: '天津大港20',
+          target: '东营自提20',
+          station: '湖州20',
+          trafficMileage: 524782747,
+          orderNum: 123,
+          coords: [
+            [125.401524, 43.869853],
+            [125.401749, 43.868963],
+            [125.402144, 43.867461],
+            [125.402413, 43.866493],
+            [125.402791, 43.86517],
+            [125.402957, 43.864611],
+            [125.403496, 43.863506],
+            [125.403729, 43.863012],
+            [125.404053, 43.862343],
+            [125.404457, 43.861479],
+            [125.405077, 43.860289],
+            [125.405247, 43.859961],
+            [125.405526, 43.859418],
+            [125.405809, 43.858875],
+            [125.40602, 43.858524],
+            [125.406379, 43.857929],
+            [125.406766, 43.857149],
+            [125.407394, 43.855918],
+            [125.40774, 43.855271],
+            [125.408311, 43.854198],
+            [125.408679, 43.853395],
+            [125.408908, 43.852836],
+            [125.409056, 43.852404],
+            [125.409411, 43.851283],
+            [125.40969, 43.850441],
+            [125.41, 43.849426],
+            [125.410458, 43.848032],
+            [125.410597, 43.8476],
+            [125.410525, 43.847505],
+            [125.410552, 43.847427],
+            [125.410655, 43.847437],
+            [125.411244, 43.847411],
+            [125.411738, 43.847239],
+            [125.412137, 43.846946],
+            [125.412353, 43.846673],
+            [125.412447, 43.846283],
+            [125.412411, 43.846017],
+            [125.412236, 43.845682],
+            [125.41185, 43.845353],
+            [125.411599, 43.84523],
+            [125.411567, 43.845123],
+            [125.411428, 43.84495],
+            [125.411581, 43.844355],
+            [125.412079, 43.842743],
+            [125.412609, 43.841114],
+            [125.413045, 43.839674],
+            [125.413669, 43.837609],
+            [125.413948, 43.836644],
+            [125.414469, 43.835103],
+            [125.414994, 43.833428],
+            [125.41543, 43.832043],
+            [125.415812, 43.830872],
+            [125.416148, 43.829793],
+            [125.416166, 43.829676],
+            [125.41613, 43.828525],
+            [125.415973, 43.827917],
+            [125.415794, 43.827422],
+            [125.415641, 43.827094],
+            [125.415353, 43.826551],
+            [125.415147, 43.82617],
+            [125.414891, 43.825686],
+            [125.414496, 43.824743],
+            [125.413952, 43.823354],
+            [125.41335, 43.821731],
+            [125.412856, 43.820457],
+            [125.41238, 43.819211],
+            [125.411962, 43.818229],
+            [125.411585, 43.817546],
+            [125.410274, 43.815998],
+            [125.409074, 43.814593],
+            [125.408544, 43.813986],
+            [125.408082, 43.813358],
+            [125.407871, 43.813023],
+            [125.407704, 43.812674],
+            [125.407525, 43.812322],
+            [125.407466, 43.811971],
+            [125.407287, 43.811155],
+            [125.407049, 43.809987],
+            [125.406878, 43.809096],
+            [125.406595, 43.807775],
+            [125.406406, 43.806877],
+            [125.406393, 43.80663],
+            [125.406442, 43.805934],
+            [125.406523, 43.80583],
+            [125.406685, 43.805296],
+            [125.407161, 43.803751],
+            [125.407619, 43.802248],
+            [125.40805, 43.800817],
+            [125.408302, 43.800016],
+            [125.408324, 43.799359],
+            [125.40827, 43.798985],
+            [125.408145, 43.798103],
+            [125.407435, 43.796795],
+            [125.406703, 43.795432],
+            [125.406568, 43.795032],
+            [125.406132, 43.793942],
+            [125.406096, 43.79374],
+            [125.406069, 43.792764],
+            [125.406195, 43.792201],
+            [125.406325, 43.791755],
+            [125.406667, 43.790649],
+            [125.406703, 43.790434],
+            [125.406721, 43.790164],
+            [125.406662, 43.789396],
+            [125.40655, 43.788912],
+            [125.406465, 43.788716],
+            [125.406276, 43.788274],
+            [125.406074, 43.787802],
+            [125.405611, 43.78678],
+            [125.404951, 43.785443],
+            [125.404542, 43.784594],
+            [125.404179, 43.783839],
+            [125.403675, 43.782768],
+            [125.40306, 43.781564],
+            [125.402306, 43.78008],
+            [125.401901, 43.779198],
+            [125.401744, 43.778908],
+            [125.401353, 43.778134],
+            [125.401219, 43.777776],
+            [125.40103, 43.776669],
+            [125.401003, 43.776165],
+            [125.400886, 43.77594],
+            [125.400891, 43.775569],
+            [125.40076, 43.774137],
+            [125.400639, 43.772663],
+            [125.400563, 43.771507],
+            [125.400464, 43.769964],
+            [125.4005, 43.769642],
+            [125.400828, 43.769063],
+            [125.401403, 43.768532],
+            [125.401542, 43.768444],
+            [125.402889, 43.767507],
+            [125.404385, 43.766472],
+            [125.406191, 43.765231],
+            [125.407332, 43.764434],
+            [125.407933, 43.763936],
+            [125.408275, 43.763503],
+            [125.40845, 43.763047],
+            [125.408513, 43.762634],
+            [125.408459, 43.762347],
+            [125.408198, 43.760824],
+            [125.408032, 43.759893],
+            [125.407808, 43.758675],
+            [125.407561, 43.757334],
+            [125.407417, 43.756468],
+            [125.407143, 43.75481],
+            [125.407134, 43.754436],
+            [125.407359, 43.75385],
+            [125.407516, 43.753593],
+            [125.408055, 43.752798],
+            [125.408194, 43.752505],
+            [125.408791, 43.751535],
+            [125.409631, 43.750142],
+            [125.409735, 43.749715],
+            [125.409788, 43.749292],
+            [125.409501, 43.747944],
+            [125.409178, 43.746286],
+            [125.40902, 43.74586],
+            [125.408567, 43.744541],
+            [125.408252, 43.743658],
+            [125.40792, 43.742678],
+            [125.40774, 43.74217],
+            [125.407403, 43.741353],
+            [125.407224, 43.740848],
+            [125.40673, 43.739523],
+            [125.406182, 43.737858],
+            [125.405701, 43.736585],
+            [125.405153, 43.735123],
+            [125.404547, 43.733481],
+            [125.404093, 43.732247],
+            [125.403559, 43.730794],
+            [125.403244, 43.729928],
+            [125.402728, 43.728524],
+            [125.402243, 43.727221],
+            [125.402036, 43.726517],
+            [125.40182, 43.725765],
+            [125.401524, 43.724537],
+            [125.401192, 43.723573],
+            [125.400711, 43.722081],
+            [125.400513, 43.721608],
+            [125.400055, 43.720436],
+            [125.39953, 43.719142],
+            [125.398946, 43.717657],
+            [125.398771, 43.7171],
+            [125.39842, 43.715849],
+            [125.398084, 43.714471],
+            [125.397769, 43.713317],
+            [125.397571, 43.712662],
+            [125.397275, 43.712196],
+            [125.396772, 43.711737],
+            [125.394863, 43.710082],
+            [125.393417, 43.708743],
+            [125.393174, 43.708352],
+            [125.393057, 43.707622],
+            [125.393098, 43.707205],
+            [125.393628, 43.70595],
+            [125.394396, 43.704168],
+            [125.394805, 43.703076],
+            [125.395492, 43.701154],
+            [125.395775, 43.700205],
+            [125.396345, 43.69827],
+            [125.396934, 43.696223],
+            [125.397374, 43.694734],
+            [125.397845, 43.693078],
+            [125.398402, 43.69125],
+            [125.39887, 43.690461],
+            [125.399027, 43.690272],
+            [125.399382, 43.689838],
+            [125.399768, 43.689434],
+            [125.400379, 43.688981],
+            [125.401237, 43.688772],
+            [125.402831, 43.68858],
+            [125.405382, 43.688303],
+            [125.406034, 43.688121],
+            [125.40664, 43.687808],
+            [125.407004, 43.687488],
+            [125.408454, 43.686178],
+            [125.410089, 43.684685],
+            [125.411787, 43.683104],
+            [125.413449, 43.681533],
+            [125.414675, 43.680072],
+            [125.41587, 43.678589],
+            [125.417002, 43.677178],
+            [125.418232, 43.675629],
+            [125.419638, 43.673728],
+            [125.419908, 43.673142],
+            [125.41998, 43.672812],
+            [125.419966, 43.671831],
+            [125.419957, 43.67024],
+            [125.419593, 43.669298],
+            [125.419225, 43.668792],
+            [125.418039, 43.668026],
+            [125.415439, 43.666392],
+            [125.412708, 43.664648],
+            [125.410242, 43.663044],
+            [125.407713, 43.661413],
+            [125.406757, 43.660637],
+            [125.406177, 43.659858],
+            [125.405944, 43.659199],
+            [125.405809, 43.657637],
+            [125.405692, 43.656134],
+            [125.405517, 43.654001],
+            [125.405355, 43.652514],
+            [125.405171, 43.650896],
+            [125.404897, 43.649679],
+            [125.404767, 43.649069],
+            [125.404385, 43.647396],
+            [125.403985, 43.645648],
+            [125.403653, 43.644128],
+            [125.403289, 43.642539],
+            [125.403114, 43.641665],
+            [125.402728, 43.639887],
+            [125.402216, 43.637751],
+            [125.401874, 43.636191],
+            [125.401452, 43.634377],
+            [125.401124, 43.632864],
+            [125.400567, 43.631781],
+            [125.400226, 43.63135],
+            [125.399458, 43.630818],
+            [125.397612, 43.629947],
+            [125.395438, 43.628929],
+            [125.393031, 43.627829],
+            [125.391944, 43.627307],
+            [125.390102, 43.626417],
+            [125.389289, 43.62582],
+            [125.388647, 43.624926],
+            [125.388292, 43.623983],
+            [125.388175, 43.623131],
+            [125.38796, 43.621418],
+            [125.387762, 43.619979],
+            [125.387731, 43.619923],
+            [125.387704, 43.619675],
+            [125.387578, 43.618719],
+            [125.38738, 43.617084],
+            [125.387106, 43.615097],
+            [125.386922, 43.613703],
+            [125.386724, 43.612215],
+            [125.386459, 43.610446],
+            [125.386235, 43.608655],
+            [125.385992, 43.606837],
+            [125.385885, 43.605952],
+            [125.385898, 43.604571],
+            [125.385947, 43.602384],
+            [125.386001, 43.600697],
+            [125.386073, 43.599091],
+            [125.386087, 43.598092],
+            [125.386118, 43.596512],
+            [125.386158, 43.594854],
+            [125.386181, 43.593133],
+            [125.386154, 43.592373],
+            [125.385911, 43.591615],
+            [125.385637, 43.590969],
+            [125.384905, 43.589173],
+            [125.384106, 43.587188],
+            [125.383477, 43.585631],
+            [125.383185, 43.584942],
+            [125.383028, 43.584178],
+            [125.383082, 43.583368],
+            [125.383598, 43.58169],
+            [125.384236, 43.579773],
+            [125.384317, 43.578751],
+            [125.3842, 43.577647],
+            [125.384021, 43.575841],
+            [125.383859, 43.573784],
+            [125.383652, 43.571743],
+            [125.383459, 43.571129],
+            [125.383212, 43.570515],
+            [125.382206, 43.568284],
+            [125.381896, 43.567575],
+            [125.381155, 43.565835],
+            [125.381011, 43.564982],
+            [125.380962, 43.563842],
+            [125.380885, 43.561775],
+            [125.380814, 43.55954],
+            [125.380751, 43.557639],
+            [125.380706, 43.555751],
+            [125.380656, 43.553997],
+            [125.380576, 43.552083],
+            [125.38054, 43.550567],
+            [125.380486, 43.548407],
+            [125.380405, 43.545954],
+            [125.380346, 43.544836],
+            [125.380346, 43.543781],
+            [125.38054, 43.542951],
+            [125.380917, 43.542291],
+            [125.381546, 43.541618],
+            [125.382336, 43.54066],
+            [125.383145, 43.539736],
+            [125.382008, 43.539108],
+            [125.379983, 43.538105],
+            [125.378923, 43.537488],
+            [125.377926, 43.536971],
+            [125.376066, 43.536007],
+            [125.374674, 43.535213],
+            [125.372742, 43.534089],
+            [125.372531, 43.533677],
+            [125.37206, 43.533043],
+            [125.371709, 43.532311],
+            [125.371143, 43.530491],
+            [125.370658, 43.528903],
+            [125.370501, 43.528658],
+            [125.369737, 43.528282],
+            [125.367056, 43.527815],
+            [125.36601, 43.527658],
+            [125.363764, 43.527354],
+            [125.361522, 43.527076],
+            [125.358877, 43.527047],
+            [125.358405, 43.526896],
+            [125.355715, 43.526053],
+            [125.35298, 43.525226],
+            [125.350451, 43.524491],
+            [125.346903, 43.523451],
+            [125.347819, 43.522059],
+            [125.348807, 43.520601],
+            [125.349737, 43.519212],
+            [125.350761, 43.517695],
+            [125.351623, 43.516421],
+            [125.352472, 43.515152],
+            [125.353604, 43.513475],
+            [125.354547, 43.512063],
+            [125.355886, 43.510072],
+            [125.356977, 43.508454],
+            [125.357893, 43.507087],
+            [125.358688, 43.505901],
+            [125.359416, 43.504828],
+            [125.359456, 43.504652],
+            [125.359654, 43.504482],
+            [125.359861, 43.504158],
+            [125.360615, 43.503085],
+            [125.360678, 43.502919],
+            [125.360826, 43.502785],
+            [125.361347, 43.502016],
+            [125.362232, 43.500708],
+            [125.363135, 43.499368],
+            [125.36402, 43.498067],
+            [125.364738, 43.496997],
+            [125.366598, 43.497717],
+          ],
+          lineStyle: {
+            normal: {
+              color: 'rgba(207,223,90,1)',
+            },
+          },
+        },
+      ],
+      // 车辆状态 companyCarStatusMap
+      companyCarStatusData: [
+        /* eslint-disable */
+        {
+          name: "黑龙江",
+          value: [126.661669, 45.742347, 20],
+          symbolSize: 10,
+          currentStatus: "重车",
+          qyCarId: "冀R70623",
+          gCarId: "冀RV706挂",
+          facilitator: "华北配送中心",
+          driver: "黄冬华",
+          driverPhone: 17733697679,
+          orderNum: "G18012900090",
+          gasSource: "深圳大鹏",
+          goodsType: "天然气",
+          time: "2018-01-31 13:53:53",
+          speed: 1,
+          position: "陕西榆林市榆阳区",
+          symbolSize: [32, 24],
+          symbol: "image://" + require("../../../assets/chartsImg/loaded.png")
+        },
+        {
+          name: "吉林",
+          value: [126.549572, 43.83788, 20],
+          symbolSize: 10,
+          currentStatus: "重车",
+          qyCarId: "冀R70623",
+          gCarId: "冀RV706挂",
+          facilitator: "华北配送中心",
+          driver: "黄冬华",
+          driverPhone: 17733697679,
+          orderNum: "G18012900090",
+          gasSource: "深圳大鹏",
+          goodsType: "天然气",
+          time: "2018-01-31 13:53:53",
+          speed: 2,
+          position: "陕西榆林市榆阳区",
+          symbolSize: [32, 24],
+          symbol: "image://" + require("../../../assets/chartsImg/loaded.png")
+        },
+        {
+          name: "南昌",
+          value: [115.858198, 28.682892, 2],
+          symbolSize: 10,
+          currentStatus: "重车",
+          qyCarId: "冀R70623",
+          gCarId: "冀RV706挂",
+          facilitator: "华北配送中心",
+          driver: "黄冬华",
+          driverPhone: 17733697679,
+          orderNum: "G18012900090",
+          gasSource: "深圳大鹏",
+          goodsType: "天然气",
+          time: "2018-01-31 13:53:53",
+          speed: 20,
+          position: "陕西榆林市榆阳区",
+          symbolSize: [32, 24],
+          symbol: "image://" + require("../../../assets/chartsImg/loaded.png")
+        },
+        {
+          name: "三河",
+          value: [117.078295, 39.982718, 4],
+          symbolSize: 10,
+          currentStatus: "重车",
+          qyCarId: "冀R70623",
+          gCarId: "冀RV706挂",
+          facilitator: "华北配送中心",
+          driver: "黄冬华",
+          driverPhone: 17733697679,
+          orderNum: "G18012900090",
+          gasSource: "深圳大鹏",
+          goodsType: "天然气",
+          time: "2018-01-31 13:53:53",
+          speed: 19,
+          position: "陕西榆林市榆阳区",
+          symbolSize: [32, 24],
+          symbol: "image://" + require("../../../assets/chartsImg/loaded.png")
+        },
+        {
+          name: "大连",
+          value: [121.614682, 38.914003, 40],
+          symbolSize: 3,
+          currentStatus: "重车",
+          qyCarId: "冀R70623",
+          gCarId: "冀RV706挂",
+          facilitator: "华北配送中心",
+          driver: "黄冬华",
+          driverPhone: 17733697679,
+          orderNum: "G18012900090",
+          gasSource: "深圳大鹏",
+          goodsType: "天然气",
+          time: "2018-01-31 13:53:53",
+          speed: 18,
+          position: "陕西榆林市榆阳区",
+          symbolSize: [32, 24],
+          symbol: "image://" + require("../../../assets/chartsImg/loaded.png")
+        },
+        {
+          name: "辉南",
+          value: [126.046912, 42.684993, 1],
+          symbolSize: 10,
+          currentStatus: "重车",
+          qyCarId: "冀R70623",
+          gCarId: "冀RV706挂",
+          facilitator: "华北配送中心",
+          driver: "黄冬华",
+          driverPhone: 17733697679,
+          orderNum: "G18012900090",
+          gasSource: "深圳大鹏",
+          goodsType: "天然气",
+          time: "2018-01-31 13:53:53",
+          speed: 17,
+          position: "陕西榆林市榆阳区",
+          symbolSize: [32, 24],
+          symbol: "image://" + require("../../../assets/chartsImg/loaded.png")
+        },
+        {
+          name: "无锡",
+          value: [120.31191, 31.49117, 14],
+          symbolSize: 10,
+          currentStatus: "重车",
+          qyCarId: "冀R70623",
+          gCarId: "冀RV706挂",
+          facilitator: "华北配送中心",
+          driver: "黄冬华",
+          driverPhone: 17733697679,
+          orderNum: "G18012900090",
+          gasSource: "深圳大鹏",
+          goodsType: "天然气",
+          time: "2018-01-31 13:53:53",
+          speed: 16,
+          position: "陕西榆林市榆阳区",
+          symbolSize: [32, 24],
+          symbol: "image://" + require("../../../assets/chartsImg/loaded.png")
+        },
+        {
+          name: "常州",
+          value: [119.973987, 31.810689, 4],
+          symbolSize: 10,
+          currentStatus: "空车",
+          qyCarId: "冀R70623",
+          gCarId: "冀RV706挂",
+          facilitator: "华北配送中心",
+          driver: "黄冬华",
+          driverPhone: 17733697679,
+          orderNum: "G18012900090",
+          gasSource: "深圳大鹏",
+          goodsType: "天然气",
+          time: "2018-01-31 13:53:53",
+          speed: 15,
+          position: "陕西榆林市榆阳区",
+          symbolSize: [32, 24],
+          symbol:
+            "image://" + require("../../../assets/chartsImg/underloaded.png")
+        },
+        {
+          name: "广西",
+          value: [108.327546, 22.815478, -1],
+          symbolSize: 10,
+          currentStatus: "重车",
+          qyCarId: "冀R70623",
+          gCarId: "冀RV706挂",
+          facilitator: "华北配送中心",
+          driver: "黄冬华",
+          driverPhone: 17733697679,
+          orderNum: "G18012900090",
+          gasSource: "深圳大鹏",
+          goodsType: "天然气",
+          time: "2018-01-31 13:53:53",
+          speed: 14,
+          position: "陕西榆林市榆阳区",
+          symbolSize: [32, 24],
+          symbol:
+            "image://" + require("../../../assets/chartsImg/underloaded.png")
+        },
+        {
+          name: "张家港",
+          value: [120.553284, 31.870367, 4],
+          symbolSize: 10,
+          currentStatus: "空车",
+          qyCarId: "冀R70623",
+          gCarId: "冀RV706挂",
+          facilitator: "华北配送中心",
+          driver: "黄冬华",
+          driverPhone: 17733697679,
+          orderNum: "G18012900090",
+          gasSource: "深圳大鹏",
+          goodsType: "天然气",
+          time: "2018-01-31 13:53:53",
+          speed: 13,
+          position: "陕西榆林市榆阳区",
+          symbolSize: [32, 24],
+          symbol:
+            "image://" + require("../../../assets/chartsImg/underloaded.png")
+        },
+        {
+          name: "临安",
+          value: [119.724733, 30.233873, 1],
+          symbolSize: 10,
+          currentStatus: "空车",
+          qyCarId: "冀R70623",
+          gCarId: "冀RV706挂",
+          facilitator: "华北配送中心",
+          driver: "黄冬华",
+          driverPhone: 17733697679,
+          orderNum: "G18012900090",
+          gasSource: "深圳大鹏",
+          goodsType: "天然气",
+          time: "2018-01-31 13:53:53",
+          speed: 12,
+          position: "陕西榆林市榆阳区",
+          symbolSize: [32, 24],
+          symbol:
+            "image://" + require("../../../assets/chartsImg/underloaded.png")
+        },
+        {
+          name: "延安",
+          value: [109.489727, 36.585455, 1],
+          symbolSize: 10,
+          currentStatus: "空车",
+          qyCarId: "冀R70623",
+          gCarId: "冀RV706挂",
+          facilitator: "华北配送中心",
+          driver: "黄冬华",
+          driverPhone: 17733697679,
+          orderNum: "G18012900090",
+          gasSource: "深圳大鹏",
+          goodsType: "天然气",
+          time: "2018-01-31 13:53:53",
+          speed: 11,
+          position: "陕西榆林市榆阳区",
+          symbolSize: [32, 24],
+          symbol:
+            "image://" + require("../../../assets/chartsImg/underloaded.png")
+        },
+        {
+          name: "天津",
+          value: [117.200983, 39.084158, 28],
+          symbolSize: 10,
+          currentStatus: "空车",
+          qyCarId: "冀R70623",
+          gCarId: "冀RV706挂",
+          facilitator: "华北配送中心",
+          driver: "黄冬华",
+          driverPhone: 17733697679,
+          orderNum: "G18012900090",
+          gasSource: "深圳大鹏",
+          goodsType: "天然气",
+          time: "2018-01-31 13:53:53",
+          speed: 10,
+          position: "陕西榆林市榆阳区",
+          symbolSize: [32, 24],
+          symbol:
+            "image://" + require("../../../assets/chartsImg/underloaded.png")
+        },
+        {
+          name: "城阳",
+          value: [120.39631, 36.307064, 15],
+          symbolSize: 10,
+          currentStatus: "空车",
+          qyCarId: "冀R70623",
+          gCarId: "冀RV706挂",
+          facilitator: "华北配送中心",
+          driver: "黄冬华",
+          driverPhone: 17733697679,
+          orderNum: "G18012900090",
+          gasSource: "深圳大鹏",
+          goodsType: "天然气",
+          time: "2018-01-31 13:53:53",
+          speed: 9,
+          position: "陕西榆林市榆阳区",
+          symbolSize: [32, 24],
+          symbol:
+            "image://" + require("../../../assets/chartsImg/underloaded.png")
+        },
+        {
+          name: "丰台",
+          value: [116.287149, 39.858427, 3],
+          symbolSize: 10,
+          currentStatus: "空车",
+          qyCarId: "冀R70623",
+          gCarId: "冀RV706挂",
+          facilitator: "华北配送中心",
+          driver: "黄冬华",
+          driverPhone: 17733697679,
+          orderNum: "G18012900090",
+          gasSource: "深圳大鹏",
+          goodsType: "天然气",
+          time: "2018-01-31 13:53:53",
+          speed: 8,
+          position: "陕西榆林市榆阳区",
+          symbolSize: [32, 24],
+          symbol:
+            "image://" + require("../../../assets/chartsImg/underloaded.png")
+        },
+        {
+          name: "山东",
+          value: [117.020359, 36.66853, -6],
+          symbolSize: 10,
+          currentStatus: "空车",
+          qyCarId: "冀R70623",
+          gCarId: "冀RV706挂",
+          facilitator: "华北配送中心",
+          driver: "黄冬华",
+          driverPhone: 17733697679,
+          orderNum: "G18012900090",
+          gasSource: "深圳大鹏",
+          goodsType: "天然气",
+          time: "2018-01-31 13:53:53",
+          speed: 7,
+          position: "陕西榆林市榆阳区",
+          symbolSize: [32, 24],
+          symbol: "image://" + require("../../../assets/chartsImg/offline.png")
+        },
+        {
+          name: "舟山",
+          value: [122.207216, 29.985295, 1],
+          symbolSize: 10,
+          currentStatus: "空车",
+          qyCarId: "冀R70623",
+          gCarId: "冀RV706挂",
+          facilitator: "华北配送中心",
+          driver: "黄冬华",
+          driverPhone: 17733697679,
+          orderNum: "G18012900090",
+          gasSource: "深圳大鹏",
+          goodsType: "天然气",
+          time: "2018-01-31 13:53:53",
+          speed: 6,
+          position: "陕西榆林市榆阳区",
+          symbolSize: [32, 24],
+          symbol: "image://" + require("../../../assets/chartsImg/offline.png")
+        },
+        {
+          name: "连云港",
+          value: [119.221611, 34.596653, 1],
+          symbolSize: 10,
+          currentStatus: "离线",
+          qyCarId: "冀R70623",
+          gCarId: "冀RV706挂",
+          facilitator: "华北配送中心",
+          driver: "黄冬华",
+          driverPhone: 17733697679,
+          orderNum: "G18012900090",
+          gasSource: "深圳大鹏",
+          goodsType: "天然气",
+          time: "2018-01-31 13:53:53",
+          speed: 5,
+          position: "陕西榆林市榆阳区",
+          symbolSize: [32, 24],
+          symbol: "image://" + require("../../../assets/chartsImg/offline.png")
+        },
+        {
+          name: "西安",
+          value: [108.940175, 34.341568, 3],
+          symbolSize: 10,
+          currentStatus: "离线",
+          qyCarId: "冀R70623",
+          gCarId: "冀RV706挂",
+          facilitator: "华北配送中心",
+          driver: "黄冬华",
+          driverPhone: 17733697679,
+          orderNum: "G18012900090",
+          gasSource: "深圳大鹏",
+          goodsType: "天然气",
+          time: "2018-01-31 13:53:53",
+          speed: 4,
+          position: "陕西榆林市榆阳区",
+          symbolSize: [32, 24],
+          symbol: "image://" + require("../../../assets/chartsImg/offline.png")
+        },
+        {
+          name: "兰山",
+          value: [118.347707, 35.051729, 1],
+          symbolSize: 10,
+          currentStatus: "离线",
+          qyCarId: "冀R70623",
+          gCarId: "冀RV706挂",
+          facilitator: "华北配送中心",
+          driver: "黄冬华",
+          driverPhone: 17733697679,
+          orderNum: "G18012900090",
+          gasSource: "深圳大鹏",
+          goodsType: "天然气",
+          time: "2018-01-31 13:53:53",
+          speed: 3,
+          position: "陕西榆林市榆阳区",
+          symbolSize: [32, 24],
+          symbol: "image://" + require("../../../assets/chartsImg/offline.png")
+        }
+      ]
+    };
+  }
+};
+</script>
+
+<style lang="scss" scoped>
+.zoomimg{
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0px;
+  left: 0px;
+  z-index: 111;
+  overflow-y: auto;
+  background-color: rgba(0,0,0,0.6);
+  text-align: center;
+  img{
+    display: inline-block;
+    max-width: 1200px;
+    margin: 50px auto;
+  }
+}
+.zoomimg::-webkit-scrollbar{
+  width: 0px;
+}
+.centerMap_wrap{
+  height:700px;
+}
+.check_year_month {
+  height: 30px;
+  position: absolute;
+  right: 510px;
+  top: 156px;
+  div {
+    width: 100px;
+    height: 30px;
+    float: left;
+    margin-right: 10px;
+    line-height: 28px;
+    box-sizing: border-box;
+    font-size: 18px;
+    color: #b5b5b5;
+    border: 1px solid rgba(0, 191, 229, 1);
+    background: rgba(0, 191, 229, 0.2);
+    text-align: center;
+    cursor: pointer;
+  }
+  .hover {
+    background: rgba(0, 191, 229, 0.5);
+    color: #ffffff;
+  }
+}
+.center_x1 {
+  float: left;
+}
+.center_x2 {
+  float: left;
+  width: 4px;
+  height: 250px;
+  background: #000000;
+}
+.center_x3 {
+  float: left;
+}
+.center_second_layer {
+  position: absolute;
+  top: 500px;
+  left: 600px;
+  z-index: 10;
+  width: 1220px;
+  height: 30px;
+  // background: lightblue;
+}
+.centerMap {
+  width: 1008px;
+  height: 700px;
+}
+.center_left_layer::-webkit-scrollbar {
+  width: 0;
+}
+.center_left_layer {
+  position: absolute;
+  top: 200px;
+  left: 70px;
+  z-index: 10;
+  overflow-y: auto;
+  max-height: 600px;
+  .son {
+    margin-bottom: 20px;
+    div:nth-child(1) {
+      cursor: pointer;
+    }
+    .tbg {
+      background: rgba(9, 10, 11, 0.8);
+    }
+    .next {
+      margin-top: 10px;
+      width: 520px;
+      box-sizing: border-box;
+      padding: 8px;
+      background: rgba(9, 122, 206, 0.2) content-box;
+      border: 2px solid rgba(5, 208, 235, 0.8);
+      overflow: hidden;
+    }
+    .fleet_box{
+      width: 390px;
+      padding: 8px;
+      border: 2px solid rgba(5, 208, 235, 0.8);
+      max-height: 300px;
+      overflow-y: auto;
+      &_content{
+        padding: 10px;
+        background:rgba(9, 122, 206, 0.2);
+      }
+      .fleet_detail{
+        margin: 5px 0;
+        background: rgba(9, 122, 206, 0.2) content-box;
+        p{
+          display: inline-block;
+          width: 150px;
+          padding: 0 5px;
+          padding-top: 7px;
+          text-align: center;
+          color: #89DDDF;
+        }
+      }
+    }
+    .fleet_box::-webkit-scrollbar {
+      width: 0px;
+    }
+  }
+}
+.center_header {
+  width: 825px;
+  height: 95px;
+  border-bottom: 2px solid #038bfc;
+  position: absolute;
+  top: 15px;
+  left: 75px;
+  cursor: pointer;
+  .num {
+    height: 55px;
+    div {
+      width: 410px;
+      height: 55px;
+      background: rgba(3, 139, 252, 0.4);
+      text-align: center;
+      font-size: 14px;
+      color: #ffffff;
+      float: left;
+      span:nth-child(1) {
+        font-size: 48px;
+        font-weight: bold;
+        color: #efca0f;
+        font-family: "digi";
+        margin-right: 20px;
+      }
+    }
+    div:nth-child(1) {
+      margin-right: 5px;
+    }
+  }
+  .name {
+    margin-top: 5px;
+    div {
+      float: left;
+      height: 35px;
+      width: 410px;
+      background: rgba(3, 139, 252, 0.2);
+      font-size: 18px;
+      color: #ffffff;
+      line-height: 35px;
+      text-align: center;
+    }
+    div:nth-child(1) {
+      margin-right: 5px;
+    }
+  }
+}
+
+.center_left_icon {
+  width: 70px;
+  height: 60px;
+  background: url("../../../assets/company/company_infor_off.png") no-repeat;
+  position: absolute;
+  left: 0;
+  top: 120px;
+  cursor: pointer;
+}
+
+.center_left_icon:hover {
+  background: url("../../../assets/company/company_infor_on.png") no-repeat;
+}
+
+.center_right_icon {
+  width: 70px;
+  height: 60px;
+  background: url("../../../assets/company/company_alarm_off.png") no-repeat;
+  position: absolute;
+  right: 5px;
+  top: 150px;
+  cursor: pointer;
+}
+.center_right_icon:hover {
+  background: url("../../../assets/company/company_alarm_on.png") no-repeat;
+}
+
+.center_right_icon_expire{
+  width: 70px;
+  height: 60px;
+  background: url("../../../assets/car/guoqi.png") no-repeat;
+  position: absolute;
+  right: 5px;
+  top: 220px;
+  cursor: pointer;
+}
+.center_right_icon_expire:hover {
+  background: url("../../../assets/car/guoqi_2.png") no-repeat;
+}
+.center_right_icon_expire div {
+  width: 30px;
+  height: 30px;
+  background:#515151;
+  border-radius: 50%;
+  float: right;
+  line-height: 30px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: bold;
+  color: #ffffff;
+}
+.center_left_center {
+  position: absolute;
+  left: 0;
+  bottom: 260px;
+  width: 220px;
+  div {
+    width: 220px;
+    height: 60px;
+    box-sizing: border-box;
+    border: 2px solid rgba(5, 208, 235, 0.8);
+    margin-top: 10px;
+    cursor: pointer;
+    div {
+      width: 190px;
+      height: 30px;
+      margin: 13px auto;
+      border: 0px;
+      line-height: 30px;
+      text-align: center;
+      background: rgba(5, 208, 235, 0.3);
+      color: #b5b5b5;
+    }
+    .hover {
+      color: #ffffff;
+      background: rgba(5, 208, 235, 0.6);
+    }
+  }
+}
+
+.center_bottom {
+  width: 1008px;
+  height: 250px;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  background: #082333;
+  .title {
+    margin-top: 10px;
+    margin-left: 20px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #89dddf;
+    width: 200px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    background: #005b71;
+  }
+  .header_car {
+    margin-top: 10px;
+    margin-left: 20px;
+    padding-bottom: 10px;
+    height: 20px;
+    width: 480px;
+    float: left;
+    div {
+      float: left;
+      font-size: 16px;
+      color: #89dddf;
+      text-align: center;
+      margin-right: 5px;
+      width: 135px;
+    }
+    div:nth-child(2) {
+      width: 105px;
+    }
+    div:nth-child(3) {
+      margin-right: 0px;
+      width: 175px;
+      padding-left:70px;
+      box-sizing: border-box;
+    }
+  }
+  .header {
+    margin-top: 10px;
+    margin-left: 20px;
+    padding-bottom: 10px;
+    height: 20px;
+    div {
+      width:108px !important;
+      float: left;
+      font-size: 16px;
+      color: #89dddf;
+      text-align: center;
+      margin-right: 0px;
+      // background:red;
+    }
+  }
+  ul {
+    list-style: none;
+    height: 135px;
+    overflow-y: scroll;
+    clear: both;
+    margin-left: 20px;
+    li {
+      height: 30px;
+      margin-bottom: 5px;
+      div {
+        width:108px !important;
+        float: left;
+        background: rgba(3, 139, 252, 0.4);
+        font-size: 14px;
+        color: #ffffff;
+        text-align: center;
+        line-height: 30px;
+        margin-right: 1px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+  }
+  ul::-webkit-scrollbar {
+    width: 0px;
+  }
+  .car_ul {
+    li {
+      width: 474px;
+      margin-right: 20px;
+      overflow: hidden;
+      float: left;
+      cursor: pointer;
+      div {
+        background: rgba(3, 139, 252, 0.2);
+        color: #b5b5b5;
+      }
+      div:nth-child(1) {
+        width: 118px !important;
+      }
+      div:nth-child(2) {
+        width: 130px !important;
+      }
+      div:nth-child(3) {
+        margin-right: 0px;
+        width: 224px !important;
+      }
+    }
+    li:hover {
+      div {
+        background: rgba(3, 139, 252, 0.4);
+        color: #ffffff;
+      }
+    }
+  }
+}
+
+.center_bottom .header div:nth-child(1),
+.center_bottom li div:nth-child(1) {
+  width: 218px;
+}
+
+.center_bottom .header div:nth-child(2),
+.center_bottom li div:nth-child(2) {
+  width: 100px;
+}
+
+.center_bottom .header div:nth-child(3),
+.center_bottom li div:nth-child(3) {
+  width: 120px;
+}
+
+.center_bottom .header div:nth-child(4),
+.center_bottom li div:nth-child(4) {
+  width: 150px;
+}
+
+.center_bottom .header div:nth-child(5),
+.center_bottom li div:nth-child(5) {
+  width: 120px;
+}
+
+.center_bottom .header div:nth-child(6),
+.center_bottom li div:nth-child(6) {
+  width: 180px;
+}
+
+.center_bottom .header div:nth-child(7),
+.center_bottom li div:nth-child(7) {
+  width: 150px;
+}
+
+.center_bottom .header div:nth-child(8),
+.center_bottom li div:nth-child(8) {
+  width: 150px;
+}
+
+.center_bottom .header div:nth-child(9),
+.center_bottom li div:nth-child(9) {
+  width: 150px;
+}
+
+.arrow_up {
+  width: 20px;
+  height: 16px;
+  background: url("../../../assets/company/arrow_off.png") no-repeat;
+  position: absolute;
+  top: 10px;
+  left: 500px;
+  cursor: pointer;
+}
+
+.arrow_up:hover {
+  background: url("../../../assets/company/arrow_on.png") no-repeat;
+}
+
+.arrow_down {
+  width: 20px;
+  height: 16px;
+  background: url("../../../assets/company/arrow_off.png") no-repeat;
+  position: absolute;
+  bottom: 10px;
+  left: 500px;
+  cursor: pointer;
+  transform: rotate(180deg);
+}
+
+.arrow_down:hover {
+  background: url("../../../assets/company/arrow_on.png") no-repeat;
+}
+
+.center_right_icon div {
+  width: 30px;
+  height: 30px;
+  background: #aa0019;
+  border-radius: 50%;
+  float: right;
+  line-height: 30px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: bold;
+  color: #ffffff;
+}
+.progress{
+  margin-top: 5px;
+}
+.task_progress{
+    margin-top: 8px;
+    div {
+      float: left;
+      height: 35px;
+      width: 410px;
+      font-size: 18px;
+      color: #ffffff;
+      line-height: 35px;
+      text-align: center;
+    }
+    div:nth-child(1) {
+      margin-right: 5px;
+    }
+    .task_text{
+      display: flex;
+      justify-content: center;
+      text-align: left;
+      margin-top: 5px;
+      font-size: 16px;
+      p{
+        width: 205px;
+        padding: 0 10px;
+        box-sizing: border-box;
+        border: 1px solid rgba(3, 139, 252,1);
+        span{
+          padding-left: 20px;
+        }
+      }
+      p:first-child{
+        background-color: rgba(3, 139, 252, 0.6);
+      } 
+      p:last-child{
+        background-color: rgba(3, 139, 252, 0.1);
+      } 
+    }
+}
+</style>

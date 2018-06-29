@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobiusVision.dao.TbSubject.TbSubjectJxjyMapper" >
+    <resultMap id="BaseResultMap" type="TbSubjectJxjy" >
+        <id column="tb_subject_jxjy_id" property="tb_subject_jxjy_id" jdbcType="INTEGER" />
+        <result column="Driver_ID" property="driver_ID" jdbcType="VARCHAR" />
+        <result column="Start_Date" property="start_Date" jdbcType="VARCHAR" />
+        <result column="End_Date" property="end_Date" jdbcType="VARCHAR" />
+        <result column="Training_Hours" property="training_Hours" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <resultMap id="TbSubjectJxjyAndRemainTime" type="TbSubjectJxjyARemainTime">
+        <result column="remaining_time" property="remaining_time" jdbcType="VARCHAR" />
+        <result column="remaining_days" property="remaining_days" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <!--通过driver_id查询tb_subject_jxjy表及其到期天数和未学习时间数据-->
+    <select id="findJxjyRemainByDriverId" resultMap="TbSubjectJxjyAndRemainTime">
+        select * ,
+        (Training_Hours - (select SUM(Training_Hours) from TB_BUSINESS_PX where driver_id=#{driver_id}
+        and str_to_date(concat(Year,Month,Day), '%Y%m%d') between str_to_date(start_date, '%Y%m%d') and str_to_date(end_date, '%Y%m%d'))) as remaining_time,
+        datediff(str_to_date(end_date, '%Y%m%d'),date_format(now(), '%Y%m%d')) as remaining_days
+        from tb_subject_jxjy where driver_id=#{driver_id} and start_date=(select max(start_date) from tb_subject_jxjy where driver_id=#{driver_id})
+    </select>
+</mapper>

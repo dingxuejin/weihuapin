@@ -1,0 +1,83 @@
+<template>
+  <Echarts :options="option"></Echarts>
+</template>
+
+<script type="text/javascript">
+import Echarts from 'vue-echarts'
+
+export default {
+  name: '',
+  components: {
+    Echarts,
+  },
+  computed: {},
+  methods: {
+
+  },
+  data() {
+    return {
+      option: {
+        tooltip: {
+          trigger: 'item',
+          formatter: '{a} <br/>{b} : {c} ({d}%)',
+        },
+
+        visualMap: {
+          show: false,
+          min: 80,
+          max: 600,
+          inRange: {
+            colorLightness: [0, 1],
+          },
+        },
+        series: [
+          {
+            type: 'pie',
+            radius: '70%',
+            center: ['50%', '50%'],
+            data: [
+                { value: 335, name: '6h以上' },
+                { value: 310, name: '2-6h' },
+                { value: 274, name: '1-2h' },
+                { value: 235, name: '1h以下' },
+            ].sort((a, b) => a.value - b.value),
+            roseType: 'radius',
+            label: {
+              normal: {
+                textStyle: {
+                  color: '#fff',
+                  fontSize: 14,
+                },
+              },
+            },
+            labelLine: {
+              normal: {
+                lineStyle: {
+                  color: '#F6FFCB',
+                },
+                length: 20,
+                length2: 20,
+              },
+            },
+            itemStyle: {
+              normal: {
+                color: '#05D0EB ',
+              },
+            },
+
+            animationType: 'scale',
+            animationEasing: 'elasticOut',
+            animationDelay() {
+              return Math.random() * 200
+            },
+          },
+        ],
+      },
+    }
+  },
+}
+</script>
+
+<style lang="scss" scoped>
+
+</style>

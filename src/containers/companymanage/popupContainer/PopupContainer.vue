@@ -1,9 +1,15 @@
 <template>
   <!-- 车辆经营管理详情弹出框 -->
-  <div class="company_manage_details_wrap clearfix" v-if="detailsShow">
+  <div class="company_manage_details_wrap clearfix"
+       v-if="detailsShow">
 
     <!-- 成本比例变化趋势 -->
-    <div class="cost_ratio_trend_wrap" v-if="cost_ratio_trend_show" v-drag @mousedown="move=true" @mouseup="move=false" :style="move?'cursor:move':''">
+    <div class="cost_ratio_trend_wrap"
+         v-if="cost_ratio_trend_show"
+         v-drag
+         @mousedown="move=true"
+         @mouseup="move=false"
+         :style="move?'cursor:move':''">
       <pop-up-frame @close='closeDetails'>
         <pop-up-widget title="年度成本变化趋势统计"></pop-up-widget>
         <year-cost-trend></year-cost-trend>
@@ -11,7 +17,12 @@
     </div>
 
     <!-- 总运单数量 -->
-    <div class="company_manage_waybill_wrap" v-if="company_manage_waybill_show" v-drag @mousedown="move=true" @mouseup="move=false" :style="move?'cursor:move':''">
+    <div class="company_manage_waybill_wrap"
+         v-if="company_manage_waybill_show"
+         v-drag
+         @mousedown="move=true"
+         @mouseup="move=false"
+         :style="move?'cursor:move':''">
       <pop-up-frame @close='closeDetails'>
         <pop-up-widget title="运单数统计"></pop-up-widget>
         <waybill-statistics></waybill-statistics>
@@ -25,7 +36,12 @@
     </div>
 
     <!-- 总货运量 -->
-    <div class="company_manage_volume_by_cargo_type_wrap" v-if="volume_by_cargo_show" v-drag @mousedown="move=true" @mouseup="move=false" :style="move?'cursor:move':''">
+    <div class="company_manage_volume_by_cargo_type_wrap"
+         v-if="volume_by_cargo_show"
+         v-drag
+         @mousedown="move=true"
+         @mouseup="move=false"
+         :style="move?'cursor:move':''">
       <pop-up-frame @close='closeDetails'>
         <pop-up-widget title="不同类型货物货运量统计"></pop-up-widget>
         <cargo-volume></cargo-volume>
@@ -33,38 +49,79 @@
     </div>
 
     <!-- 总周转量 -->
-    <div class="company_manage_turnover_by_cargo_type_wrap" v-if="turnover_by_cargo_show" v-drag @mousedown="move=true" @mouseup="move=false" :style="move?'cursor:move':''">
+    <div class="company_manage_turnover_by_cargo_type_wrap"
+         v-if="turnover_by_cargo_show"
+         v-drag
+         @mousedown="move=true"
+         @mouseup="move=false"
+         :style="move?'cursor:move':''">
       <pop-up-frame @close='closeDetails'>
         <pop-up-widget title="不同类型货物周转量统计"></pop-up-widget>
         <cargo-turnover></cargo-turnover>
       </pop-up-frame>
     </div>
 
-    <!-- 货物流量流向统计 -->
-    <div class="company_manage_volume_statistics_day_night_wrap" v-if="volume_statistics_day_night_show" v-drag @mousedown="move=true" @mouseup="move=false" :style="move?'cursor:move':''">
+    <!-- 货物流量流向昼夜统计 -->
+    <div class="company_manage_volume_statistics_day_night_wrap"
+         v-if="volume_statistics_day_night_show"
+         v-drag
+         @mousedown="move=true"
+         @mouseup="move=false"
+         :style="move?'cursor:move':''">
       <pop-up-frame @close='closeDetails'>
         <pop-up-widget title="货物流量昼夜统计"></pop-up-widget>
         <volumeStatisticsDayNight></volumeStatisticsDayNight>
 
       </pop-up-frame>
     </div>
+    <!-- 货物流量流向统计 -->
+    <div class="company_manage_volume_statistics_day_night_wrap"
+         v-if="goodstjFrame_show"
+         v-drag
+         @mousedown="move=true"
+         @mouseup="move=false"
+         :style="move?'cursor:move':''">
+      <pop-up-frame @close='closeDetails'>
+        <pop-up-widget title="货物流量流向变化趋势统计"></pop-up-widget>
+        <cargo-traffic-change></cargo-traffic-change>
+        <pop-up-widget title="货物流量区域分析"></pop-up-widget>
+        <volumeStatisticsDayNight></volumeStatisticsDayNight>
+        <pop-up-widget title="年度货运量各机构统计"></pop-up-widget>
+        <volumeStatisticsDayNight></volumeStatisticsDayNight>
+      </pop-up-frame>
+    </div>
 
     <!-- 线路详细信息 -->
-    <div class="company_manage_route_info_wrap" v-if="route_info_show" v-drag @mousedown="move=true" @mouseup="move=false" :style="move?'cursor:move':''">
+    <div class="company_manage_route_info_wrap"
+         v-if="route_info_show"
+         v-drag
+         @mousedown="move=true"
+         @mouseup="move=false"
+         :style="move?'cursor:move':''">
       <pop-up-frame @close='closeDetails'>
         <pop-up-widget title="线路详细信息"></pop-up-widget>
         <route-info></route-info>
       </pop-up-frame>
     </div>
     <!-- 收入排名信息 -->
-    <div class="company_manage_rank_wrap" v-if="incom_ranked_show" v-drag @mousedown="move=true" @mouseup="move=false" :style="move?'cursor:move':''">
+    <div class="company_manage_rank_wrap"
+         v-if="incom_ranked_show"
+         v-drag
+         @mousedown="move=true"
+         @mouseup="move=false"
+         :style="move?'cursor:move':''">
       <pop-up-frame @close='closeDetails'>
         <pop-up-frame-rank></pop-up-frame-rank>
       </pop-up-frame>
     </div>
 
     <!-- 货物流量流向分析 -->
-    <div class="company_manage_cargo_flow_area_wrap" v-if="cargo_flow_area_show" v-drag @mousedown="move=true" @mouseup="move=false" :style="move?'cursor:move':''">
+    <div class="company_manage_cargo_flow_area_wrap"
+         v-if="cargo_flow_area_show"
+         v-drag
+         @mousedown="move=true"
+         @mouseup="move=false"
+         :style="move?'cursor:move':''">
       <pop-up-frame @close='closeDetails'>
         <pop-up-widget title="不同类型货物周转量统计"></pop-up-widget>
         <!-- 日期选择 -->
@@ -103,6 +160,7 @@ import volumeStatisticsDayNight from '../../companymanagepopup/volumeStatisticsD
 import volumeStatisticsEntity from '../../companymanagepopup/volumeStatisticsEntity/volumeStatisticsEntity'
 import volumeInterstateEntity from '../../companymanagepopup/volumeInterstateEntity/volumeInterstateEntity'
 import popUpFrameRank from '../../companymanagepopup/popUpFrameRank/popUpFrameRank'
+import cargoTrafficChange from '../../companymanagepopup/cargoTrafficChange/cargoTrafficChange'
 
 import {
   mapState,
@@ -116,6 +174,7 @@ export default {
     PopUpFrame,
     PopUpWidget,
     lineDataZoom,
+    cargoTrafficChange,
     KeyValueSelect,
     xxx,
     bar,
@@ -167,6 +226,7 @@ export default {
       'turnover_by_cargo_show',
       'volume_statistics_day_night_show',
       'route_info_show',
+      'goodstjFrame_show',
       'cargo_flow_area_show',
       'incom_ranked_show',
 
@@ -529,8 +589,8 @@ export default {
   .company_manage_route_info_wrap {
     width: 700px;
     position: absolute;
-    top: 200px;
-    right: 1060px;
+    top: 320px;
+    right: 900px;
     // .route_info_table_wrap {
     //   width: 100%;
     //   height: 275px;

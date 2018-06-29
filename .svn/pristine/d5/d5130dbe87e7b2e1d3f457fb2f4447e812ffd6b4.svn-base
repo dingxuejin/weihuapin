@@ -1,0 +1,332 @@
+<template>
+  <div class="accumulatedWorkloadStatistics">
+    <div class="accumulatedWorkloadStatistics_left">
+      <div class="title">累计工作量统计</div>
+      <div class="title_select">
+        <div :class='{show:period=="y"}'
+            @click='showtoggle("y")'>当年</div>
+        <div :class='{show:period=="m"}'
+            @click='showtoggle("m")'>当月</div>
+      </div>
+      <!-- 行驶里程 -->
+      <div class="leftWrap">
+        <div class="leftWrapSubTitle">行驶里程</div>
+        <div class="TitleImg" @click='open("driverMileage")'></div>
+        <template v-if="pm">
+          <div class="leftWrapItem_01">事故发生数</div>
+          <div class="leftWrapItem_02">行驶里程(公里)</div>
+          <div class="leftWrapItem_03"></div>
+          <div class="leftWrapItem_04">{{qf(1)}}</div>
+          <div class="leftWrapItem_05">{{qf(pm.total_km)}}</div>
+        </template>
+        <!-- <loading :data='pm'></loading> -->
+      </div>
+      <!-- 货物量 -->
+      <div class="leftWrap">
+        <div class="leftWrapSubTitle">货物量</div>
+        <template v-if="pm">
+          <div class="leftWrapItem_01 goodsQuantityUnit numb">货物量(吨)</div>
+          <!-- <div class="leftWrapItem_02">货物量(立方米)</div> -->
+          <div class="leftWrapItem_03"></div>
+          <div class="leftWrapItem_04 goodsQuantityNo numb">{{qf(pm.volume_ton)}}</div>
+          <!-- <div class="leftWrapItem_05">{{qf(pm.volume_m3)}}</div> -->
+        </template>
+        <loading :data='pm'></loading>
+      </div>
+      <!-- 运单数 -->
+      <div class="leftWrap">
+        <div class="leftWrapSubTitle WaybillNum" :class='{WaybillNumShow:showtoggleNum===0}' @click='showtoggleNumState(0)'>运单数
+          <div class="waybillUnitImg" @click='open("WaybillNumStatistics")'></div>
+        </div>
+        <div class="turnover" :class='{WaybillNumShow:showtoggleNum===1}' @click='showtoggleNumState(1)'>周转量</div>
+        <template v-if="pm">
+          <div class="leftWrapItem_01 waybillUnit numb">运单数(单)</div>
+          <div class="leftWrapItem_03"></div>
+          <div class="leftWrapItem_04 waybillNo numb">{{qf(pm.waybill_quantity)}}</div>
+        </template>
+        <!-- <loading :data='pm'></loading> -->
+      </div>
+    </div>
+    <div class="accumulatedWorkloadStatistics_right">
+      <div class="subTilte" @click="open('workCountInfo')">工作量统计信息</div>
+      <div class="rightWrap">
+        <div class="rightWrapSubTitle">行驶里程排名</div>
+        <template v-if="pm">
+          <div class="rightWrapItem_01">
+            <div class="rightWrapItem_01_01">车队排名</div>
+            <div class="rightWrapItem_01_02">{{pm.fleet_km_ranking}}</div>
+          </div>
+          <div class="rightWrapItem_02">
+            <div class="rightWrapItem_01_01">总公司排名</div>
+            <div class="rightWrapItem_01_02">{{pm.company_km_ranking}}</div>
+          </div>
+        </template>
+        <loading :data='pm'></loading>
+      </div>
+      <div class="rightWrap">
+        <div class="rightWrapSubTitle">货物量排名</div>
+        <template v-if="pm">
+          <div class="rightWrapItem_01">
+            <div class="rightWrapItem_01_01">车队排名</div>
+            <div class="rightWrapItem_01_02">{{pm.fleet_volume_ranking}}</div>
+          </div>
+          <div class="rightWrapItem_02">
+            <div class="rightWrapItem_01_01">总公司排名</div>
+            <div class="rightWrapItem_01_02">{{pm.company_volume_ranking}}</div>
+          </div>
+        </template>
+        <loading :data='pm'></loading>
+      </div>
+      <div class="rightWrap">
+        <div class="rightWrapSubTitle">运单数排名</div>
+        <template v-if="pm">
+          <div class="rightWrapItem_01">
+            <div class="rightWrapItem_01_01">车队排名</div>
+            <div class="rightWrapItem_01_02">{{pm.fleet_waybill_ranking}}</div>
+          </div>
+          <div class="rightWrapItem_02">
+            <div class="rightWrapItem_01_01">总公司排名</div>
+            <div class="rightWrapItem_01_02">{{pm.company_waybill_ranking}}</div>
+          </div>
+        </template>
+        <loading :data='pm'></loading>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import { mapState, mapMutations } from 'vuex'
+
+export default {
+  components: {},
+  data: () => ({
+    period: 'y',
+    showtoggleNum: 0,
+  }),
+  computed: {
+    ...mapState('accumulatedWorkloadStatistics', ['pm']),
+    ...mapState('driver', ['workCountInfo']),
+  },
+  methods: {
+    ...mapMutations('driver', ['open']),
+    showtoggle(item) {
+      this.period = item
+      // if (item === 'y') {
+      // } else if (item === 'm') {
+      // }
+    },
+    // 周转量/运单数切换
+    showtoggleNumState(item) {
+      this.showtoggleNum = item
+    },
+  },
+}
+</script>
+
+<style lang="scss" scoped>
+@mixin size($width,$height) {
+  width: $width;
+  height: $height;
+}
+.accumulatedWorkloadStatistics {
+  @include size(485px,450px);
+  &_left{
+    @include size(50%,100%);
+    // background:aquamarine;
+    float: left;
+    .title {
+      @include size(200px,30px);
+      line-height: 30px;
+      background: #005b7f;
+      padding-left: 20px;
+      color: #89dddf;
+      font-size: 18px;
+      font-weight: bold;
+      box-sizing: border-box;
+    }
+    .title_select {
+      @include size(240px, 30px);
+      margin-top: 4.7px;
+      margin-bottom: 4.3px;
+      div {
+        @include size(120px, 30px);
+        box-sizing: border-box;
+        color: #b5b5b5;
+        text-align: center;
+        line-height: 23px;
+        background: rgba(0, 191, 229, 0.2);
+        border: 1px solid rgba(0, 191, 229, 1);
+        cursor: pointer;
+        float: left;
+      }
+      .show {
+        color: #ffffff;
+        background: rgba(0, 191, 229, 0.5);
+      }
+    }
+    .leftWrap {
+      @include size(241px,130px);
+      position: relative;
+      .leftWrapSubTitle {
+        @include size(150px,25px);
+        line-height: 24px;
+        color: #89dddf;
+        font-size: 16px;
+        text-align:center;
+        background: rgba(129, 217, 229, 0.3);
+        box-sizing: border-box;
+        float: left;
+      }
+      .TitleImg{
+        @include size(22.6px,15.4px);
+        background: url('../../../assets/car/renshu.png') no-repeat center center;
+        background-size: 100% 100%;
+        position: absolute;
+        top:6px;
+        left:121.4px;
+        cursor: pointer;
+      }
+      .WaybillNum{
+        @include size(120px,25px);
+        box-sizing: border-box;
+        background: rgba(0, 191, 229, 0.2);
+        border: 1px solid rgba(0, 191, 229, 1);
+        cursor: pointer;
+        position: relative;
+      }
+      .waybillUnitImg{
+        @include size(18px,19px);
+        background: url('../../../assets/driver/person.png') no-repeat center center;
+        background-size: 100% 100%;
+        position: absolute;
+        top:2px;
+        left:96.4px;
+      }
+      .turnover{
+        @include size(120px,25px);
+        line-height: 24px;
+        color: #89dddf;
+        font-size: 16px;
+        text-align:center;
+        box-sizing: border-box;
+        float: right;
+        background: rgba(0, 191, 229, 0.2);
+        border: 1px solid rgba(0, 191, 229, 1);
+        cursor: pointer;
+      }
+      .WaybillNumShow{
+        color: #ffffff;
+        background: rgba(0, 191, 229, 0.5);
+      }
+      .leftWrapItem_01 {
+        @include size(120px,25px);
+        line-height: 25px;
+        text-align: center;
+        color: #89dddf;
+        font-size: 16px;
+        float: left;
+        margin-top: 5px;
+        background: rgba(231, 80, 41, 0.5);
+      }
+      .leftWrapItem_02 {
+        @include size(119px,25px);
+        line-height: 25px;
+        text-align: center;
+        color: #89dddf;
+        font-size: 16px;
+        float: left;
+        margin-top: 5px;
+        margin-left: 2px;
+        background: #004669;
+      }
+      .leftWrapItem_03 {
+        @include size(240px,2px);
+        margin: 9px 0;
+        background: #81d9e5;
+        float: left;
+      }
+      .leftWrapItem_04 {
+        @include size(119px,50px);
+        line-height: 50px;
+        text-align: center;
+        font-family: "digi";
+        color: #e75029;
+        font-size: 36px;
+        font-weight: bold;
+        border: 2px solid #81d9e5;
+        box-sizing: border-box;
+        float: left;
+      }
+      .numb{
+        width:240px;
+      }
+      .leftWrapItem_05 {
+        @extend .leftWrapItem_04;
+        margin-left: 2px;
+        color: #89dddf;
+      }
+    }
+  }
+  &_right{
+    @include size(50%,100%);
+    float: right;
+    .subTilte {
+      @include size(160px,25px);
+      line-height: 25px;
+      margin-top: 5px;
+      padding-left: 20px;
+      margin-left: 20px;
+      color: #b5b5b5;
+      font-size: 14px;
+      background: rgba(0, 191, 229, 0.2);
+      box-sizing: border-box;
+      cursor:pointer;
+      margin-bottom:10px;
+    } 
+    .rightWrap {
+      @include size(231px,140px);
+      float: left;
+      margin-left: 20px;
+      .rightWrapSubTitle {
+        @include size(150px,25px);
+        line-height: 24px;
+        color: #89dddf;
+        font-size: 16px;
+        padding-left: 20px;
+        background: rgba(129, 217, 229, 0.3);
+        box-sizing: border-box;
+        float: left;
+      }
+      .rightWrapItem_01 {
+        @include size(113px,95px);
+        margin-top: 10px;
+        float: left;
+        .rightWrapItem_01_01 {
+          @include size(113px,55px);
+          text-align: center;
+          color: #89dddf;
+          font-size: 16px;
+          background: url(../../../assets/driver/rank_1.png) no-repeat center
+            24px;
+        }
+        .rightWrapItem_01_02 {
+          @include size(113px,40px);
+          text-align: center;
+          font-family: "digi";
+          font-size: 36px;
+          color: #efca0f;
+          border: 1px solid #81d9e5;
+          box-sizing: border-box;
+        }
+      }
+      .rightWrapItem_02 {
+        @extend .rightWrapItem_01;
+        float: left;
+        margin-left: 2px;
+        margin-top: 10px;
+      }
+    }
+  }
+}
+</style>

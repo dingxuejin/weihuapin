@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobiusVision.dao.TbBusiness.TbBusinessYzsgMapper" >
+
+    <resultMap id="BaseResultMap" type="TbBusinessYzsg" >
+        <id column="tb_business_yzsg_id" property="tb_business_yzsg_id" jdbcType="INTEGER" />
+        <result column="Driver_ID" property="driver_ID" jdbcType="VARCHAR" />
+        <result column="Waybill_Code" property="waybill_Code" jdbcType="VARCHAR" />
+        <result column="Vehicle_ID" property="vehicle_ID" jdbcType="VARCHAR" />
+        <result column="AccidentType_Time" property="accidentType_Time" jdbcType="VARCHAR" />
+        <result column="Accident_Location" property="accident_Location" jdbcType="VARCHAR" />
+        <result column="Longitude" property="longitude" jdbcType="VARCHAR" />
+        <result column="Latitude" property="latitude" jdbcType="VARCHAR" />
+        <result column="Accident_Level_Code" property="accident_Level_Code" jdbcType="VARCHAR" />
+        <result column="Accident_Responsibility_Code" property="accident_Responsibility_Code" jdbcType="VARCHAR" />
+        <result column="If_Hm_Release_Code" property="if_Hm_Release_Code" jdbcType="VARCHAR" />
+        <result column="Accident_Cause" property="accident_Cause" jdbcType="VARCHAR" />
+        <result column="Accident_Loss" property="accident_Loss" jdbcType="VARCHAR" />
+        <result column="Accident_Status" property="accident_Status" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <resultMap id="TbBusinessYzsgAndNDjZrXl" type="TbBusinessYzsgNDjZrXl" extends="BaseResultMap">
+
+        <result column="name" property="name" jdbcType="VARCHAR" />
+
+        <association property="sgdj" javaType="TbDictionarySgdj">
+            <id column="tb_dictionary_sgdj_id" property="tb_dictionary_sgdj_id" jdbcType="INTEGER" />
+            <result column="accident_level_code" property="accident_level_code" jdbcType="VARCHAR" />
+            <result column="accident_level" property="accident_level" jdbcType="VARCHAR" />
+            <result column="remark" property="remark" jdbcType="VARCHAR" />
+        </association>
+
+        <association property="sgzr" javaType="TbDictionarySgzr">
+            <id column="tb_dictionary_sgzr_id" property="tb_dictionary_sgzr_id" jdbcType="INTEGER" />
+            <result column="accident_responsibility_code" property="accident_responsibility_code" jdbcType="VARCHAR" />
+            <result column="accident_responsibility" property="accident_responsibility" jdbcType="VARCHAR" />
+            <result column="remark" property="remark" jdbcType="VARCHAR" />
+        </association>
+
+        <association property="sfxl" javaType="TbDictionarySfxl">
+            <id column="tb_dictionary_sfxl_id" property="tb_dictionary_sfxl_id" jdbcType="INTEGER" />
+            <result column="if_hm_release_code" property="if_hm_release_code" jdbcType="VARCHAR" />
+            <result column="if_hm_release" property="if_hm_release" jdbcType="VARCHAR" />
+            <result column="remark" property="remark" jdbcType="VARCHAR" />
+        </association>
+    </resultMap>
+    <!--mapper缓存参数设定-->
+    <cache  eviction="LRU" flushInterval="60000"  size="512" readOnly="true"/>
+    <!--通过driver_id查询tb_business_yzsg yzsg（安全评价-有责事故）,tb_dictionary_sgdj sgdj,tb_dictionary_sgzr sgzr,tb_dictionary_sfxl sfxl,tb_basic_ryjb ryjb表中所有数据数据-->
+    <select id="findSgxqByDriverId" resultMap="TbBusinessYzsgAndNDjZrXl">
+        select yzsg.*,ryjb.name,sgdj.*,sgzr.*,sfxl.*
+        from tb_business_yzsg yzsg,tb_dictionary_sgdj sgdj,tb_dictionary_sgzr sgzr,tb_dictionary_sfxl sfxl,tb_basic_ryjb ryjb
+        where yzsg.driver_id=ryjb.driver_id and
+        yzsg.accident_level_code=sgdj.accident_level_code and
+        yzsg.accident_responsibility_code=sgzr.accident_responsibility_code and
+        yzsg.if_hm_release_code=sfxl.if_hm_release_code and
+        yzsg.driver_id=#{driver_id}
+        order by yzsg.accidentType_Time desc
+    </select>
+
+    <!--通过entity_id查询tb_business_yzsg yzsg,tb_dictionary_sgdj sgdj,tb_dictionary_sgzr sgzr,tb_dictionary_sfxl sfxl,tb_basic_ryjb ryjb表中所有数据数据-->
+    <select id="findSgxqByEntityId" resultMap="TbBusinessYzsgAndNDjZrXl">
+        select yzsg.*,ryjb.name,sgdj.*,sgzr.*,sfxl.*
+        from tb_business_yzsg yzsg,tb_dictionary_sgdj sgdj,tb_dictionary_sgzr sgzr,tb_dictionary_sfxl sfxl,tb_basic_ryjb ryjb
+        where yzsg.driver_id=ryjb.driver_id and
+        yzsg.accident_level_code=sgdj.accident_level_code and
+        yzsg.accident_responsibility_code=sgzr.accident_responsibility_code and
+        yzsg.if_hm_release_code=sfxl.if_hm_release_code and
+        ryjb.entity_id=#{entity_id}
+        order by yzsg.accidentType_Time desc
+    </select>
+</mapper>

@@ -1,0 +1,216 @@
+<template>
+  <div class="workOrderCountInfoContent">
+    <pop-up-widget title="运单数量统计"
+                   detailsBtnShow="true"
+                   @popUpdetailsBtn="poporder = true"></pop-up-widget>
+
+    <!-- 内容部分 -->
+    <div class="mileageCon">
+      <!-- 标题 -->
+      <div class="selectCon clearfix">
+          <div class="itemCon fr clearfix">
+          <div class="fl">周转量单位</div>
+          <div class="fl">
+            <key-value-select :data="unitOption"
+                              width="120px"
+                              @select='select("unit",$event)'></key-value-select>
+          </div>
+        </div>
+        <div class="itemCon fr clearfix">
+          <div class="fl">统计周期</div>
+          <div class="fl">
+            <key-value-select :data="selectYearData"
+                              width="120px"
+                              @select='select("year",$event)'></key-value-select>
+          </div>
+          <div class="fl">
+            <key-value-select :data="selectMonthData"
+                              width="120px"
+                              @select='select("month",$event)'></key-value-select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 数据类型 -->
+      <div class="dataTypeCon clearfix">
+        <div :class="{dataTypeActive:currentDataTypeIndex === 1}"
+             @click="dataTypeActive(1)">环比</div>
+        <div :class="{dataTypeActive:currentDataTypeIndex === 0}"
+             @click="dataTypeActive(0)">同比</div>
+      </div>
+
+      <!-- 图表 -->
+      <div class="chartsCon">
+        <line-data-zoom chartTheme="dark"
+                    :data="workOrderCountInfo"
+                    :color="mileageChartColor"
+                    :areaOpacity= 0.3
+                    :dataZoom= true
+                    v-if="workOrderCountInfo"
+                    yaxisName="占比(%)"></line-data-zoom>
+      </div>
+    </div>
+
+    <!-- 三级弹窗 -->
+    <div class="mileageDetailsInfoContainer" v-if="poporder">
+        <pop-up-frame @close="poporder = false">
+           <work-order-details-info></work-order-details-info>
+        </pop-up-frame>
+    </div>
+  </div>
+</template>
+
+<script type="text/javascript">
+import { mapState, mapActions } from 'vuex'
+import PopUpFrame from '../../../components/PopUpFrame'
+import PopUpWidget from '../../../components/PopUpWidget'
+import KeyValueSelect from '../../../components/KeyValueSelect'
+import Dictionary from '../../../util/dictionary'
+import lineDataZoom from '../../../components/charts/lineDataZoom'
+
+// 三级弹窗
+import WorkOrderDetailsInfo from '../workorderdetailsinfo/WorkOrderDetailsInfo'
+
+const { date: { year, month, day }, turnoverUnit } = Dictionary
+// turnoverUnit
+
+export default {
+  name: 'workMileageCountInfo',
+  components: {
+    PopUpFrame,
+    PopUpWidget,
+    KeyValueSelect,
+    Dictionary,
+    lineDataZoom,
+    WorkOrderDetailsInfo,
+  },
+  computed: {
+    ...mapState('workordercountinfo', ['workOrderCountInfo']),
+    ...mapState('driverbase', ['ryjb']),
+    fetchData() {
+      return {
+        driver_id: this.ryjb.driver_id,
+        year: this.year,
+        month: this.month,
+        type: this.currentDataTypeIndex,
+        capacity_unit_code: this.unit,
+      }
+    },
+  },
+  data() {
+    return {
+      selectYearData: [{ label: '全部', value: null }, ...year],
+      selectMonthData: [{ label: '全年', value: null }, ...month],
+      selectDayData: [{ label: '全月', value: null }, ...day],
+      unitOption: turnoverUnit,
+      currentDataTypeIndex: 1,
+      mileageChartColor: [
+        '#05d0eb',
+        '#81d9e5',
+        '#f6ffcb',
+        '#e75029',
+        '#038bfc',
+        '#006a55',
+      ],
+      // 三级开关
+      poporder: false,
+      year: null,
+      month: null,
+      unit: 1,
+    }
+  },
+  methods: {
+    ...mapActions('workordercountinfo', ['getWorkOrderCountInfo']),
+    select(name, item) {
+      this[name] = item.value
+      this.getWorkOrderCountInfo(this.fetchData)
+    },
+    dataTypeActive(index) {
+      this.currentDataTypeIndex = index
+      this.getWorkOrderCountInfo(this.fetchData)
+    },
+  },
+}
+</script>
+
+<style lang="scss" scoped>
+// 公用样式
+@mixin size($w,$h) {
+  width: $w;
+  height: $h;
+}
+
+// 组件包裹
+.workOrderCountInfoContent {
+    position: relative;
+  // 内容包裹
+  .mileageCon {
+    position: relative;
+    // 下拉框包裹
+    .selectCon {
+      @include size(100%,25px);
+      color: #b5b5b5;
+      font-size: 14px;
+      line-height: 25px;
+      .itemCon {
+        div:nth-child(n+2) {
+          margin-left: 5px;
+        }
+      }
+      //   .itemCon:nth-child(1) {
+      //     margin-left: 132px;
+      //   }
+      .itemCon:nth-child(n + 2) {
+        margin-right: 10px;
+      }
+    }
+
+    // 切换数据
+    .dataTypeCon {
+      @include size(100%,25px);
+      margin-top: 10px;
+      // background: green;
+      div {
+        @include size(160px,25px);
+        box-sizing: border-box;
+        text-align: center;
+        line-height: 23px;
+        color: #b5b5b5;
+        float: right;
+        background: rgba(0, 191, 229, 0.2);
+        cursor: pointer;
+      }
+      .dataTypeActive {
+        color: #fff;
+        background: rgba(0, 191, 229, 0.5);
+      }
+      div:nth-child(2) {
+        margin-right: 10px;
+      }
+      div:nth-child(n + 2) {
+        margin-left: 10px;
+      }
+    }
+
+    // 图表包裹
+    .chartsCon {
+      @include size(100%,180px);
+      // overflow: hidden;
+      margin-top: 10px;
+    //   background:green;
+    }
+  }
+
+  // 三级弹窗
+  .mileageDetailsInfoContainer {
+    // @include size(750px,350px);
+    // overflow: hidden;
+    width: 750px;
+    min-height:200px;
+    // background: green;
+    position: absolute;
+    top: -80px;
+    left: -800px;
+  }
+}
+</style>

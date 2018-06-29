@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobiusVision.dao.TbSubject.TbSubjectQyCdgwNandYslTDJMapper" >
+<!--年份-->
+    <resultMap id="NBaseResultMap" type="com.mobiusVision.pojo.TbSubject.TbSubjectQyCdgwnsl" >
+        <id column="tb_subject_qy_cdgwnsl_id" property="tb_subject_qy_cdgwnsl_id" jdbcType="INTEGER" />
+        <result column="year" property="year" jdbcType="VARCHAR" />
+        <result column="entity_id" property="entity_id" jdbcType="VARCHAR" />
+        <result column="drive_event_type_code" property="drive_event_type_code" jdbcType="VARCHAR" />
+        <result column="total_danger_drive" property="total_danger_drive" jdbcType="VARCHAR" />
+    </resultMap>
+    <resultMap id="TbSubjectQyCdgwNslAndTDJ" type="TbSubjectQyCdgwNslTDJ" extends="NBaseResultMap"   >
+        <association property="jssjlx" javaType="TbDictionaryJssjlx" >
+            <id column="tb_dictionary_jssjlx_id" property="tb_dictionary_jssjlx_id" jdbcType="INTEGER" />
+            <result column="drive_event_type_code" property="drive_event_type_code" jdbcType="VARCHAR" />
+            <result column="drive_event_type" property="drive_event_type" jdbcType="VARCHAR" />
+            <result column="remark" property="remark" jdbcType="VARCHAR" />
+        </association>
+    </resultMap>
+<!--月份-->
+    <resultMap id="YBaseResultMap" type="com.mobiusVision.pojo.TbSubject.TbSubjectQyCdgwysl" >
+        <id column="tb_subject_qy_cdgwysl_id" property="tb_subject_qy_cdgwysl_id" jdbcType="INTEGER" />
+        <result column="year" property="year" jdbcType="VARCHAR" />
+        <result column="month" property="month" jdbcType="VARCHAR" />
+        <result column="entity_id" property="entity_id" jdbcType="VARCHAR" />
+        <result column="drive_event_type_code" property="drive_event_type_code" jdbcType="VARCHAR" />
+        <result column="total_danger_drive" property="total_danger_drive" jdbcType="VARCHAR" />
+    </resultMap>
+    <resultMap id="TbSubjectQyCdgwYslAndTDJ" type="TbSubjectQyCdgwYslTDJ" extends="YBaseResultMap"   >
+        <association property="jssjlx" javaType="TbDictionaryJssjlx" >
+            <id column="tb_dictionary_jssjlx_id" property="tb_dictionary_jssjlx_id" jdbcType="INTEGER" />
+            <result column="drive_event_type_code" property="drive_event_type_code" jdbcType="VARCHAR" />
+            <result column="drive_event_type" property="drive_event_type" jdbcType="VARCHAR" />
+            <result column="remark" property="remark" jdbcType="VARCHAR" />
+        </association>
+    </resultMap>
+    <!--mapper缓存参数设定-->
+    <cache  eviction="LRU" flushInterval="60000"  size="512" readOnly="true"/>
+    <!--通过entity_id和year查询TB_SUBJECT_QY_CDGWNSL表和TB_DICTIONARY_JSSJLX（驾驶时间类型）码表6-13表中所有数据-->
+    <select id="findListGwNslByEntityIdAndYear" resultMap="TbSubjectQyCdgwNslAndTDJ">
+        select t1.*,t2.* from TB_SUBJECT_QY_CDGWNSL t1,TB_DICTIONARY_JSSJLX t2 where t1.entity_id=#{entity_id} and t1.year=#{year} and t1.drive_event_type_code=t2.drive_event_type_code;
+    </select>
+
+    <!--通过entity_id和year和month查询TTB_SUBJECT_QY_CDGWYSL表和TB_DICTIONARY_JSSJLX表中所有数据-->
+    <select id="findAllListGwYslByEntityIdAndYearAndMonth" resultMap="TbSubjectQyCdgwYslAndTDJ">
+        select t1.*,t2.* from TB_SUBJECT_QY_CDGWYSL t1,TB_DICTIONARY_JSSJLX t2 where t1.entity_id=#{entity_id} and t1.year=#{year} and t1.month=#{month} and t1.drive_event_type_code=t2.drive_event_type_code;
+    </select>
+</mapper>

@@ -1,0 +1,622 @@
+import axios from 'axios'
+
+// const baseURL = process.env.NODE_ENV === 'production' ? 'http://172.16.5.51:3033' : 'http://172.30.6.147:3033'
+// const baseURL = process.env.NODE_ENV === 'production' ? 'http://www.mobius-vision.com:3033' : 'http://172.30.7.103:3033'
+const baseURL = process.env.NODE_ENV === 'production' ? 'http://39.104.89.57:3034' : 'http://172.30.7.103:3033'
+const baseURL1 = process.env.NODE_ENV === 'production' ? 'http://39.104.89.57:8081' : 'http://39.104.89.57:8081'
+
+
+//  驾驶员基本信息
+export async function getRyjb(search) {
+  return axios.get(`${baseURL}/tb_basic_ryjb`, {
+    params: {
+      search,
+    },
+  })
+}
+//  健康（体检）信息
+export async function getDriverHealthy(driver_id) {
+  return axios.get(`${baseURL1}/TbBusinessTjByDriverId`, {
+    params: {
+      driver_id,
+    },
+  })
+}
+//  驾驶员自身标签
+export async function getDriverMyselfTag(driver_id) {
+  return axios.get(`${baseURL1}/TbBusinessBqByIAS`, {
+    params: {
+      driver_id,
+    },
+  })
+}
+//  驾驶员同事印象
+export async function getDriverTheirTag(driver_id) {
+  return axios.get(`${baseURL1}/TbBusinessBqTBRByI`, {
+    params: {
+      driver_id,
+    },
+  })
+}
+// 培训周期
+export async function getSubject(driver_id) {
+  return axios.get(`${baseURL1}/TbSubjectJxjyARemainTime`, {
+    params: {
+      driver_id,
+    },
+  })
+}
+//  奖励信息
+export async function getJc({ year, driver_id }) {
+  return axios.get(`${baseURL}/tb_business_jc`, {
+    params: {
+      year,
+      driver_id,
+    },
+  })
+}
+// 安全积分
+export async function getSafetyIntegral(driver_id) {
+  return axios.get(`${baseURL1}/TbBusinessAqxwjfjjASwByDid`, {
+    params: { driver_id },
+  })
+}
+// 当年累计工作量统计(行驶里程排名)
+export async function getPm({ year, driver_id }) {
+  return axios.get(`${baseURL}/tb_subject_pm`, {
+    params: {
+      year,
+      driver_id,
+    },
+  })
+}
+// 安全评价总得分及排名(月)
+export async function getKhxmydfjpm({ year, driver_id, month }) {
+  return axios.get(`${baseURL}/tb_business_khxmydfjpm`, {
+    params: {
+      year,
+      driver_id,
+      month,
+    },
+  })
+}
+// 安全评价总得分及排名(年)
+export async function getKhxmndfjpm({ year, driver_id }) {
+  return axios.get(`${baseURL}/tb_business_khxmndfjpm`, {
+    params: {
+      year,
+      driver_id,
+    },
+  })
+}
+// 安全评价总得分及排名(高频不良驾驶行为)
+export async function getQngrmxsbj({ driver_id, year, month }) {
+  return axios.get(`${baseURL}/tb_subject_qngrmxsbj_2017`, {
+    params: {
+      year,
+      driver_id,
+      month,
+    },
+  })
+}
+// 安全评价总得分及排名(高频违规行为)
+export async function getQngrmxswg({ driver_id, year, month }) {
+  return axios.get(`${baseURL}/tb_subject_qngrmxswg`, {
+    params: {
+      year,
+      driver_id,
+      month,
+    },
+  })
+}
+// 安全评价总得分及排名(高频违法行为)
+export async function getQngrbglwf({ driver_id, month }) {
+  return axios.get(`${baseURL}/tb_subject_qngrbglwf`, {
+    params: {
+      driver_id,
+      month,
+    },
+  })
+}
+// 安全评价总得分及排名(累计事故次数)
+export async function getQngrwglsg({ driver_id, month }) {
+  return axios.get(`${baseURL}/tb_subject_qngrwglsg`, {
+    params: {
+      driver_id,
+      month,
+    },
+  })
+}
+// 驾驶员承运线路(jy)
+export async function getJy({ driver_id }) {
+  return axios.get(`${baseURL}/tb_subject_jy`, {
+    params: {
+      driver_id,
+    },
+  })
+}
+
+// 驾驶员承运线路(驾驶行为)
+export async function getTodayDriver({ driver_id, year, month, day }) {
+  return axios.get(`${baseURL}/tb_subject_rssbjtj`, {
+    params: {
+      driver_id,
+      year,
+      month,
+      day,
+    },
+  })
+}
+// 驾驶员承运线路(驾驶行为)
+export async function getTodayIrregularity({ driver_id, year, month, day }) {
+  return axios.get(`${baseURL}/tb_subject_rsswg`, {
+    params: {
+      driver_id,
+      year,
+      month,
+      day,
+    },
+  })
+}
+
+// 驾驶员承运线路(驾驶行为)
+export async function getTodayIllegal({ driver_id, year, month, day }) {
+  return axios.get(`${baseURL}/tb_subject_rsswf`, {
+    params: {
+      driver_id,
+      year,
+      month,
+      day,
+    },
+  })
+}
+
+// 驾驶员承运线路(驾驶行为)
+export async function getTodayAccident({ driver_id, year, month, day }) {
+  return axios.get(`${baseURL}/tb_subject_rsssg`, {
+    params: {
+      driver_id,
+      year,
+      month,
+      day,
+    },
+  })
+}
+
+export async function getPopUpDriverLicense({ driver_id }) {
+  return axios.get(`${baseURL}/tb_basic_jsz`, {
+    params: {
+      driver_id,
+    },
+  })
+}
+
+export async function getPopUpWorkQualification({ driver_id }) {
+  return axios.get(`${baseURL}/tb_basic_cyzgz`, {
+    params: { driver_id },
+  })
+}
+
+export async function getPopUpTrainInfo({ driver_id, training_theme_code }) {
+  return axios.get(`${baseURL}/driver_training_info`, {
+    params: { driver_id, training_theme_code },
+  })
+}
+
+// 培训统计信息
+export async function getTrainCountInfo({
+  driver_id,
+  training_type_code,
+  training_theme_code,
+  year,
+  month,
+  type,
+}) {
+  return axios.get(`${baseURL1}/TbBusinessPxByDidCY`, {
+    params: {
+      driver_id,
+      year,
+      month,
+      training_type_code,
+      training_theme_code,
+      type,
+    },
+  })
+}
+
+
+// export async function getTrainCountInfo({
+//   driver_id,
+//   training_type_code,
+//   training_theme_code,
+//   year,
+//   month,
+//   type,
+// }) {
+//   return axios.get(`${baseURL}/driver_training_statistics`, {
+//     params: {
+//       driver_id,
+//       training_type_code,
+//       training_theme_code,
+//       year,
+//       month,
+//       type,
+//     },
+//   })
+// }
+export async function getAlarmType() {
+  return axios.get(`${baseURL}/tb_basic_qy_xlxx_driver`, {
+    params: {},
+  })
+}
+
+
+export async function getTrainDetailsInfo({
+  driver_id,
+  training_type_code,
+  training_theme_code,
+  year,
+  month,
+}) {
+  return axios.get(`${baseURL}/driver_training_detail`, {
+    params: {
+      driver_id,
+      training_type_code,
+      training_theme_code,
+      year,
+      month,
+    },
+  })
+}
+
+export async function getRewardInfo({ driver_id }) {
+  return axios.get(`${baseURL}/driver_reward_info`, {
+    params: {
+      driver_id,
+    },
+  })
+}
+
+export async function getRewardCountInfo({
+  driver_id,
+  reward_type_code,
+  year,
+  month,
+  type,
+}) {
+  return axios.get(`${baseURL}/driver_reward_statistics`, {
+    params: {
+      driver_id,
+      reward_type_code,
+      year,
+      month,
+      type,
+    },
+  })
+}
+
+export async function getRewardDetailsInfo({ driver_id, year, month, day }) {
+  return axios.get(`${baseURL}/driver_reward_detail`, {
+    params: {
+      driver_id,
+      year,
+      month,
+      day,
+    },
+  })
+}
+
+export async function getPunishInfo({ driver_id }) {
+  return axios.get(`${baseURL}/driver_punishment_info`, {
+    params: {
+      driver_id,
+    },
+  })
+}
+
+export async function getPunishCountInfo({
+  driver_id,
+  punishment_type_code,
+  year,
+  month,
+  type,
+}) {
+  return axios.get(`${baseURL}/driver_punishment_statistics`, {
+    params: {
+      driver_id,
+      punishment_type_code,
+      year,
+      month,
+      type,
+    },
+  })
+}
+
+export async function getPunishDetailsInfo({ driver_id, year, month, day }) {
+  return axios.get(`${baseURL}/driver_punishiment_detail`, {
+    params: {
+      driver_id,
+      year,
+      month,
+      day,
+    },
+  })
+}
+
+export async function getWorkMileageCountInfo({
+  driver_id,
+  year,
+  month,
+  type,
+}) {
+  return axios.get(`${baseURL}/driver_mileage_statistics`, {
+    params: {
+      driver_id,
+      year,
+      month,
+      type,
+    },
+  })
+}
+
+export async function getWorkStrengthCountInfo({
+  driver_id,
+  year,
+  month,
+  type,
+}) {
+  return axios.get(`${baseURL}/driver_workload_statistics`, {
+    params: {
+      driver_id,
+      year,
+      month,
+      type,
+    },
+  })
+}
+
+export async function getWorkOrderCountInfo({
+  driver_id,
+  year,
+  month,
+  type,
+  capacity_unit_code,
+}) {
+  return axios.get(`${baseURL}/driver_waybill_quantity_statistics`, {
+    params: {
+      driver_id,
+      year,
+      month,
+      type,
+      capacity_unit_code,
+    },
+  })
+}
+// 驾驶时段信息
+export async function getWorkStrengthDetailsInfo({
+  driver_id,
+  year,
+  month,
+  day,
+}) {
+  return axios.get(`${baseURL}/driver_interval_item`, {
+    params: {
+      driver_id,
+      year,
+      month,
+      day,
+    },
+  })
+}
+// 驾驶区间信息
+export async function getWorkMileageDetailsInfo({
+  driver_id,
+  year,
+  month,
+  day,
+}) {
+  return axios.get(`${baseURL}/driver_area_between_item`, {
+    params: {
+      driver_id,
+      year,
+      month,
+      day,
+    },
+  })
+}
+
+export async function getWorkOrderDetailsInfo({ driver_id, year, month, day }) {
+  return axios.get(`${baseURL}/driver_waybill_detail_info`, {
+    params: {
+      driver_id,
+      year,
+      month,
+      day,
+    },
+  })
+}
+
+// 驾驶行为报警次数统计
+export async function getDriverBehaviorAlarmCountInfo({
+  driver_id,
+  drive_event_type_code,
+  year,
+  month,
+}) {
+  return axios.get(`${baseURL}/driver_alarm_count_danger`, {
+    params: {
+      driver_id,
+      drive_event_type_code,
+      year,
+      month,
+    },
+  })
+}
+
+// 速度标准差变化趋势
+export async function getDriverBehaviorSpeedCountInfo({
+  driver_id,
+  year,
+  month,
+  // day,
+}) {
+  return axios.get(`${baseURL}/driver_danger_speed_deviation_trend`, {
+    params: {
+      driver_id,
+      year,
+      month,
+      // day,
+    },
+  })
+}
+// 每日均速/平稳度
+export async function getDriverBehaviorSpeedStatistics({ driver_id }) {
+  return axios.get(`${baseURL}/driver_danger_speed_deviation_statistics`, {
+    params: {
+      driver_id,
+    },
+  })
+}
+// 驾驶行为详细信息
+export async function getDriverBehaviorAlarmDetailsInfo({ driver_id }) {
+  return axios.get(`${baseURL}/driver_danger_detail`, {
+    params: {
+      driver_id,
+    },
+  })
+}
+
+// 违规行为报警次数统计
+export async function getIrregalarityBehaviorCountInfo({
+  driver_id,
+  drive_event_type_code,
+  year,
+  month,
+}) {
+  return axios.get(`${baseURL}/driver_alarm_count_irregularity`, {
+    params: {
+      driver_id,
+      drive_event_type_code,
+      year,
+      month,
+    },
+  })
+}
+
+export async function getIrregalarityBehaviorDetailsInfo({ driver_id }) {
+  return axios.get(`${baseURL}/driver_detail_irregularity`, {
+    params: {
+      driver_id,
+    },
+  })
+}
+
+export async function getIllegalBehaviorAlarmCount({
+  driver_id,
+  drive_event_type_code,
+  year,
+  month,
+}) {
+  return axios.get(`${baseURL}/driver_alarm_count_illegal`, {
+    params: {
+      driver_id,
+      drive_event_type_code,
+      year,
+      month,
+    },
+  })
+}
+
+export async function getIllegalBehaviorProportionCount({
+  driver_id,
+  year,
+  month,
+  day,
+}) {
+  return axios.get(`${baseURL}/driver_ratio_illegal`, {
+    params: {
+      driver_id,
+      year,
+      month,
+      day,
+    },
+  })
+}
+// 违法行为详细信息
+export async function getIllegalBehaviorDetailsInfo({ driver_id }) {
+  return axios.get(`${baseURL}/driver_detail_illegal`, {
+    params: {
+      driver_id,
+    },
+  })
+}
+
+// 有责事故次数统计
+export async function getBlameAccidentNumCountInfo({
+  driver_id,
+  accident_level_code,
+  year,
+  month,
+}) {
+  return axios.get(`${baseURL}/driver_alarm_count_accident`, {
+    params: {
+      driver_id,
+      accident_level_code,
+      year,
+      month,
+    },
+  })
+}
+
+export async function getBlameAccidentProportionInfo({
+  driver_id,
+  year,
+  month,
+  day,
+  type,
+}) {
+  return axios.get(`${baseURL}/driver_ratio_accident`, {
+    params: {
+      driver_id,
+      year,
+      month,
+      day,
+      type,
+    },
+  })
+}
+
+export async function getBlameAccidentDetailsInfo({ driver_id }) {
+  return axios.get(`${baseURL}/driver_detail_accident`, {
+    params: {
+      driver_id,
+    },
+  })
+}
+
+export async function getDriverLineRealtimeAlarmInfo({
+  driver_id,
+  year,
+  month,
+  day,
+  type,
+}) {
+  return axios.get(`${baseURL}/driver_runtime_alarm_statistics`, {
+    params: {
+      driver_id,
+      year,
+      month,
+      day,
+      type,
+    },
+  })
+}
+// 人员地图：实时路线
+export async function getDriver_runtime_route_info({ driver_id }) {
+  return axios.get(`${baseURL}/driver_runtime_route_info`, {
+    params: {
+      driver_id,
+    },
+  })
+}
+export default {}

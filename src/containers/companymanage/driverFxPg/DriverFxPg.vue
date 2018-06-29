@@ -1,0 +1,116 @@
+<template>
+  <div class="DriverFxPg_contend">
+      <!-- 标题 -->
+      <div class="DriverFxPg_title">
+          <div class="title_icon"></div>
+          <div class="title_text">驾驶员分析评价</div>
+      </div>
+      <!-- 切换五种类型按钮 -->
+      <div class="switch_five_type">
+          <div :class="{active:switchNumber===1}" @click="switchNumber=1">客户运单量特征</div>
+          <div :class="{active:switchNumber===2}" @click="switchNumber=2">车辆品牌特征</div>
+          <div :class="{active:switchNumber===3}" @click="switchNumber=3">驾驶效率</div>
+          <div :class="{active:switchNumber===4}" @click="switchNumber=4">培训情况</div>
+          <div :class="{active:switchNumber===5}" @click="switchNumber=5">收支情况</div>
+      </div>
+      <!-- 切换内容 -->
+      <div class="switch_contend">
+          <div v-if="switchNumber===1"><WaybillFeature></WaybillFeature></div>
+          <div v-if="switchNumber===2"><CarBrandFeature></CarBrandFeature></div>
+          <div v-if="switchNumber===3"><DriveEfficiency></DriveEfficiency></div>
+          <div v-if="switchNumber===4"><TrainCondition></TrainCondition></div>
+        <div v-if="switchNumber===5"><ExpenseCondition></ExpenseCondition></div>
+      </div>
+  </div>
+</template>
+
+<script type="text/javascript">
+import WaybillFeature from './waybillFeature/WaybillFeature'
+import CarBrandFeature from './carBrandFeature/CarBrandFeature'
+import DriveEfficiency from './driveEfficiency/DriveEfficiency'
+import TrainCondition from './trainCondition/TrainCondition'
+import ExpenseCondition from './expenseCondition/ExpenseCondition'
+
+export default {
+  name: '',
+  components: {
+    WaybillFeature,
+    CarBrandFeature,
+    DriveEfficiency,
+    TrainCondition,
+    ExpenseCondition,
+  },
+  computed: {},
+  methods: {
+
+  },
+  data() {
+    return {
+      switchNumber: 1,
+    }
+  },
+}
+</script>
+
+<style lang="scss" scoped>
+.DriverFxPg_contend{
+    width: 100%;
+    height: 100%;
+    // background: pink;
+    .DriverFxPg_title{
+        width: 100%;
+        height: 30px;
+        background-color: rgba(3,139,252,0.2);
+        .title_icon{
+            width: 16px;
+            height: 30px;
+            float: left;
+            border-left: solid 4px rgba(129,217,229,0.3);
+            border-right: solid 10px rgba(129,217,229,0.5);
+        }
+        .title_text{
+            height: 30px;
+            float: left;
+            margin-left: 20px;
+            color: #89DDDF;
+            font-size: 18px;
+            line-height: 30px;
+            display: inline-block;
+        }
+    }
+    .switch_five_type{
+        width: 100%;
+        height: 30px;
+        background: rgba(5,208,235,0.60);
+        border: 1px solid #05D0EB;
+        margin-top: 11px;
+        box-sizing: border-box;
+        div{
+            height: 29px;
+            float: left;
+            line-height: 29px;
+            padding: 0 16px;
+            cursor: pointer;
+            color: #fff;
+            font-size: 16px;
+        }
+        div:nth-child(5){
+            padding: 0 18px;
+        }
+        .active{
+            background-color: rgba(0,0,0,0.50);
+            border: 1px solid #05D0EB;
+            box-sizing: border-box;
+            color: #B5B5B5;
+        }
+    }
+    .switch_contend{
+        width: 100%;
+        height: 189px;
+        div{
+            width: 100%;
+            height: 100%;
+        }
+    }
+}
+</style>

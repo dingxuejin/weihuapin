@@ -1,0 +1,497 @@
+import _ from 'lodash'
+
+const nowYear = new Date().getFullYear()
+const nowMonth = ((new Date().getMonth() + 1) / 10).toFixed(1).replace('.', '')
+// 2030-2015=15  +1
+const sum = Number(nowYear) + (-2014) + 1
+
+// 2014 - 2015 - 2016 - 2017 - 2018
+const date = {
+  year: _.times(sum, number => ({
+    label: `${2014 + number}年`,
+    value: 2014 + number,
+  })),
+  month: _.times(12, number => ({
+    label: `${1 + number}月`,
+    value: (1 + number) < 10 ? `0${1 + number}` : 1 + number,
+  })),
+  day: _.times(31, number => ({
+    label: `${1 + number}日`,
+    value: (1 + number) < 10 ? `0${1 + number}` : 1 + number,
+  })),
+}
+
+const cargoTypeCode = [
+  { value: '03110', label: '爆炸品' },
+  { value: '03111', label: '有整体爆炸危险的物质和物品' },
+  { value: '03112', label: '有迸射危险，但无整体爆炸危险的物质和物品' },
+  { value: '03113', label: '有燃烧危险和较小爆炸或较小迸射危险、或两者兼有，但无整体爆炸危险的物质和物品' },
+  { value: '03114', label: '不呈现重大危险的物质和物品' },
+  { value: '03115', label: '有整体爆炸危险的非常不敏感物质' },
+  { value: '03116', label: '无整体爆炸危险的极端不敏感物品' },
+  { value: '03120', label: '气体' },
+  { value: '03121', label: '易燃气体' },
+  { value: '03122', label: '非易燃无毒气体' },
+  { value: '03123', label: '毒性气体' },
+  { value: '03131', label: '易燃液体' },
+  { value: '03140', label: '易燃固体、易于自燃的物质、遇水放出易燃气体的物质' },
+  { value: '03141', label: '易燃固体、自反应物质和固态退敏爆炸品' },
+  { value: '03142', label: '易于自燃的物质' },
+  { value: '03143', label: '遇水放出易燃气体的物质' },
+  { value: '03150', label: '氧化性物质和有机过氧化物' },
+  { value: '03151', label: '氧化性物质' },
+  { value: '03152', label: '有机过氧化物' },
+  { value: '03160', label: '毒性物质和感染性物质' },
+  { value: '03161', label: '毒性物质' },
+  { value: '03162', label: '感染性物质' },
+  { value: '03171', label: '放射性物质' },
+  { value: '03181', label: '腐蚀性物质' },
+  { value: '03191', label: '杂项危险物质和物品，包括危害环境物质' },
+]
+// const cargoTypeCode = [{
+//   value: '03121', label: '易燃气体',
+// }, {
+//   value: '03110', label: '爆炸品',
+// }, {
+//   value: '03111', label: '有整体爆炸危险的物质和物品',
+// }, {
+//   value: '03112', label: '有迸射危险，但无整体爆炸危险的物质和物品',
+// }, {
+//   value: '03113', label: '有燃烧危险和较小爆炸或较小迸射危险、或两者兼有，但无整体爆炸危险的物质和物品',
+// }, {
+//   value: '03114', label: '不呈现重大危险的物质和物品',
+// }, {
+//   value: '03115', label: '有整体爆炸危险的非常不敏感物质',
+// }, {
+//   value: '03116', label: '无整体爆炸危险的极端不敏感物品',
+// }, {
+//   value: '03120', label: '气体',
+// }, {
+//   value: '03122', label: '非易燃无毒气体',
+// }, {
+//   value: '03123', label: '毒性气体',
+// }, {
+//   value: '03131', label: '易燃液体',
+// }, {
+//   value: '03140', label: '易燃固体、易于自燃的物质、遇水放出易燃气体的物质',
+// }, {
+//   value: '03141', label: '易燃固体、自反应物质和固态退敏爆炸品',
+// }, {
+//   value: '03142', label: '易于自燃的物质',
+// }, {
+//   value: '03143', label: '遇水放出易燃气体的物质',
+// }, {
+//   value: '03150', label: '氧化性物质和有机过氧化物',
+// }, {
+//   value: '03151', label: '氧化性物质',
+// }, {
+//   value: '03152', label: '有机过氧化物',
+// }, {
+//   value: '03160', label: '毒性物质和感染性物质',
+// }, {
+//   value: '03161', label: '毒性物质',
+// }, {
+//   value: '03162', label: '感染性物质',
+// }, {
+//   value: '03171', label: '放射性物质',
+// }, {
+//   value: '03181', label: '腐蚀性物质',
+// }, {
+//   value: '03191', label: '杂项危险物质和物品，包括危害环境物质',
+// },
+// ]
+const driveEventType = {
+  danger: [
+    // { value: 10000, label: '驾驶行为' },
+    // { label: '驾驶专注度', value: '10100' },
+    { label: '左顾右盼', value: '10110' },
+    { label: '分神提醒', value: '10120' },
+    // { label: '驾驶平稳度', value: '10200' },
+    { label: '变道频次', value: '10210' },
+    { label: '急加速', value: '10220' },
+    { label: '急减速', value: '10230' },
+    // { label: '高危驾驶行为', value: '10300' },
+    { label: '车距过近', value: '10310' },
+    { label: '车距监测', value: '10311' },
+    { label: '前碰撞', value: '10312' },
+    { label: '行人碰撞', value: '10313' },
+    { label: '转弯过速', value: '10320' },
+    { label: '车道偏离', value: '10330' },
+  ],
+  irregalarity: [
+    // { value: 20000, label: '违规行为' },
+    { value: 20100, label: '驾驶过程中抽烟' },
+    { value: 20200, label: '驾驶过程中使用电话' },
+    { value: 20300, label: '超速行驶20%以内' },
+    { value: 20400, label: '超速行驶20%到50%' },
+    { value: 20500, label: '超速行驶50%以上' },
+    { value: 20600, label: '货物混装' },
+    { value: 20700, label: '遮挡车内镜头' },
+    { value: 20800, label: '驾驶过程中离岗' },
+    { value: 20900, label: '疲劳驾驶' },
+    { value: 21000, label: '超时驾驶' },
+    { value: 21100, label: '禁行时段行驶' },
+    { value: 21200, label: '偏离规定线路行驶' },
+    { value: 21300, label: '违规载人' },
+    { value: 21400, label: '未进行出车检查' },
+  ],
+  illegal: [
+    // { value: 30000, label: '违法行为' },
+    { value: 30100, label: '醉驾' },
+    { value: 30200, label: '毒驾' },
+    { value: 30300, label: '酒驾' },
+    { value: 30400, label: '肇事逃逸' },
+    { value: 30500, label: '超速行驶20%以内' },
+    { value: 30600, label: '超速行驶20%到50%' },
+    { value: 30700, label: '超速行驶50%以上' },
+    { value: 30800, label: '高速倒车/逆行' },
+    { value: 30900, label: '疲劳驾驶' },
+    { value: 31000, label: '超载超限' },
+    { value: 31100, label: '禁行时段行驶' },
+    { value: 31200, label: '违规载人' },
+    { value: 31300, label: '闯红灯' },
+    { value: 31400, label: '紧急车道行驶' },
+    { value: 31500, label: '长期占用超车道行驶' },
+    { value: 31600, label: '未按规定线路行驶' },
+    { value: 31700, label: '非法停车' },
+    { value: 31800, label: '未采取安全防护措施并配备应急器材' },
+  ],
+}
+
+const accidentLevelCode = [
+  { value: 1, label: '特大事故' },
+  { value: 2, label: '重大事故' },
+  { value: 3, label: '一般事故' },
+  { value: 4, label: '轻微事故' },
+]
+
+const accidentResCode = [
+  // { value: 0, label: '无' },
+  { value: 1, label: '次要责任' },
+  { value: 2, label: '对等责任' },
+  { value: 3, label: '主要责任' },
+  { value: 4, label: '完全责任' },
+]
+
+const regionCode = [
+  { value: 411381, label: '邓州' },
+  { value: 411300, label: '南阳' },
+  { value: 420300, label: '十堰' },
+  { value: 130200, label: '唐山' },
+  { value: 130283, label: '迁安' },
+  { value: 130281, label: '遵化' },
+  { value: 130300, label: '秦皇岛' },
+  { value: 410100, label: '郑州' },
+  { value: 410200, label: '开封' },
+  { value: 410700, label: '新乡' },
+  { value: 410300, label: '洛阳' },
+  { value: 442000, label: '中山' },
+  { value: 320623, label: '如东' },
+  { value: 450500, label: '北海' },
+  { value: 440307, label: '大鹏' },
+  { value: 530000, label: '云南' },
+  { value: 440000, label: '广东' },
+  { value: 440400, label: '珠海' },
+  { value: 370000, label: '山东' },
+  { value: 320000, label: '江苏' },
+  { value: 430000, label: '湖南' },
+  { value: 330200, label: '宁波' },
+  { value: 410421, label: '宝丰' },
+  { value: 350300, label: '莆田' },
+  { value: 370000, label: '山东' },
+  { value: 131000, label: '廊坊' },
+  { value: 110000, label: '北京' },
+  { value: 120000, label: '天津' },
+  { value: 210200, label: '大连' },
+]
+
+// 周转量单位
+const turnoverUnit = [
+  { value: 1, label: '吨' },
+  { value: 2, label: '立方米' },
+  { value: 3, label: 'TEU' },
+  { value: 9, label: '其它' },
+]
+
+// 奖励统计信息中的类型主题
+const rewardEvent = [
+  { value: 1, label: '安全之星' },
+  { value: 2, label: '优秀员工' },
+  { value: 3, label: '节油之星' },
+  { value: 4, label: '优秀员工家属' },
+]
+
+// 统计类型
+const countType = [
+  { value: 1, label: '平均报警次数' },
+  { value: 2, label: '时段' },
+  { value: 3, label: '区域' },
+  { value: 4, label: '线路' },
+]
+// 时间段
+const timeSlot = [
+  { value: 1, label: '0-1点' },
+  { value: 2, label: '1-2点' },
+  { value: 3, label: '2-3点' },
+  { value: 4, label: '3-4点' },
+  { value: 5, label: '4-5点' },
+  { value: 6, label: '5-6点' },
+  { value: 7, label: '6-7点' },
+  { value: 8, label: '7-8点' },
+  { value: 9, label: '8-9点' },
+  { value: 10, label: '9-10点' },
+  { value: 11, label: '10-11点' },
+  { value: 12, label: '11-12点' },
+  { value: 13, label: '12-13点' },
+  { value: 14, label: '13-14点' },
+  { value: 15, label: '14-15点' },
+  { value: 16, label: '15-16点' },
+  { value: 17, label: '16-17点' },
+  { value: 18, label: '17-18点' },
+  { value: 19, label: '18-19点' },
+  { value: 20, label: '19-20点' },
+  { value: 21, label: '20-21点' },
+  { value: 22, label: '21-22点' },
+  { value: 23, label: '22-23点' },
+  { value: 24, label: '23-24点' },
+]
+const lineData = [
+  { value: 1, label: '空车线路' },
+  { value: 2, label: '重车线路' },
+]
+//
+const trainingThemeCode = [
+  { value: 10, label: '安全生产' },
+  { value: 20, label: '职业道德' },
+  { value: 30, label: '业务知识' },
+  { value: 40, label: '操作规程' },
+  { value: 90, label: '其它' },
+]
+
+const trainingTypeCode = [
+  // { value: 10, label: '线下' },
+  // { value: 20, label: '线上' },
+  { value: 11, label: '线下实操' },
+  { value: 12, label: '线下笔试' },
+  { value: 21, label: '线上实操' },
+  { value: 22, label: '线上笔试' },
+]
+
+const punishType = [
+  { value: 20, label: '警告' },
+  { value: 21, label: '通报批评' },
+  { value: 22, label: '记过' },
+  { value: 23, label: '记大过' },
+  { value: 24, label: '降级' },
+  { value: 28, label: '留用查看' },
+]
+
+// 机构名称
+const entityType = [
+  { value: '1310000010010000', label: '华南配送中心' },
+  { value: '1310000010020000', label: 'CNG配送中心' },
+  { value: '1310000010030000', label: '华中配送中心' },
+  { value: '1310000010040000', label: '西北区域' },
+  { value: '1310000010040100', label: '邓州分队' },
+  { value: '1310000010040200', label: '唐山分队' },
+  { value: '1310000010040300', label: '郑州分队' },
+  { value: '1310000010040400', label: '洛阳分队' },
+  { value: '1310000010050000', label: '中山分队' },
+  { value: '1310000010060000', label: '如东分队' },
+  { value: '1310000010070000', label: '华南区域' },
+  { value: '1310000010070100', label: '北海分队' },
+  { value: '1310000010070200', label: '大鹏分队' },
+  { value: '1310000010070300', label: '云南分队' },
+  { value: '1310000010070400', label: '珠海分队' },
+  { value: '1310000010080000', label: '华中区域' },
+  { value: '1310000010080100', label: '山东分队' },
+  { value: '1310000010080200', label: '江苏分队' },
+  { value: '1310000010090000', label: '华东区域' },
+  { value: '1310000010090100', label: '宁波分队' },
+  { value: '1310000010090200', label: '宝丰分队' },
+  { value: '1310000010090300', label: '莆田分队' },
+  { value: '1310000010090400', label: '山东分队' },
+  { value: '1310000010100000', label: '华北区域' },
+  { value: '1310000010100100', label: '廊坊等CNG业务' },
+  { value: '1310000010100200', label: '北京新奥安捷贸易有限公司' },
+  { value: '1310000010100300', label: '天津新奥安捷物流有限公司' },
+  { value: '1310000010100400', label: '大连分队' },
+  { value: '1310000010110000', label: 'CNG分拨中心' },
+  { value: '1310000010120000', label: '华北分拨中心' },
+  { value: '1310000010130000', label: '珠海分拨中心' },
+  { value: '1310000010140000', label: '郑州分拨中心' },
+  { value: '1310000010150000', label: '山东分拨中心' },
+  { value: '1310000010160000', label: '宁波分拨中心' },
+  { value: '1310000010170000', label: '北海分拨中心' },
+  { value: '1310000010180000', label: '华北运营中心' },
+  { value: '1310000010190000', label: '华南运营中心' },
+  { value: '1310000010200000', label: 'CNG运营中心' },
+
+]
+const provinces = [
+  {
+    name: '广东',
+  },
+  {
+    name: '江苏',
+  },
+  {
+    name: '山东',
+  },
+  {
+    name: '浙江',
+  },
+  {
+    name: '河南',
+  },
+  {
+    name: '四川',
+  },
+  {
+    name: '湖北',
+  },
+  {
+    name: '上海',
+  },
+  {
+    name: '湖南',
+  },
+  {
+    name: '河北',
+  },
+  {
+    name: '福建',
+  },
+  {
+    name: '北京',
+  },
+  {
+    name: '安徽',
+  },
+  {
+    name: '辽宁',
+  },
+  {
+    name: '江西',
+  },
+  {
+    name: '陕西',
+  },
+  {
+    name: '天津',
+  },
+  {
+    name: '重庆',
+  },
+  {
+    name: '广西',
+  },
+  {
+    name: '云南',
+  },
+  {
+    name: '内蒙古',
+  },
+  {
+    name: '山西',
+  },
+  {
+    name: '黑龙江',
+  },
+  {
+    name: '贵州',
+  },
+  {
+    name: '吉林',
+  },
+  {
+    name: '新疆',
+  },
+  {
+    name: '甘肃',
+  },
+  {
+    name: '海南',
+  },
+  {
+    name: '宁夏',
+  },
+  {
+    name: '青海',
+  },
+  {
+    name: '西藏',
+  },
+  {
+    name: '香港',
+  },
+  {
+    name: '澳门',
+  },
+  {
+    name: '台湾',
+  },
+]
+const provincesType = [
+  { label: '北京市', value: '110000' },
+  { label: '天津市', value: '120000' },
+  { label: '河北省', value: '130000' },
+  { label: '山西省', value: '140000' },
+  { label: '内蒙古自治区', value: '150000' },
+  { label: '辽宁省', value: '210000' },
+  { label: '吉林省', value: '220000' },
+  { label: '黑龙江省', value: '230000' },
+  { label: '上海市', value: '310000' },
+  { label: '江苏省', value: '320000' },
+  { label: '浙江省', value: '330000' },
+  { label: '安徽省', value: '340000' },
+  { label: '福建省', value: '350000' },
+  { label: '江西省', value: '360000' },
+  { label: '山东省', value: '370000' },
+  { label: '河南省', value: '410000' },
+  { label: '湖北省', value: '420000' },
+  { label: '湖南省', value: '430000' },
+  { label: '广东省', value: '440000' },
+  { label: '广西壮族自治区', value: '450000' },
+  { label: '海南省', value: '460000' },
+  { label: '重庆市', value: '500000' },
+  { label: '四川省', value: '510000' },
+  { label: '贵州省', value: '520000' },
+  { label: '云南省 ', value: '530000' },
+  { label: '西藏自治区', value: '540000' },
+  { label: '陕西省', value: '610000' },
+  { label: '甘肃省', value: '620000' },
+  { label: '青海省', value: '630000' },
+  { label: '宁夏回族自治区', value: '640000' },
+  { label: '新疆维吾尔自治区', value: '650000' },
+  { label: '台湾省', value: '710000' },
+  { label: '香港特别行政区', value: '810000' },
+  { label: '澳门特别行政区', value: '820000' },
+]
+const SeverType = [
+  { value: 1, label: '服务商' },
+  { value: 2, label: '省份' },
+]
+
+export default {
+  nowYear,
+  nowMonth,
+  provinces,
+  date,
+  cargoTypeCode,
+  driveEventType,
+  accidentLevelCode,
+  regionCode,
+  turnoverUnit,
+  rewardEvent,
+  countType,
+  timeSlot,
+  trainingThemeCode,
+  trainingTypeCode,
+  punishType,
+  entityType,
+  accidentResCode,
+  SeverType,
+  provincesType,
+  lineData,
+}
