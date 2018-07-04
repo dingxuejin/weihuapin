@@ -1,0 +1,430 @@
+<template>
+  <div class="personState_contend">
+
+    <div class="firstRow">
+      <div class="first_colum">
+        <div class="staff">配送中心管理人员异常描述</div>
+        <div class="staffName"><div></div>姓名（岗位）-异常类型</div>
+      </div>
+      <div class="second_colum">
+        <div class="driversAmountText">编制驾驶人员（人）</div>
+        <div class="driversAmount"><div></div>253</div>
+      </div>
+      <div class="third_colum">
+        <div class="driversAmountText">实际驾驶人员（人）</div>
+        <div class="driversAmount"><div></div>250</div>
+      </div>
+      <div class="fourth_colum">
+        <div class="abnormalDrivers">异常驾驶员</div>
+        <div class="abnormalDrivers_details">
+          <div class="state">
+            <div class="state_text">状态</div>
+            <div class="state_content">
+              <div><div></div>调休</div>
+              <div><div></div>事假</div>
+              <div><div></div>病假</div>
+              <div><div></div>闲置</div>
+            </div>
+          </div>
+          <div class="peopleAmount">
+            <div class="peopleAmount_text">人数</div>
+            <div class="peopleAmount_content">
+              <div><div></div>1</div>
+              <div><div></div>2</div>
+              <div><div></div>3</div>
+              <div><div></div>4</div>
+            </div>
+          </div>
+          <div class="peopleDetail">
+            <div class="peopleDetail_text">人员明细</div>
+            <div class="peopleDetail_content">
+              <div><div></div>xxxxxxxx</div>
+              <div><div></div>xxxxxxxx</div>
+              <div><div></div>xxxxxxxx</div>
+              <div><div></div>xxxxxxxx</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="secondRow">
+      <div class="abnormalRate_text">异常人员占比</div>
+      <div class="abnormalRate"><div></div>4.00%</div>
+    </div>
+    <div class="thirdRow">
+      <div class="helpNeed_text">所需支持</div>
+      <div class="helpNeedContent"><div></div>4.00%</div>
+    </div>
+    <div class="fourthRow">
+      备注：
+    </div>
+  </div>
+</template>
+
+<script type="text/javascript">
+
+
+export default {
+  name: '',
+  components: {
+  },
+  computed: {},
+  methods: {
+
+  },
+  data() {
+    return {
+
+    }
+  },
+}
+</script>
+
+<style lang="scss" scoped>
+.personState_contend{
+    width: 100%;
+    height: 100%;
+    div:nth-child(n+2){
+      margin-top: 3px;
+    }
+    .firstRow{
+      width: 100%;
+      height: 150px;
+      div{
+        background: rgba(9,122,206,0.2);
+        float: left;
+        margin: 0;
+        padding: 2px;
+        box-sizing: border-box;
+      }
+      div:nth-child(n+2){
+        margin-left: 2px;
+      }
+      .first_colum{
+        width: 121px;
+        height: 100%;
+        .staff{
+          width: 100%;
+          height: 68px;
+          text-align: center;
+          padding: 15px 0;
+          box-sizing: border-box;
+          font-size: 16px;
+          color: #89DDDF;
+        }
+        .staffName{
+          width: 100%;
+          height: 79px;
+          font-size: 12px;
+          color: #fff;
+          margin: 0;
+          padding: 20px 0;
+          box-sizing: border-box;
+          border: solid 1px rgba(5,208,235,1);
+          div{
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            transform: rotate(45deg);
+            background: #05D0EB;
+            margin:2px 2px 0 2px;
+          }
+        }
+      }
+      .second_colum{
+        width: 100px;
+        height: 100%;
+        .driversAmountText{
+          width: 100%;
+          height: 68px;
+          text-align: center;
+          padding: 15px 0;
+          box-sizing: border-box;
+          font-size: 16px;
+          color: #89DDDF;
+        }
+        .driversAmount{
+          width: 100%;
+          height: 79px;
+          font-size: 12px;
+          color: #fff;
+          margin: 0;
+          padding: 20px 0;
+          box-sizing: border-box;
+          border: solid 1px rgba(5,208,235,1);
+          div{
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            transform: rotate(45deg);
+            background: #05D0EB;
+            margin:2px 2px 0 2px;
+          }
+        }
+      }
+      .third_colum{
+        width: 100px;
+        height: 100%;
+        .driversAmountText{
+          width: 100%;
+          height: 68px;
+          text-align: center;
+          padding: 15px 0;
+          box-sizing: border-box;
+          font-size: 16px;
+          color: #89DDDF;
+        }
+        .driversAmount{
+          width: 100%;
+          height: 79px;
+          font-size: 12px;
+          color: #fff;
+          margin: 0;
+          padding: 20px 0;
+          box-sizing: border-box;
+          border: solid 1px rgba(5,208,235,1);
+          div{
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            transform: rotate(45deg);
+            background: #05D0EB;
+            margin:2px 2px 0 2px;
+          }
+        }
+      }
+      .fourth_colum{
+        width: 214px;
+        height: 100%;
+        .abnormalDrivers{
+          width: 100%;
+          height: 30px;
+          font-size: 16px;
+          color: #89DDDF;
+          text-align: center;
+          line-height: 30px;
+        }
+        .abnormalDrivers_details{
+          width: 100%;
+          height: 118px;
+          padding: 0;
+          margin: 0;
+          margin-top: 1px;
+          div{
+            float: left;
+            padding: 2px;
+            box-sizing: border-box;
+          }
+          .state{
+            width: 53px;
+            height: 100%;
+            .state_text{
+              width: 100%;
+              height: 34px;
+              text-align: center;
+              line-height: 34px;
+              font-size: 16px;
+              color: #89DDDF;
+            }
+            .state_content{
+              width: 100%;
+              height: 79px;
+              padding: 0;
+              margin: 0;
+              div:nth-child(n+2){
+                margin-top: 1px;
+              }
+              div{
+                width: 100%;
+                height: 19px;
+                padding: 0;
+                margin: 0;
+                color: #fff;
+                text-align: left;
+                line-height: 19px;
+                font-size: 12px;
+                border: solid 1px  #05D0EB;
+                box-sizing: border-box;
+                div{
+                  display: inline-block;
+                  width: 8px;
+                  height: 8px;
+                  transform: rotate(45deg);
+                  background: #05D0EB;
+                  margin:6px 4px 0 4px;
+                }
+              }
+            }
+          }
+          .peopleAmount{
+            width: 53px;
+            height: 100%;
+            margin-left: 1px;
+            .peopleAmount_text{
+              width: 100%;
+              height: 34px;
+              text-align: center;
+              line-height: 34px;
+              font-size: 16px;
+              color: #89DDDF;
+            }
+            .peopleAmount_content{
+              width: 100%;
+              height: 79px;
+              padding: 0;
+              margin: 0;
+              div:nth-child(n+2){
+                margin-top: 1px;
+              }
+              div{
+                width: 100%;
+                height: 19px;
+                padding: 0;
+                margin: 0;
+                color: #fff;
+                text-align: left;
+                line-height: 19px;
+                font-size: 12px;
+                border: solid 1px  #05D0EB;
+                box-sizing: border-box;
+                div{
+                  display: inline-block;
+                  width: 8px;
+                  height: 8px;
+                  transform: rotate(45deg);
+                  background: #05D0EB;
+                  margin:6px 4px 0 4px;
+                }
+              }
+            }
+          }
+          .peopleDetail{
+            width: 102px;
+            height: 100%;
+            margin-left: 1px;
+            .peopleDetail_text{
+              width: 100%;
+              height: 34px;
+              text-align: center;
+              line-height: 34px;
+              font-size: 16px;
+              color: #89DDDF;
+            }
+            .peopleDetail_content{
+              width: 100%;
+              height: 79px;
+              padding: 0;
+              margin: 0;
+              div:nth-child(n+2){
+                margin-top: 1px;
+              }
+              div{
+                width: 100%;
+                height: 19px;
+                padding: 0;
+                margin: 0;
+                color: #fff;
+                text-align: left;
+                line-height: 19px;
+                font-size: 12px;
+                border: solid 1px  #05D0EB;
+                box-sizing: border-box;
+                div{
+                  display: inline-block;
+                  width: 8px;
+                  height: 8px;
+                  transform: rotate(45deg);
+                  background: #05D0EB;
+                  margin:6px 4px 0 4px;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    .secondRow{
+      width: 100%;
+      height: 59px;
+      background: rgba(9,122,206,0.2);
+      div{
+        float: left;
+      }
+      .abnormalRate_text{
+        width: 110px;
+        height: 100%;
+        text-align: center;
+        line-height: 59px;
+        color: #89DDDF;
+        font-size: 16px;
+      }
+      .abnormalRate{
+        width: 420px;
+        height: 49px;
+        border: solid 1px rgba(5,208,235,1);
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        margin-top: 5px;
+        padding: 18px 0 0 10px;
+        font-size: 12px;
+        color: #fff;
+          div{
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            transform: rotate(45deg);
+            background: #05D0EB;
+            margin-top: 2px;
+            margin-right: 4px;
+          }
+      }
+    }
+    .thirdRow{
+      width: 100%;
+      height: 59px;
+      background: rgba(9,122,206,0.2);
+      div{
+        float: left;
+      }
+      .helpNeed_text{
+        width: 110px;
+        height: 100%;
+        text-align: center;
+        line-height: 59px;
+        color: #89DDDF;
+        font-size: 16px;
+      }
+      .helpNeedContent{
+        width: 420px;
+        height: 49px;
+        border: solid 1px rgba(5,208,235,1);
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        margin-top: 5px;
+        padding: 18px 0 0 10px;
+        font-size: 12px;
+        color: #fff;
+          div{
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            transform: rotate(45deg);
+            background: #05D0EB;
+            margin-top: 2px;
+            margin-right: 4px;
+          }
+      }
+    }
+    .fourthRow{
+      width: 100%;
+      height: 187px;
+      background: rgba(9,122,206,0.2);
+      font-size: 12px;
+      color: #89DDDF;
+      padding: 16px;
+      box-sizing: border-box;
+    }
+}
+</style>

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobiusVision.dao.TbBusiness.TbBusineseeQngrxsscMapper" >
+
+    <!--mapper缓存参数设定-->
+    <cache  eviction="LRU" flushInterval="60000"  size="512" readOnly="true"/>
+
+    <!--#所有年的行驶时长相关数据查询-->
+    <!--select year,-->
+    <!--sum(qngrxssc.drive_time) as drive_time,-->
+    <!--sum(qngrxssc.day_drive_time) as day_drive_time,-->
+    <!--sum(qngrxssc.night_drive_time) as night_drive_time,-->
+    <!--sum(qngrxssc.day_drive_time/qngrxssc.night_drive_time) as day_night_drive_time_rate-->
+    <!--from TB_BUSINESEE_QNGRXSSC qngrxssc where driver_id=201408000001 group by year order by abs(year);-->
+
+    <!--#所有月的行驶时长相关数据查询-->
+    <!--select month,-->
+    <!--sum(qngrxssc.drive_time) as drive_time,-->
+    <!--sum(qngrxssc.day_drive_time) as day_drive_time,-->
+    <!--sum(qngrxssc.night_drive_time) as night_drive_time,-->
+    <!--sum(qngrxssc.day_drive_time/qngrxssc.night_drive_time) as day_night_drive_time_rate-->
+    <!--from TB_BUSINESEE_QNGRXSSC qngrxssc where driver_id=201408000001 and year=2017 group by month order by abs(month);-->
+
+    <!--#所有天的行驶时长相关数据查询-->
+    <!--select day,-->
+    <!--sum(qngrxssc.drive_time) as drive_time,-->
+    <!--sum(qngrxssc.day_drive_time) as day_drive_time,-->
+    <!--sum(qngrxssc.night_drive_time) as night_drive_time,-->
+    <!--sum(qngrxssc.day_drive_time/qngrxssc.night_drive_time) as day_night_drive_time_rate-->
+    <!--from TB_BUSINESEE_QNGRXSSC qngrxssc where driver_id=201408000001 and year=2014 and month=01 group by day order by abs(day);-->
+
+    <!--通过driver_id查询TB_BUSINESEE_QNGRXSSC查询全年各日行驶时长表（档案Excel）中年月日所有行驶里程相关的统计信息-->
+    <select id="findAllYearMonthDayTjXxByDId" resultType="TbBusineseeQngrxsscTjXx">
+        select
+        <if test="year==null and month==null">
+            year,
+        </if>
+        <if test="year!=null and month==null">
+            month,
+        </if>
+        <if test="year!=null and month!=null">
+            day,
+        </if>
+        sum(drive_time) as drive_time,
+        sum(day_drive_time) as day_drive_time,
+        sum(night_drive_time) as night_drive_time,
+        sum(day_drive_time/night_drive_time) as day_night_drive_time_rate,
+        (select avg(drive_time) from
+        (select
+        driver_id,
+        sum(drive_time) as drive_time,
+        sum(day_drive_time) as day_drive_time,
+        sum(night_drive_time) as night_drive_time,
+        sum(day_drive_time/night_drive_time) as day_night_drive_time_rate
+        from TB_BUSINESEE_QNGRXSSC where driver_id=#{driver_id}
+        <if test="year==null and month==null">
+            group by year order by abs(year)
+        </if>
+        <if test="year!=null and month==null">
+            and year=#{year} group by month order by abs(month)
+        </if>
+        <if test="year!=null and month!=null">
+            and year=#{year} and month=#{month} group by day order by abs(day)
+        </if>) total group by driver_id) as avg_drive_time,
+        (select avg(day_drive_time) from
+        (select
+        driver_id,
+        sum(drive_time) as drive_time,
+        sum(day_drive_time) as day_drive_time,
+        sum(night_drive_time) as night_drive_time,
+        sum(day_drive_time/night_drive_time) as day_night_drive_time_rate
+        from TB_BUSINESEE_QNGRXSSC where driver_id=#{driver_id}
+        <if test="year==null and month==null">
+            group by year order by abs(year)
+        </if>
+        <if test="year!=null and month==null">
+            and year=#{year} group by month order by abs(month)
+        </if>
+        <if test="year!=null and month!=null">
+            and year=#{year} and month=#{month} group by day order by abs(day)
+        </if>) total group by driver_id) as avg_day_drive_time,
+        (select avg(night_drive_time) from
+        (select
+        driver_id,
+        sum(drive_time) as drive_time,
+        sum(day_drive_time) as day_drive_time,
+        sum(night_drive_time) as night_drive_time,
+        sum(day_drive_time/night_drive_time) as day_night_drive_time_rate
+        from TB_BUSINESEE_QNGRXSSC where driver_id=#{driver_id}
+        <if test="year==null and month==null">
+            group by year order by abs(year)
+        </if>
+        <if test="year!=null and month==null">
+            and year=#{year} group by month order by abs(month)
+        </if>
+        <if test="year!=null and month!=null">
+            and year=#{year} and month=#{month} group by day order by abs(day)
+        </if>) total group by driver_id) as avg_night_drive_time,
+        (select avg(day_night_drive_time_rate) from
+        (select
+        driver_id,
+        sum(drive_time) as drive_time,
+        sum(day_drive_time) as day_drive_time,
+        sum(night_drive_time) as night_drive_time,
+        sum(day_drive_time/night_drive_time) as day_night_drive_time_rate
+        from TB_BUSINESEE_QNGRXSSC where driver_id=#{driver_id}
+        <if test="year==null and month==null">
+            group by year order by abs(year)
+        </if>
+        <if test="year!=null and month==null">
+            and year=#{year} group by month order by abs(month)
+        </if>
+        <if test="year!=null and month!=null">
+            and year=#{year} and month=#{month} group by day order by abs(day)
+        </if>) total group by driver_id) as avg_day_night_drive_time_rate
+        from TB_BUSINESEE_QNGRXSSC where driver_id=#{driver_id}
+        <if test="year==null and month==null">
+            group by year order by abs(year)
+        </if>
+        <if test="year!=null and month==null">
+            and year=#{year} group by month order by abs(month)
+        </if>
+        <if test="year!=null and month!=null">
+            and year=#{year} and month=#{month} group by day order by abs(day)
+        </if>
+    </select>
+
+
+</mapper>

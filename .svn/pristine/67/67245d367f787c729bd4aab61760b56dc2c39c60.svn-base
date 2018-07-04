@@ -1,0 +1,55 @@
+<template>
+<div class="user-custom" :style="{top,left}">
+    <!-- 自定义 -->
+<div  
+       v-if="computeShow"
+       @mousedown="move=true"
+       @mouseup="move=false"
+       :style="{cursor: move?':move':''}">
+    <div >
+      <pop-up-frame @close='closePopFrame()'>
+        <pop-up-widget title="自定义"></pop-up-widget>
+        <div>
+          <slot></slot>
+        </div>
+      </pop-up-frame>
+
+    </div>
+
+  </div>
+
+</div>
+  
+  
+</template>
+<script>
+import popUpFrame from '../../../components/PopUpFrame'
+import popUpWidget from '../../../components/PopUpWidget'
+
+export default {
+  props: ['top', 'left', 'isShow'],
+  data() {
+    return {
+      move: false,
+    }
+  },
+  methods: {
+    closePopFrame() {
+      this.$emit('close')
+    },
+  },
+  computed: {
+    computeShow() {
+      return this.isShow
+    },
+  },
+  components: { popUpFrame, popUpWidget },
+}
+</script>
+<style scoped>
+.user-custom {
+  width: 500px;
+  position: absolute;
+}
+</style>
+

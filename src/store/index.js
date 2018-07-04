@@ -53,14 +53,14 @@ import rewardinfo from "../containers/driverPopup/rewardinfo/store";
 import traincountinfo from "../containers/driverPopup/traincountinfo/store";
 import traindetailsinfo from "../containers/driverPopup/traindetailsinfo/store";
 import workinfo from "../containers/driverPopup/workinfo/store";
-import workmileagecountinfo from "../containers/driverPopup/workmileagecountinfo/store";
+import workmileagecountinfoStore from "../containers/driverPopup/workmileagecountinfo/store";
 import workmileagedetailsinfo from "../containers/driverPopup/workmileagedetailsinfo/store";
 import workordercountinfo from "../containers/driverPopup/workordercountinfo/store";
 import workorderdetailsinfo from "../containers/driverPopup/workorderdetailsinfo/store";
 import workstrengthcountinfo from "../containers/driverPopup/workstrengthcountinfo/store";
 import workstrengthdetailsinfo from "../containers/driverPopup/workstrengthdetailsinfo/store";
-import  popupwaybillnumstatisticsStore from  "../containers/driverPopup/popupwaybillnumstatistics/store"
-
+import popupwaybillnumstatisticsStore from  "../containers/driverPopup/popupwaybillnumstatistics/store"
+import popupdriverMileageStore from "../containers/driverPopup/popupdriverMileage/store"
 // car store
 import caralertinfo from "../containers/car/carAlertInfoContainer/store";
 import tyreConfigurationContainer from "../containers/car/tyreConfigurationContainer/store";
@@ -114,6 +114,7 @@ import manageRunReal from "../containers/companymanage/runReal/store";
 import manageRunTime from "../containers/companymanage/runTime/store";
 import maintitlemsg from "../containers/companymanage/maintitlemsg/store";
 import popupContainer from "../containers/companymanage/popupContainer/store";
+import DailyManageLedger from "../containers/companymanage/dailyManageLedger/store";
 
 // companysecure
 import secureMain from "../containers/companysecure/mainTitleMsg/store";
@@ -149,6 +150,7 @@ import volumeStatisticsDayNight from "../containers/companymanagepopup/volumeSta
 import volumeStatisticsEntity from "../containers/companymanagepopup/volumeStatisticsEntity/store";
 import volumeInterstateEntity from "../containers/companymanagepopup/volumeInterstateEntity/store";
 import popUpFrameRank from "../containers/companymanagepopup/popUpFrameRank/store";
+import waybillAndTurnoverStatistics from "../containers/companymanagepopup/waybillAndTurnoverStatistics/store";
 // 首页index
 import index from "../containers/index/store";
 
@@ -205,13 +207,14 @@ export default new Vuex.Store({
     traincountinfo,
     traindetailsinfo,
     workinfo,
-    workmileagecountinfo,
+    workmileagecountinfoStore,
     workmileagedetailsinfo,
     workordercountinfo,
     workorderdetailsinfo,
     workstrengthcountinfo,
     workstrengthdetailsinfo,
     popupwaybillnumstatisticsStore,
+    popupdriverMileageStore,
 
     // car Store
     caralertinfo,
@@ -264,6 +267,7 @@ export default new Vuex.Store({
     manageRunTime,
     maintitlemsg,
     popupContainer,
+    DailyManageLedger,
 
     // companymanagepopup
     yearCostTrend,
@@ -276,6 +280,7 @@ export default new Vuex.Store({
     volumeStatisticsDayNight,
     volumeStatisticsEntity,
     volumeInterstateEntity,
+    waybillAndTurnoverStatistics,
     popUpFrameRank,
     // companysecure
     secureMain,

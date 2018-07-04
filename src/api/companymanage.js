@@ -93,6 +93,12 @@ export async function requireDcFrameMonthRanking({ entity_id, year }) {
     params: { entity_id, year },
   })
 }
+// 运单数和周转量统计
+export async function requireTbSubjectQyMYRydAndHwzzl({ entity_id, year, monthlist }) {
+  return axios.get(`${baseURL_java}/TbSubjectQyMYRydAndHwzzlYearMonthDayByEId`, {
+    params: { entity_id, year, monthlist },
+  })
+}
 // 运输时段运行车辆次数分布
 export async function getIntervalVehicleQuantity({ entity_id, year, month }) {
   return axios.get(`${baseURL}/company_manage_vehicle_quantiy_by_interval`, {
@@ -344,6 +350,18 @@ export async function getManageGoodsBh({
 }) {
   return axios.get(`${baseURL}/company_manage_cargo_flow_direction_options`, {
     params: { entity_id, cargo_id, year, route },
+  })
+}
+
+// 日常管理台账
+export async function getDailyManageLedger({
+  entity_id,
+  year,
+  month,
+  day,
+}) {
+  return axios.get(`${baseURL}/company_manage_day_accounts`, {
+    params: { entity_id, year, month, day },
   })
 }
 

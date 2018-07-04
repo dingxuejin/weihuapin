@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobiusVision.dao.TbSubject.TbSubjectQyHwzzlMapper" >
+
+    <!--mapper缓存参数设定-->
+    <cache  eviction="LRU" flushInterval="60000"  size="512" readOnly="true"/>
+
+    <!--#周转量所有年数据-->
+    <!--select year,sum(turnover) as turnover-->
+    <!--from TB_SUBJECT_QY_HWZZL-->
+    <!--group by year order by abs(year);-->
+
+    <!--#周转量所有月数据-->
+    <!--select month,sum(turnover) as turnover-->
+    <!--from TB_SUBJECT_QY_HWZZL where year=2017-->
+    <!--group by month order by abs(month);-->
+
+    <!--TB_SUBJECT_QY_HWZZL运营企业数据表记录中，通过entity_id查询所有年和某年所有月或部分月的信息-->
+    <select id="findHwzzlAllYearMonthByEId" resultType="TbSubjectQyHwzzl">
+        select
+        <if test="year==null">
+            year,
+        </if>
+        <if test="year!=null">
+            month,
+        </if>
+        sum(turnover) as turnover
+        from TB_SUBJECT_QY_HWZZL
+        where entity_id=#{entity_id}
+        <if test="year==null and monthlist==null">
+            group by year order by abs(year)
+        </if>
+        <if test="year!=null and monthlist==null">
+            and year=#{year} group by month order by abs(month)
+        </if>
+        <if test="year!=null and monthlist!=null">
+            and year=#{year} and month in
+            <foreach collection="monthlist" open="(" separator="," close=")" item="monthOne">
+                #{monthOne}
+            </foreach>
+            group by month order by abs(month)
+        </if>
+    </select>
+
+</mapper>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobiusVision.dao.TbSubject.TbSubjectQyMYRydMapper" >
+
+    <!--mapper缓存参数设定-->
+    <cache  eviction="LRU" flushInterval="60000"  size="512" readOnly="true"/>
+
+    <!--#运单量所有年数据-->
+    <!--select year,sum(waybill_quantity) as waybill_quantity-->
+    <!--from TB_SUBJECT_QY_MYYD-->
+    <!--group by year order by abs(year);-->
+
+    <!--#运单量所有月数据-->
+    <!--select month,sum(waybill_quantity) as waybill_quantity-->
+    <!--from TB_SUBJECT_QY_MYYD where year=2017-->
+    <!--group by month order by abs(month);-->
+
+    <!--#运单量所有日数据-->
+    <!--select day,sum(waybill_quantity) as waybill_quantity-->
+    <!--from TB_SUBJECT_QY_MRYD-->
+    <!--group by day order by abs(day);-->
+
+    <!--TB_SUBJECT_QY_MYYD运营企业数据表记录中，通过entity_id查询所有年和某年所有月的信息-->
+    <select id="findMYYDAllYearMonthByEId" resultType="TbSubjectQyMyyd">
+        select
+        <if test="year==null">
+            year,
+        </if>
+        <if test="year!=null">
+            month,
+        </if>
+        sum(waybill_quantity) as waybill_quantity
+        from TB_SUBJECT_QY_MYYD
+        where entity_id=#{entity_id}
+        <if test="year==null and monthlist==null">
+            group by year order by abs(year)
+        </if>
+        <if test="year!=null and monthlist==null">
+            and year=#{year} group by month order by abs(month)
+        </if>
+        <if test="year!=null and monthlist!=null">
+            and year=#{year} and month in
+            <foreach collection="monthlist" open="(" separator="," close=")" item="monthOne">
+                #{monthOne}
+            </foreach>
+            group by month order by abs(month)
+        </if>
+    </select>
+
+    <!--TB_SUBJECT_QY_MYYD运营企业数据表记录中，通过entity_id查询某年某月所有天的信息-->
+    <select id="findMYYDAllDayByEId" resultType="TbSubjectQyMryd">
+       select
+        day,
+        sum(waybill_quantity) as waybill_quantity
+        from TB_SUBJECT_QY_MRYD
+        where entity_id=#{entity_id} and year=#{year} and month=#{month}
+        group by day order by abs(day);
+    </select>
+</mapper>

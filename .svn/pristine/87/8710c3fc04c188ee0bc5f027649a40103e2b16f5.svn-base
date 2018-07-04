@@ -1,0 +1,720 @@
+<template>
+  <!-- 车辆经营管理详情弹出框 -->
+  <div class="company_manage_details_wrap clearfix"
+       v-if="detailsShow">
+
+    <!-- 成本比例变化趋势 -->
+    <div class="cost_ratio_trend_wrap"
+         v-if="cost_ratio_trend_show"
+         v-drag
+         @mousedown="move=true"
+         @mouseup="move=false"
+         :style="move?'cursor:move':''">
+      <pop-up-frame @close='closeDetails'>
+        <pop-up-widget title="年度成本变化趋势统计"></pop-up-widget>
+        <year-cost-trend></year-cost-trend>
+      </pop-up-frame>
+    </div>
+
+    <!-- 总运单数量 -->
+    <div class="company_manage_waybill_wrap"
+         v-if="company_manage_waybill_show"
+         v-drag
+         @mousedown="move=true"
+         @mouseup="move=false"
+         :style="move?'cursor:move':''">
+      <pop-up-frame @close='closeDetails'>
+        <pop-up-widget title="运单数统计"></pop-up-widget>
+        <waybill-statistics></waybill-statistics>
+
+        <pop-up-widget title="最近运单数变化趋势"></pop-up-widget>
+        <waybill-trend-recently></waybill-trend-recently>
+
+        <pop-up-widget title="每年本月运单数同比"></pop-up-widget>
+        <waybillYearOnYearThisMonth></waybillYearOnYearThisMonth>
+      </pop-up-frame>
+    </div>
+
+    <!-- 总货运量 -->
+    <div class="company_manage_volume_by_cargo_type_wrap"
+         v-if="volume_by_cargo_show"
+         v-drag
+         @mousedown="move=true"
+         @mouseup="move=false"
+         :style="move?'cursor:move':''">
+      <pop-up-frame @close='closeDetails'>
+        <pop-up-widget title="不同类型货物货运量统计"></pop-up-widget>
+        <cargo-volume></cargo-volume>
+      </pop-up-frame>
+    </div>
+
+    <!-- 总周转量 -->
+    <div class="company_manage_turnover_by_cargo_type_wrap"
+         v-if="turnover_by_cargo_show"
+         v-drag
+         @mousedown="move=true"
+         @mouseup="move=false"
+         :style="move?'cursor:move':''">
+      <pop-up-frame @close='closeDetails'>
+        <pop-up-widget title="不同类型货物周转量统计"></pop-up-widget>
+        <cargo-turnover></cargo-turnover>
+      </pop-up-frame>
+    </div>
+
+    <!-- 货物流量流向昼夜统计 -->
+    <div class="company_manage_volume_statistics_day_night_wrap"
+         v-if="volume_statistics_day_night_show"
+         v-drag
+         @mousedown="move=true"
+         @mouseup="move=false"
+         :style="move?'cursor:move':''">
+      <pop-up-frame @close='closeDetails'>
+        <pop-up-widget title="货物流量昼夜统计"></pop-up-widget>
+        <volumeStatisticsDayNight></volumeStatisticsDayNight>
+
+      </pop-up-frame>
+    </div>
+    <!-- 货物流量流向统计 -->
+    <div class="company_manage_volume_statistics_day_night_wrap"
+         v-if="goodstjFrame_show"
+         v-drag
+         @mousedown="move=true"
+         @mouseup="move=false"
+         :style="move?'cursor:move':''">
+      <pop-up-frame @close='closeDetails'>
+        <pop-up-widget title="货物流量流向变化趋势统计"></pop-up-widget>
+        <cargo-traffic-change></cargo-traffic-change>
+        <!-- <pop-up-widget title="货物流量区域分析"></pop-up-widget>
+        <volumeStatisticsDayNight></volumeStatisticsDayNight>
+        <pop-up-widget title="年度货运量各机构统计"></pop-up-widget>
+        <volumeStatisticsDayNight></volumeStatisticsDayNight> -->
+
+      </pop-up-frame>
+    </div>
+
+    <!-- 线路详细信息 -->
+    <div class="company_manage_route_info_wrap"
+         v-if="route_info_show"
+         v-drag
+         @mousedown="move=true"
+         @mouseup="move=false"
+         :style="move?'cursor:move':''">
+      <pop-up-frame @close='closeDetails'>
+        <pop-up-widget title="线路详细信息"></pop-up-widget>
+        <route-info></route-info>
+      </pop-up-frame>
+    </div>
+    <!-- 收入排名信息 -->
+    <div class="company_manage_rank_wrap"
+         v-if="incom_ranked_show"
+         v-drag
+         @mousedown="move=true"
+         @mouseup="move=false"
+         :style="move?'cursor:move':''">
+      <pop-up-frame @close='closeDetails'>
+        <pop-up-frame-rank></pop-up-frame-rank>
+      </pop-up-frame>
+    </div>
+
+    <!-- 货物流量流向分析 -->
+    <div class="company_manage_cargo_flow_area_wrap"
+         v-if="cargo_flow_area_show"
+         v-drag
+         @mousedown="move=true"
+         @mouseup="move=false"
+         :style="move?'cursor:move':''">
+      <pop-up-frame @close='closeDetails'>
+        <pop-up-widget title="不同类型货物周转量统计"></pop-up-widget>
+        <!-- 日期选择 -->
+        <volumeStatisticsEntity></volumeStatisticsEntity>
+        <pop-up-widget title="本机构跨省跨市货运量统计"></pop-up-widget>
+
+        <!-- bars图 -->
+        <volumeInterstateEntity></volumeInterstateEntity>
+      </pop-up-frame>
+    </div>
+     <!-- 日常管理台账==运单状况日报 -->
+    <div class="dailyManageLedger_waybillConditionDaily"
+         v-if="waybillConditionDaily_show"
+         v-drag
+         @mousedown="move=true"
+         @mouseup="move=false"
+         :style="move?'cursor:move':''">
+      <pop-up-frame @close='closeDetails'>
+        <waybillConditionDailyPopup></waybillConditionDailyPopup>
+      </pop-up-frame>
+    </div>
+    <!-- 默认获取数据 -->
+    <!-- <div v-show="false">{{getDefaultWaybill_statistics}}</div> -->
+  </div>
+</template>
+<script>
+import PopUpFrame from '@/components/PopUpFrame'
+import PopUpWidget from '@/components/PopUpWidget'
+import lineDataZoom from '@/components/charts/lineDataZoom'
+import barMore from '@/components/charts/barMore'
+import KeyValueSelect from '@/components/KeyValueSelect'
+import bar from '@/components/charts/bar'
+import lineChart from '@/components/charts/lineChart'
+import lineDoubleAxis from '@/components/charts/lineDoubleAxis'
+import xxx from '../../../util/dictionary'
+
+// companymanagepopup container
+import yearCostTrend from '../../companymanagepopup/yearCostTrend/yearCostTrend'
+import cargoVolume from '../../companymanagepopup/cargoVolume/cargoVolume'
+import waybillStatistics from '../../companymanagepopup/waybillStatistics/waybillStatistics'
+import waybillTrendRecently from '../../companymanagepopup/waybillTrendRecently/waybillTrendRecently'
+import waybillYearOnYearThisMonth from '../../companymanagepopup/waybillYearOnYearThisMonth/waybillYearOnYearThisMonth'
+import cargoTurnover from '../../companymanagepopup/cargoTurnover/cargoTurnover'
+import routeInfo from '../../companymanagepopup/routeInfo/routeInfo'
+import volumeStatisticsDayNight from '../../companymanagepopup/volumeStatisticsDayNight/volumeStatisticsDayNight'
+import volumeStatisticsEntity from '../../companymanagepopup/volumeStatisticsEntity/volumeStatisticsEntity'
+import volumeInterstateEntity from '../../companymanagepopup/volumeInterstateEntity/volumeInterstateEntity'
+import popUpFrameRank from '../../companymanagepopup/popUpFrameRank/popUpFrameRank'
+import cargoTrafficChange from '../../companymanagepopup/cargoTrafficChange/cargoTrafficChange'
+import waybillConditionDailyPopup from '../../companymanagepopup/waybillConditionDailyPopup/waybillConditionDailyPopup'
+
+import {
+  mapState,
+  mapMutations,
+  // mapActions,
+} from '../../../../node_modules/_vuex@3.0.1@vuex'
+
+export default {
+  name: '',
+  components: {
+    PopUpFrame,
+    PopUpWidget,
+    lineDataZoom,
+    cargoTrafficChange,
+    KeyValueSelect,
+    xxx,
+    bar,
+    lineChart,
+    barMore,
+    lineDoubleAxis,
+
+    yearCostTrend,
+    cargoVolume,
+    waybillStatistics,
+    waybillTrendRecently,
+    waybillYearOnYearThisMonth,
+    cargoTurnover,
+    routeInfo,
+    volumeStatisticsDayNight,
+    volumeStatisticsEntity,
+    volumeInterstateEntity,
+    popUpFrameRank,
+    waybillConditionDailyPopup,
+  },
+  data() {
+    return {
+      move: false,
+      years: [...xxx.date.year],
+      months: [...xxx.date.month],
+      cargoTypeCode: [...xxx.cargoTypeCode],
+      //   年度成本变化趋势统计
+      cost_ratio_trend_details_show: {
+        fixed: true,
+        turnover: false,
+        variation: false,
+      },
+      yearValue: null,
+      monthValue: null,
+      trend_line_toMonth: null,
+      trend_line_toThisDay: null,
+      trend_line_show: false,
+      yearonyear_this_month: null,
+    }
+  },
+  computed: {
+    ...mapState('popupContainer', [
+      // 弹框显示/隐藏：
+      'cost_ratio_trend_show',
+      'company_manage_waybill_show',
+      'detailsShow',
+
+      // 状态
+      'volume_by_cargo_show',
+      'turnover_by_cargo_show',
+      'volume_statistics_day_night_show',
+      'route_info_show',
+      'goodstjFrame_show',
+      'cargo_flow_area_show',
+      'incom_ranked_show',
+      'waybillConditionDaily_show',
+
+      // 数据：
+      'cost_trend_fixed',
+      'cost_trend_turnover',
+      'cost_trend_float',
+      'waybill_statistics',
+      'waybill_trend_recently',
+      'waybill_yearonyear_this_month',
+      'turnover_by_cargo_type',
+      'volume_by_cargo_type',
+
+    ]),
+    ...mapState('maintitlemsg', ['selectedEntity']),
+    getSelectedParams() {
+      if (this.selectedEntity) {
+        return {
+          entity_id: this.selectedEntity.entity_id,
+          year: this.yearValue,
+          month: this.monthValue,
+        }
+      }
+      return null
+    },
+  },
+  methods: {
+    ...mapMutations('popupContainer', ['closeComDetails']),
+    // ...mapActions('popupContainer', ['getCompany_manage_waybill_statistics']),
+    // 关闭弹窗
+    closeDetails() {
+      this.closeComDetails()
+    },
+    toggleDetails(item) {
+      if (item === 'variation') {
+        this.cost_ratio_trend_details_show.variation = true
+      } else {
+        this.cost_ratio_trend_details_show.variation = false
+      }
+      if (item === 'turnover') {
+        this.cost_ratio_trend_details_show.turnover = true
+      } else {
+        this.cost_ratio_trend_details_show.turnover = false
+      }
+      if (item === 'fixed') {
+        this.cost_ratio_trend_details_show.fixed = true
+      } else {
+        this.cost_ratio_trend_details_show.fixed = false
+      }
+    },
+    selectYear(item) {
+      this.yearValue = item
+      // this.getCompany_manage_waybill_statistics(this.getSelectedParams)
+    },
+    selectMonth(item) {
+      this.monthValue = item
+      // this.getCompany_manage_waybill_statistics(this.getSelectedParams)
+    },
+
+    // 最近运单数变化趋势:内容切换
+    trend_toggleDetails() {
+      this.trend_line_show = !this.trend_line_show
+    },
+  },
+}
+</script>
+
+<style lang="scss" scoped>
+@mixin size($width, $height) {
+  width: $width;
+  height: $height;
+}
+.clearfix {
+  &:before,
+  &:after {
+    content: "";
+    display: table;
+  }
+  &:after {
+    clear: both;
+    overflow: hidden;
+  }
+}
+.company_manage_details_wrap {
+  @include size(100%, 100%);
+  position: relative;
+  .cost_ratio_trend_wrap {
+    width: 750px;
+    position: absolute;
+    top: 175px;
+    left: 640px;
+    .cost_ratio_trend_content_wrap {
+      @include size(100%, 235px);
+      margin-top: 10px;
+      .cost_ratio_trend_toggleTitle_wrap {
+        @include size(100%, 25px);
+        .cost_ratio_trend_toggleTitle {
+          @include size(160px, 25px);
+          line-height: 25px;
+          float: right;
+          margin-left: 10px;
+          color: #b5b5b5;
+          font-size: 14px;
+          text-align: center;
+          background: rgba(0, 191, 229, 0.2);
+          cursor: pointer;
+        }
+        .cost_ratio_trend_toggleTitle:hover {
+          color: #fff;
+          background: rgba(0, 191, 229, 0.5);
+        }
+        .cost_ratio_trend_toggleTitle_box_on {
+          color: #fff;
+          background: rgba(0, 191, 229, 0.5);
+        }
+      }
+      .cost_ratio_trend_fixed_wrap {
+        @include size(710px, 200px);
+      }
+      .cost_ratio_trend_turnover_wrap {
+        @extend .cost_ratio_trend_fixed_wrap;
+      }
+      .cost_ratio_trend_variation_wrap {
+        @extend .cost_ratio_trend_fixed_wrap;
+      }
+    }
+  }
+  .company_manage_waybill_wrap {
+    width: 750px;
+    position: absolute;
+    top: 30px;
+    left: 388px;
+    .company_manage_waybill_content_statistic_wrap {
+      @include size(100%, 235px);
+      margin-top: 10px;
+      margin-bottom: 20px;
+      .dateSelectedWrap {
+        width: 100%;
+        position: relative;
+        .dateSelecteContent {
+          @include size(426px, 25px);
+          float: right;
+          .dateTypeTitle {
+            width: 100px;
+            text-align: center;
+            line-height: 25px;
+            float: right;
+            color: #b5b5b5;
+            font-size: 14px;
+            margin-right: 10px;
+          }
+          .yearWrap {
+            width: 100px;
+            height: 25px;
+            float: right;
+            margin-right: 5px;
+          }
+          .monthWrap {
+            width: 100px;
+            height: 25px;
+            float: right;
+            margin-right: 5px;
+          }
+          .dayWrap {
+            width: 100px;
+            height: 25px;
+            float: right;
+            margin-right: 5px;
+          }
+        }
+      }
+      .company_manage_waybill_content_statistic_bar_wrap {
+        @include size(100%, 200px);
+        margin-top: 10px;
+      }
+    }
+    .company_manage_waybill_content_trend_wrap {
+      @include size(100%, 235px);
+      margin-top: 10px;
+      margin-bottom: 20px;
+      .company_manage_waybill_content_trend_title_wrap {
+        @include size(100%, 25px);
+        margin-top: 10px;
+        .company_manage_waybill_content_trend_toggleTitle {
+          @include size(160px, 25px);
+          line-height: 25px;
+          float: right;
+          margin-left: 10px;
+          color: #b5b5b5;
+          font-size: 14px;
+          text-align: center;
+          background: rgba(0, 191, 229, 0.2);
+          cursor: pointer;
+        }
+        .company_manage_waybill_content_trend_toggleTitle:hover {
+          color: #fff;
+          background: rgba(0, 191, 229, 0.5);
+        }
+        .trend_line_box_on {
+          color: #fff;
+          background: rgba(0, 191, 229, 0.5);
+        }
+      }
+      .company_manage_waybill_content_trend_line_wrap {
+        @include size(100%, 200px);
+        margin-top: 10px;
+      }
+    }
+    .company_manage_waybill_content_ratio_wrap {
+      @include size(100%, 200px);
+      .company_manage_waybill_content_statistic_line_wrap {
+        @include size(100%, 200px);
+        margin-top: 10px;
+      }
+    }
+  }
+  .company_manage_volume_by_cargo_type_wrap {
+    width: 700px;
+    position: absolute;
+    top: 290px;
+    left: 140px;
+    .dateSelectedWrap {
+      width: 100%;
+      position: relative;
+      margin-top: 10px;
+      .dateSelecteContent {
+        @include size(556px, 25px);
+        float: right;
+        .title {
+          width: 100px;
+          text-align: center;
+          line-height: 25px;
+          float: left;
+          color: #b5b5b5;
+          font-size: 14px;
+          margin-right: 10px;
+          margin-left: 10px;
+        }
+        .yearWrap {
+          width: 100px;
+          height: 25px;
+          float: left;
+          margin-right: 5px;
+        }
+        .monthWrap {
+          width: 100px;
+          height: 25px;
+          float: left;
+          margin-right: 5px;
+        }
+        .typeWrap {
+          width: 100px;
+          height: 25px;
+          float: left;
+          margin-right: 5px;
+        }
+      }
+    }
+    .volume_by_cargo_type_bar_wrap {
+      width: 100%;
+      height: 200px;
+      margin-top: 10px;
+    }
+  }
+  .company_manage_turnover_by_cargo_type_wrap {
+    width: 700px;
+    position: absolute;
+    top: 200px;
+    left: 640px;
+    .dateSelectedWrap {
+      width: 100%;
+      position: relative;
+      margin-top: 10px;
+      .dateSelecteContent {
+        @include size(556px, 25px);
+        float: right;
+        .title {
+          width: 100px;
+          text-align: center;
+          line-height: 25px;
+          float: left;
+          color: #b5b5b5;
+          font-size: 14px;
+          margin-right: 10px;
+          margin-left: 10px;
+        }
+        .yearWrap {
+          width: 100px;
+          height: 25px;
+          float: left;
+          margin-right: 5px;
+        }
+        .monthWrap {
+          width: 100px;
+          height: 25px;
+          float: left;
+          margin-right: 5px;
+        }
+        .typeWrap {
+          width: 100px;
+          height: 25px;
+          float: left;
+          margin-right: 5px;
+        }
+      }
+    }
+    .turnover_by_cargo_type_bar_wrap {
+      width: 100%;
+      height: 200px;
+      margin-top: 10px;
+    }
+  }
+  .company_manage_volume_statistics_day_night_wrap {
+    width: 700px;
+    position: absolute;
+    top: 150px;
+    left: 950px;
+    .dateSelectedWrap {
+      width: 100%;
+      position: relative;
+      margin-top: 10px;
+      .dateSelecteContent {
+        @include size(226px, 25px);
+        float: right;
+        .title {
+          width: 100px;
+          text-align: center;
+          line-height: 25px;
+          float: left;
+          color: #b5b5b5;
+          font-size: 14px;
+          margin-right: 10px;
+          margin-left: 10px;
+        }
+        .yearWrap {
+          width: 100px;
+          height: 25px;
+          float: left;
+          margin-right: 5px;
+        }
+        .monthWrap {
+          width: 100px;
+          height: 25px;
+          float: left;
+          margin-right: 5px;
+        }
+        .typeWrap {
+          width: 100px;
+          height: 25px;
+          float: left;
+          margin-right: 5px;
+        }
+      }
+    }
+    .volume_statistics_day_night_bar_wrap {
+      width: 100%;
+      height: 200px;
+      margin-top: 10px;
+    }
+  }
+  .company_manage_route_info_wrap {
+    width: 700px;
+    position: absolute;
+    top: 320px;
+    right: 900px;
+    // .route_info_table_wrap {
+    //   width: 100%;
+    //   height: 275px;
+    //   background: pink;
+    // }
+  }
+  .company_manage_rank_wrap {
+    width: 450px;
+    position: absolute;
+    top: 400px;
+    left: 630px;
+  }
+  .company_manage_cargo_flow_area_wrap {
+    width: 700px;
+    position: absolute;
+    top: 110px;
+    left: 940px;
+    .dateSelectedWrap {
+      width: 100%;
+      position: relative;
+      margin-top: 10px;
+      .dateSelecteContent {
+        @include size(556px, 25px);
+        float: right;
+        .title {
+          width: 100px;
+          text-align: center;
+          line-height: 25px;
+          float: left;
+          color: #b5b5b5;
+          font-size: 14px;
+          margin-right: 10px;
+          margin-left: 10px;
+        }
+        .yearWrap {
+          width: 100px;
+          height: 25px;
+          float: left;
+          margin-right: 5px;
+        }
+        .monthWrap {
+          width: 100px;
+          height: 25px;
+          float: left;
+          margin-right: 5px;
+        }
+        .typeWrap {
+          width: 100px;
+          height: 25px;
+          float: left;
+          margin-right: 5px;
+        }
+      }
+    }
+    .cargo_flow_area_bar_wrap {
+      width: 100%;
+      height: 200px;
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+    .cargo_flow_area_bars_wrap {
+      width: 100%;
+      height: 250px;
+      margin-top: 10px;
+      .dateSelectedWrap {
+        width: 100%;
+        position: relative;
+        margin-top: 10px;
+        .dateSelecteContent {
+          @include size(226px, 25px);
+          float: right;
+          .title {
+            width: 100px;
+            text-align: center;
+            line-height: 25px;
+            float: left;
+            color: #b5b5b5;
+            font-size: 14px;
+            margin-right: 10px;
+            margin-left: 10px;
+          }
+          .yearWrap {
+            width: 100px;
+            height: 25px;
+            float: left;
+            margin-right: 5px;
+          }
+          .monthWrap {
+            width: 100px;
+            height: 25px;
+            float: left;
+            margin-right: 5px;
+          }
+          .typeWrap {
+            width: 100px;
+            height: 25px;
+            float: left;
+            margin-right: 5px;
+          }
+        }
+      }
+    }
+  }
+  .dailyManageLedger_waybillConditionDaily{
+    width: 637px;
+    height: 632px;
+    position: absolute;
+    top: 110px;
+    left: 940px;
+  }
+}
+</style>

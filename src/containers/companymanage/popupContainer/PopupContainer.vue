@@ -60,6 +60,77 @@
         <cargo-turnover></cargo-turnover>
       </pop-up-frame>
     </div>
+    <!-- 货物流量流向统计 -->
+    <div class="company_manage_cargo_change_analyze_statistics"
+         v-if="goodstjFrame_show"
+         v-drag
+         @mousedown="move=true"
+         @mouseup="move=false"
+         :style="move?'cursor:move':''">
+      <pop-up-frame @close='closeDetails'>
+        <transition-group :name='changeTranstion'>
+          <div class="flex-between"
+               key="0"
+               v-if="changeActive==0">
+            <div class="content">
+              <pop-up-widget title="货物流量流向变化趋势统计"
+                             :detailsBtnShow='true'
+                             @popUpdetailsBtn='getComDetails("goodstj")'></pop-up-widget>
+              <cargo-traffic-change></cargo-traffic-change>
+              <pop-up-widget title="货物流量区域分析"></pop-up-widget>
+              <cargo-traffic-analyze></cargo-traffic-analyze>
+              <pop-up-widget title="年度货运量各机构统计"></pop-up-widget>
+              <cargo-traffic-statistics></cargo-traffic-statistics>
+            </div>
+            <div class="next_icon flex-center">
+              <img class="icon_img"
+                   src="../../../assets/companymanage/right.png"
+                   @click="changeActive=1;changeTranstion='rightTranstion'">
+            </div>
+          </div>
+          <div class="flex-between"
+               key="1"
+               v-if="changeActive==1">
+            <div class="next_icon flex-center">
+              <img class="icon_img"
+                   src="../../../assets/companymanage/left.png"
+                   @click="changeActive=0;changeTranstion='leftTranstion'">
+            </div>
+            <div class="content1">
+              <pop-up-widget title="运单数和周转量统计"></pop-up-widget>
+              <waybill-and-turnover-statistics></waybill-and-turnover-statistics>
+              <pop-up-widget title="货运量统计"></pop-up-widget>
+              <shipping-statistics></shipping-statistics>
+              <pop-up-widget title="区域货运量统计"></pop-up-widget>
+              <regional-freight-volume-statistics></regional-freight-volume-statistics>
+            </div>
+            <div class="next_icon flex-center">
+              <img class="icon_img"
+                   src="../../../assets/companymanage/right.png"
+                   @click="changeActive=2;changeTranstion='rightTranstion'">
+            </div>
+          </div>
+          <div class="flex-between"
+               key="2"
+               v-if="changeActive==2">
+            <div class="next_icon flex-center">
+              <img class="icon_img"
+                   src="../../../assets/companymanage/left.png"
+                   @click="changeActive=1;changeTranstion='leftTranstion'">
+            </div>
+            <div class="content">
+              <pop-up-widget title="跨域货物量统计"></pop-up-widget>
+              <cross-regional-cargo-statistics></cross-regional-cargo-statistics>
+              <pop-up-widget title="客户运量统计"></pop-up-widget>
+              <customer-traffic-statistics></customer-traffic-statistics>
+            </div>
+
+          </div>
+
+        </transition-group>
+
+      </pop-up-frame>
+    </div>
 
     <!-- 货物流量流向昼夜统计 -->
     <div class="company_manage_volume_statistics_day_night_wrap"
@@ -68,29 +139,13 @@
          @mousedown="move=true"
          @mouseup="move=false"
          :style="move?'cursor:move':''">
-      <pop-up-frame @close='closeDetails'>
+      <pop-up-frame @close='closeDayNightDetails'>
+      <!-- <pop-up-frame @close='closeDetails'> -->
         <pop-up-widget title="货物流量昼夜统计"></pop-up-widget>
         <volumeStatisticsDayNight></volumeStatisticsDayNight>
 
       </pop-up-frame>
     </div>
-    <!-- 货物流量流向统计 -->
-    <div class="company_manage_volume_statistics_day_night_wrap"
-         v-if="goodstjFrame_show"
-         v-drag
-         @mousedown="move=true"
-         @mouseup="move=false"
-         :style="move?'cursor:move':''">
-      <pop-up-frame @close='closeDetails'>
-        <pop-up-widget title="货物流量流向变化趋势统计"></pop-up-widget>
-        <cargo-traffic-change></cargo-traffic-change>
-        <pop-up-widget title="货物流量区域分析"></pop-up-widget>
-        <volumeStatisticsDayNight></volumeStatisticsDayNight>
-        <pop-up-widget title="年度货运量各机构统计"></pop-up-widget>
-        <volumeStatisticsDayNight></volumeStatisticsDayNight>
-      </pop-up-frame>
-    </div>
-
     <!-- 线路详细信息 -->
     <div class="company_manage_route_info_wrap"
          v-if="route_info_show"
@@ -132,6 +187,7 @@
         <volumeInterstateEntity></volumeInterstateEntity>
       </pop-up-frame>
     </div>
+   
 
     <!-- 默认获取数据 -->
     <!-- <div v-show="false">{{getDefaultWaybill_statistics}}</div> -->
@@ -161,6 +217,13 @@ import volumeStatisticsEntity from '../../companymanagepopup/volumeStatisticsEnt
 import volumeInterstateEntity from '../../companymanagepopup/volumeInterstateEntity/volumeInterstateEntity'
 import popUpFrameRank from '../../companymanagepopup/popUpFrameRank/popUpFrameRank'
 import cargoTrafficChange from '../../companymanagepopup/cargoTrafficChange/cargoTrafficChange'
+import cargoTrafficAnalyze from '../../companymanagepopup/cargoTrafficAnalyze/cargoTrafficAnalyze'
+import cargoTrafficStatistics from '../../companymanagepopup/cargoTrafficStatistics/cargoTrafficStatistics'
+import waybillAndTurnoverStatistics from '../../companymanagepopup/waybillAndTurnoverStatistics/waybillAndTurnoverStatistics'
+import shippingStatistics from '../../companymanagepopup/shippingStatistics/shippingStatistics'
+import regionalFreightVolumeStatistics from '../../companymanagepopup/regionalFreightVolumeStatistics/regionalFreightVolumeStatistics'
+import crossRegionalCargoStatistics from '../../companymanagepopup/crossRegionalCargoStatistics/crossRegionalCargoStatistics'
+import customerTrafficStatistics from '../../companymanagepopup/customerTrafficStatistics/customerTrafficStatistics'
 
 import {
   mapState,
@@ -175,6 +238,13 @@ export default {
     PopUpWidget,
     lineDataZoom,
     cargoTrafficChange,
+    cargoTrafficStatistics,
+    waybillAndTurnoverStatistics,
+    regionalFreightVolumeStatistics,
+    crossRegionalCargoStatistics,
+    customerTrafficStatistics,
+    cargoTrafficAnalyze,
+    shippingStatistics,
     KeyValueSelect,
     xxx,
     bar,
@@ -197,6 +267,8 @@ export default {
   data() {
     return {
       move: false,
+      changeActive: 0,
+      changeTranstion: 'rightTranstion',
       years: [...xxx.date.year],
       months: [...xxx.date.month],
       cargoTypeCode: [...xxx.cargoTypeCode],
@@ -228,6 +300,7 @@ export default {
       'route_info_show',
       'goodstjFrame_show',
       'cargo_flow_area_show',
+      'user_custom_show',
       'incom_ranked_show',
 
       // 数据：
@@ -254,6 +327,8 @@ export default {
   },
   methods: {
     ...mapMutations('popupContainer', ['closeComDetails']),
+    ...mapMutations('popupContainer', ['getComDetails']),
+    ...mapMutations('popupContainer', ['closeDayNightDetails']),
     // ...mapActions('popupContainer', ['getCompany_manage_waybill_statistics']),
     // 关闭弹窗
     closeDetails() {
@@ -294,6 +369,21 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.rightTranstion-enter {
+  transform: translateX(1000px);
+  opacity: 0.2;
+}
+.rightTranstion-enter-active {
+  transition: all 500ms ease;
+}
+.leftTranstion-enter {
+  transform: translateX(-1000px);
+  opacity: 0.2;
+}
+.leftTranstion-enter-active {
+  transition: all 500ms ease;
+}
+
 @mixin size($width, $height) {
   width: $width;
   height: $height;
@@ -309,6 +399,7 @@ export default {
     overflow: hidden;
   }
 }
+
 .company_manage_details_wrap {
   @include size(100%, 100%);
   position: relative;
@@ -541,8 +632,8 @@ export default {
   .company_manage_volume_statistics_day_night_wrap {
     width: 700px;
     position: absolute;
-    top: 150px;
-    left: 950px;
+    top: 200px;
+    left: 1100px;
     .dateSelectedWrap {
       width: 100%;
       position: relative;
@@ -584,6 +675,24 @@ export default {
       width: 100%;
       height: 200px;
       margin-top: 10px;
+    }
+  }
+  .company_manage_cargo_change_analyze_statistics {
+    width: 850px;
+    position: absolute;
+    top: 50px;
+    left: 500px;
+    .content {
+      width: 800px;
+    }
+    .content1 {
+      width: 750px;
+    }
+    .next_icon {
+      width: 40px;
+      .icon_img {
+        width: 30px;
+      }
     }
   }
   .company_manage_route_info_wrap {

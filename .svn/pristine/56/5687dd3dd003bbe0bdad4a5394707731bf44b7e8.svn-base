@@ -1,0 +1,24 @@
+import * as CompanyManageAPI from '@/api/companymanage'
+
+const state = {
+  dailyManageLedger: null,
+}
+const mutations = {
+  setData(state, data) {
+    state.dailyManageLedger = data
+  },
+}
+const actions = {
+  async getDailyManageLedger({ commit }, param) {
+    commit('setData', null)
+    const dailyManageLedger = await CompanyManageAPI.getDailyManageLedger(param)
+    console.log('dailyManageLedger', dailyManageLedger.data)
+    commit('setData', dailyManageLedger.data.wallbill)
+  },
+}
+export default {
+  namespaced: true,
+  state,
+  mutations,
+  actions,
+}

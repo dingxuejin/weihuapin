@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobiusVision.dao.TbSubject.TbSubjectXlzbMapper" >
+
+    <!--mapper缓存参数设定-->
+    <cache  eviction="LRU" flushInterval="60000"  size="512" readOnly="true"/>
+
+    <!--#年-->
+    <!--select year,-->
+    <!--sum(Waybill_Quantity) as waybill_quantity,-->
+    <!--(select avg(Waybill_Quantity) from-->
+    <!--(select driver_id,sum(Waybill_Quantity) as Waybill_Quantity from TB_SUBJECT_XLZB-->
+    <!--where driver_id=201408000001-->
+    <!--and route_id=445200431100201501-->
+    <!--group by year order by abs(year)) total group by driver_id ) as avg_waybill_quantity,-->
+
+    <!--sum(turnover) as turnover,-->
+    <!--(select avg(turnover) from-->
+    <!--(select driver_id,sum(turnover) as turnover from TB_SUBJECT_XLZB-->
+    <!--where driver_id=201408000001-->
+    <!--and route_id=445200431100201501-->
+    <!--group by year order by abs(year)) total group by driver_id ) as avg_turnover,-->
+
+    <!--sum(average_fuel_cost) as average_fuel_cost,-->
+    <!--(select cast(standard_oil_use as decimal(10,2)) from TB_BASIC_QY_XLXX where TB_BASIC_QY_XLXX.route_id=TB_SUBJECT_XLZB.route_id) as standard_oil_use,-->
+    <!--sum(fleet_average_fuel_cost) as fleet_average_fuel_cost,-->
+    <!--sum(company_average_fuel_cost) as company_average_fuel_cost,-->
+
+    <!--sum(average_driving_time) as average_driving_time,-->
+    <!--(select cast(plan_time as decimal(10,2)) from TB_BASIC_QY_XLXX where TB_BASIC_QY_XLXX.route_id=TB_SUBJECT_XLZB.route_id) as standard_time,-->
+    <!--sum(fleet_average_driving_time) as fleet_average_driving_time,-->
+    <!--sum(company_average_driving_time) as company_average_driving_time-->
+
+    <!--from TB_SUBJECT_XLZB-->
+    <!--where driver_id=201408000001-->
+    <!--and route_id=445200431100201501-->
+    <!--group by year order by abs(year);-->
+
+    <!--#月-->
+    <!--select month,-->
+    <!--sum(Waybill_Quantity) as waybill_quantity,-->
+    <!--sum(turnover),-->
+    <!--sum(average_fuel_cost),-->
+    <!--sum(average_driving_time),-->
+    <!--sum(company_average_fuel_cost),-->
+    <!--sum(company_average_driving_time),-->
+    <!--(select avg(Waybill_Quantity) from-->
+    <!--(select driver_id,sum(Waybill_Quantity) as Waybill_Quantity from TB_SUBJECT_XLZB-->
+    <!--where driver_id=201408000001-->
+    <!--and route_id=445200431100201501 and year=2017-->
+    <!--group by month order by abs(month)) total group by driver_id ) as avg_waybill_quantity,-->
+    <!--(select avg(turnover) from-->
+    <!--(select driver_id,sum(turnover) as turnover from TB_SUBJECT_XLZB-->
+    <!--where driver_id=201408000001-->
+    <!--and route_id=445200431100201501 and year=2017-->
+    <!--group by month order by abs(month)) total group by driver_id ) as avg_turnover,-->
+    <!--(select standard_oil_use from TB_BASIC_QY_XLXX where TB_BASIC_QY_XLXX.route_id=TB_SUBJECT_XLZB.route_id) as standard_oil_use,-->
+    <!--(select plan_time from TB_BASIC_QY_XLXX where TB_BASIC_QY_XLXX.route_id=TB_SUBJECT_XLZB.route_id) as plan_time-->
+    <!--from TB_SUBJECT_XLZB-->
+    <!--where driver_id=201408000001-->
+    <!--and route_id=445200431100201501 and year=2017-->
+    <!--group by month order by abs(month);-->
+
+    <!--TB_SUBJECT_XLZB档案人员记录中，通过driver_id查询所有年和某年所有月的信息-->
+    <select id="findAllTjXxYearMonthByDId" resultType="TbSubjectXlzbTjXxExtends">
+        select
+        <if test="year==null">
+            year,
+        </if>
+        <if test="year!=null">
+            month,
+        </if>
+        sum(Waybill_Quantity) as waybill_quantity,
+        (select avg(Waybill_Quantity) from
+        (select driver_id,sum(Waybill_Quantity) as Waybill_Quantity from TB_SUBJECT_XLZB
+        where driver_id=#{driver_id}
+        and route_id=#{route_id}
+        <if test="year==null">
+            group by year order by abs(year)
+        </if>
+        <if test="year!=null">
+            and year=#{year} group by month order by abs(month)
+        </if>
+        ) total group by driver_id ) as avg_waybill_quantity,
+
+        sum(turnover) as turnover,
+        (select avg(turnover) from
+        (select driver_id,sum(turnover) as turnover from TB_SUBJECT_XLZB
+        where driver_id=#{driver_id}
+        and route_id=#{route_id}
+        <if test="year==null">
+            group by year order by abs(year)
+        </if>
+        <if test="year!=null">
+            and year=#{year} group by month order by abs(month)
+        </if>
+        ) total group by driver_id ) as avg_turnover,
+
+        sum(average_fuel_cost) as average_fuel_cost,
+        (select cast(standard_oil_use as decimal(10,2)) from TB_BASIC_QY_XLXX where TB_BASIC_QY_XLXX.route_id=TB_SUBJECT_XLZB.route_id) as standard_oil_use,
+        sum(fleet_average_fuel_cost) as fleet_average_fuel_cost,
+        sum(company_average_fuel_cost) as company_average_fuel_cost,
+
+        sum(average_driving_time) as average_driving_time,
+        (select cast(plan_time as decimal(10,2)) from TB_BASIC_QY_XLXX where TB_BASIC_QY_XLXX.route_id=TB_SUBJECT_XLZB.route_id) as standard_time,
+        sum(fleet_average_driving_time) as fleet_average_driving_time,
+        sum(company_average_driving_time) as company_average_driving_time
+
+        from TB_SUBJECT_XLZB
+        where driver_id=#{driver_id}
+        and route_id=#{route_id}
+        <if test="year==null">
+            group by year order by abs(year)
+        </if>
+        <if test="year!=null">
+            and year=#{year} group by month order by abs(month)
+        </if>
+    </select>
+</mapper>
